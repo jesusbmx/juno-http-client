@@ -1,7 +1,7 @@
 ## Juno Http Client
 **HTTP client** for Java and Android, which facilitates the creation of **HTTP request**  such as: GET, POST, HEAD, OPTIONS, PUT, DELETE and TRACE.
 
-Download [juno-http-client.jar](https://github.com/jesusbmx/HttpClient/raw/master/dist/juno-http-client.jar)
+Download [juno-http-client.jar](https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar)
 
 Download [juno.jar](https://github.com/jesusbmx/juno/raw/master/dist/juno.jar)
 
@@ -42,7 +42,7 @@ String post(int id, String name, boolean active) throws Exception {
 ```java
 File download() throws Exception {
   HttpRequest request = new HttpRequest(
-      "GET", "https://github.com/jesusbmx/HttpClient/raw/master/dist/juno-http-client.jar")
+      "GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
       .setTimeoutMs(20000);
   
   FileResponseBodyConvert convert = new FileResponseBodyConvert()
