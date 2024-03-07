@@ -46,8 +46,8 @@ public class HttpURLConnectionStack implements HttpStack {
     final HttpURLConnection conn = open(src);
     conn.setConnectTimeout(request.getTimeoutMs());
     conn.setReadTimeout(request.getTimeoutMs());
-    conn.setUseCaches(Boolean.FALSE);
-    conn.setDoInput(Boolean.TRUE);
+    conn.setUseCaches(false);
+    conn.setDoInput(true);
     conn.setRequestMethod(request.getMethod());
     
     return conn;
@@ -92,7 +92,7 @@ public class HttpURLConnectionStack implements HttpStack {
       final String contentType = requestBody.contentType(request.getCharset()); 
         
       // Setup connection:
-      conn.setDoOutput(Boolean.TRUE);
+      conn.setDoOutput(true);
       conn.addRequestProperty(Headers.CONTENT_TYPE, contentType);
 
       // Length:
@@ -147,7 +147,7 @@ public class HttpURLConnectionStack implements HttpStack {
     final ResponseBody response = new ResponseBody(
             new UrlConnectionInputStream(conn, in));
     
-    response.request = request;
+    response.charset = request.charset;
     response.code = responseCode;
     response.status = status;
     response.headers.addHeadersMapList(conn.getHeaderFields());

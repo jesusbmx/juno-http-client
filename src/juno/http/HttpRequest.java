@@ -1,7 +1,6 @@
 package juno.http;
 
 import java.nio.charset.Charset;
-import juno.http.convert.ResponseBodyConvert;
 
 public class HttpRequest {
   /** Codificación predeterminada. */
@@ -12,8 +11,6 @@ public class HttpRequest {
   
   /** Metodo por default. */
   public static final String DEFAULT_METHOD = "GET";
-  
-  HttpClient client = HttpClient.getInstance();
   
   /** Metodo de la request: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE. */
   String method = DEFAULT_METHOD;
@@ -128,14 +125,6 @@ public class HttpRequest {
     return this;
   }
   
-  public HttpClient getClient() {
-    return client;
-  }
-  
-  public void setClient(HttpClient client) {
-    this.client = client;
-  }
-  
   public boolean requiresRequestBody() {
     return method.equals("POST") || method.equals("PUT") || method.equals("PATCH");
   }
@@ -153,30 +142,6 @@ public class HttpRequest {
     return "Request@" + hashCode() + " " + method + " " + url + "\nheaders:\n" 
             + headers + "\nbody: " + body + "\n\ntag=" + tag + ", timeoutMs=" + timeoutMs 
             + ", charset=" + charset + "\n---";
-  }
-  
-  public ResponseBody execute() throws Exception {
-    return client.execute(this);
-  }
-  
-  public <V> V execute(ResponseBodyConvert<V> convert) throws Exception {
-        return client.execute(this, convert);
-  }
-  
-  public <V> V execute(Class<V> cast) throws Exception {
-    return client.execute(this, cast);
-  }
-  
-  public <V> AsyncRequest<V> newAsyncRequest(ResponseBodyConvert<V> convert) {
-    return client.newAsyncRequest(this, convert);
-  }
-  
-  public <V> AsyncRequest<V> newAsyncRequest(Class<V> cast) {
-    return client.newAsyncRequest(this, cast);
-  }
-  
-  public AsyncRequest<ResponseBody> newAsyncRequest() {
-    return client.newAsyncRequest(this);
   }
   
 //  public static void main(String[] args) {

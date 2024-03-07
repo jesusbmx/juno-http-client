@@ -34,14 +34,14 @@ public class HttpClient {
     this(new HttpURLConnectionStack());
   }
   
-  public static HttpClient getInstance() {
+  public synchronized static HttpClient getInstance() {
     if (instance == null) {
       instance = new HttpClient();
     }
     return instance;
   }
   
-  public static void setInstance(HttpClient val) {
+  public synchronized static void setInstance(HttpClient val) {
     instance = val;
   }
 
@@ -95,12 +95,9 @@ public class HttpClient {
    * servidor
    */
   public ResponseBody execute(HttpRequest request) throws Exception {
-    request.setClient(this);
-    
     if (mInterceptor != null) {
         return mInterceptor.intercept(request, getHttpStack());
     }
-    
     return getHttpStack().execute(request);
   }
 
@@ -134,8 +131,7 @@ public class HttpClient {
    * @return una llamada
    */
   public <V> AsyncRequest<V> newAsyncRequest(HttpRequest request, ResponseBodyConvert<V> convert) {
-    request.setClient(this);
-    return new AsyncRequest<V>(getDispatcher(), request, convert);
+    return new AsyncRequest<V>(this, request, convert);
   }
   
   public <V> AsyncRequest<V> newAsyncRequest(HttpRequest request, Class<V> cast) {

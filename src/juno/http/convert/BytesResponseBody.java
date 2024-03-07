@@ -11,7 +11,7 @@ public class BytesResponseBody extends ResponseBody {
     public BytesResponseBody(ResponseBody body, byte[] data) {
         super(new ByteArrayInputStream(data));
         this.data = data;
-        this.request = body.request;
+        this.charset = body.charset;
         this.code = body.code;
         this.headers.addHeaders(body.headers);
     }

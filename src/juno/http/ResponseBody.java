@@ -8,14 +8,16 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import juno.io.IOUtils;
-import juno.http.convert.ResponseBodyConvert;
 
 public class ResponseBody implements Closeable {
-  public HttpRequest request;
+   /** Codificación predeterminada. */
+  public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
+  
   public int code;  
   public String status;
   public final Headers headers = new Headers();
   public boolean closed;
+  public Charset charset = DEFAULT_ENCODING;
   public final InputStream in;
   
   public ResponseBody(InputStream in) {
@@ -35,7 +37,7 @@ public class ResponseBody implements Closeable {
   }
   
   public Reader charStream() throws IOException {
-    return new InputStreamReader(in, request.charset);
+    return charStream(charset);
   }
   
   public byte[] bytes() throws IOException {
@@ -47,12 +49,12 @@ public class ResponseBody implements Closeable {
   }
   
   public String string(Charset charset) throws IOException {
-    final byte[] data = bytes();
+    byte[] data = bytes();
     return new String(data, charset);
   }
   
   public String string() throws IOException {
-    return string(request != null ? request.charset : HttpRequest.DEFAULT_ENCODING);
+    return string(charset);
   }
   
   public void writeTo(OutputStream out) throws IOException {
@@ -63,20 +65,9 @@ public class ResponseBody implements Closeable {
     }
   }
   
-  public <V> V as(ResponseBodyConvert<V> convert) throws Exception {
-    return convert.parse(this);
-  }
-  
-  public <V> V as(Class<V> classOf) throws Exception {
-    if (request == null || request.client == null) {
-        throw new NullPointerException("This request does not have any HttpCli");
-    }
-    return as(request.client.getFactory().getResponseBodyConvert(classOf));
-  }
-  
   @Override public void close() {
     if (!closed) {
-      closed = Boolean.TRUE;
+      closed = true;
       IOUtils.closeQuietly(in);
     }
   }   

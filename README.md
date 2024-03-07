@@ -125,7 +125,7 @@ insert.execute((ResponseBody result) -> {
   String str = result.string();
   System.out.println(str);
 
-  //JSONObject json = result.as(JSONObject.class);
+  //JSONObject json = new JSONObject(str);
   //System.out.println(json);
 
 }, (Exception e) ->  {
@@ -236,7 +236,8 @@ public class MyApi implements JWT.OnAuth {
         "POST", ".../auth/login", body);
         
     // Result
-    JSONObject json = request.execute(JSONObject.class);
+    HttpClient defaultClient = HttpClient.getInstance();
+    JSONObject json = defaultClient.execute(request, JSONObject.class);
     String access_token = json.optString("token");
 
     return new JWT(access_token);
