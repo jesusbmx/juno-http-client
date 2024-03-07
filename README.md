@@ -236,8 +236,7 @@ public class MyApi implements JWT.OnAuth {
         "POST", ".../auth/login", body);
         
     // Result
-    HttpClient defaultClient = HttpClient.getInstance();
-    JSONObject json = defaultClient.execute(request, JSONObject.class);
+    JSONObject json = request.execute(JSONObject.class);
     String access_token = json.optString("token");
 
     return new JWT(access_token);
