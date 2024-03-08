@@ -79,7 +79,7 @@ ResponseBody getResponseBody() throws Exception {
   url.addQueryParameter("fields", "status,message,query,country,city");
   url.addQueryParameter("lang", "en");
 
-  HttpRequest request = new HttpRequest("POST", url);
+  HttpRequest request = new HttpRequest("GET", url);
 
   Headers headers = new Headers();
   headers.add("User-Agent: nombre-cliente");
