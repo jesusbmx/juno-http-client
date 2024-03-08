@@ -72,8 +72,17 @@ String upload(File file) throws Exception {
 #### Response Body
 ```java
 ResponseBody getResponseBody() throws Exception { 
-  HttpRequest request = new HttpRequest(
-    "POST", "http://127.0.0.1/test.php", reqBody);
+  HttpUtl ur = new HttpUtl("http://ip-api.com/{returnType}/{ip}");
+  url.setPath("returnType", "json");
+  url.setPath("ip", "24.48.0.1");
+
+  url.addQueryParameter("fields", "status,message,query,country,city");
+  url.addQueryParameter("lang", "en");
+
+  HttpRequest request = new HttpRequest("POST", url);
+
+  Headers headers = Headers.of("");
+  request.setHeaders(headers);
 
   return client.execute(request, ResponseBody.class);
 }
