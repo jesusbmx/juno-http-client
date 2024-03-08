@@ -81,7 +81,10 @@ ResposeBody getResponseBody() throws Exception {
 
 ```java
 try (ResposeBody body = getResponseBody() ) {
-  InputStream in = body.in;
+  int code = body.code;  
+  String status = body.status;
+  Headers headers = body.headers;
+  Charset charset = body.charset;
   InputStream in = body.in;
 }
 ```
