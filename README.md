@@ -69,18 +69,18 @@ String upload(File file) throws Exception {
 }
 ```
 
-#### ResposeBody
+#### Response Body
 ```java
-ResposeBody getResponseBody() throws Exception { 
+ResponseBody getResponseBody() throws Exception { 
   HttpRequest request = new HttpRequest(
     "POST", "http://127.0.0.1/test.php", reqBody);
 
-  return client.execute(request, ResposeBody.class);
+  return client.execute(request, ResponseBody.class);
 }
 ```
 
 ```java
-try (ResposeBody body = getResponseBody() ) {
+try (ResponseBody body = getResponseBody() ) {
   int code = body.code;  
   String status = body.status;
   Headers headers = body.headers;
