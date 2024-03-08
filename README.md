@@ -24,7 +24,8 @@ Response<String> get() throws Exception {
 
 #### POST
 ```java
-Response<String> post(int id, String name, boolean active) throws Exception {
+Response<String> post(
+    int id, String name, boolean active) throws Exception {
   // application-www-www-form-urlencoded
   FormBody reqBody = new FormBody()
           .add("id", id)
