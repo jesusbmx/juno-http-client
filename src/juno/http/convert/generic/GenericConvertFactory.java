@@ -1,5 +1,6 @@
 package juno.http.convert.generic;
 
+import juno.http.convert.internal.ObjectAdapter;
 import java.util.Map;
 import juno.http.convert.ConvertFactory;
 import juno.http.convert.RequestBodyConvert;

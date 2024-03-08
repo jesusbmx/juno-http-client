@@ -4,7 +4,7 @@ import juno.concurrent.AbstractAsync;
 import juno.concurrent.Dispatcher;
 import juno.http.convert.ResponseBodyConvert;
 
-public class AsyncRequest<T> extends AbstractAsync<Response<T>> {
+public class AsyncRequest<T> extends AbstractAsync<T> {
     public final HttpExecutor executor;
     public final HttpRequest request;
     public final ResponseBodyConvert<T> convert;
@@ -23,7 +23,7 @@ public class AsyncRequest<T> extends AbstractAsync<Response<T>> {
     }
 
     @Override
-    public Response<T> call() throws Exception {
+    public T call() throws Exception {
         if (interceptor == null)
             return executor.execute(request, convert);
         
@@ -40,6 +40,6 @@ public class AsyncRequest<T> extends AbstractAsync<Response<T>> {
     }
     
     public interface OnInterceptor<V> {
-        Response<V> intercept(HttpExecutor executor, HttpRequest request, ResponseBodyConvert<V> convert) throws Exception;
+        V intercept(HttpExecutor executor, HttpRequest request, ResponseBodyConvert<V> convert) throws Exception;
     }
 }

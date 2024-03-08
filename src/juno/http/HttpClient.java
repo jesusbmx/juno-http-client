@@ -103,12 +103,11 @@ public class HttpClient implements HttpExecutor {
   }
 
   @Override
-  public <V> Response<V> execute(HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
+  public <V> V execute(HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
     ResponseBody response = null;
     try {
       response = execute(request);
-      final V result = convert.parse(response);
-      return new Response<V>(result, response);
+      return convert.parse(response);
       
     } catch(Exception e) {
       if (response != null) {
@@ -120,7 +119,7 @@ public class HttpClient implements HttpExecutor {
   }
   
   @Override
-  public <V> Response<V> execute(HttpRequest request, Class<V> cast) throws Exception {
+  public <V> V execute(HttpRequest request, Class<V> cast) throws Exception {
     return execute(request, getFactory().getResponseBodyConvert(cast));
   }
  
@@ -143,9 +142,9 @@ public class HttpClient implements HttpExecutor {
             .getResponseBodyConvert(cast));
   }
   
-  public AsyncRequest<String> newAsyncRequest(HttpRequest request) {
+  public AsyncRequest<ResponseBody> newAsyncRequest(HttpRequest request) {
     return this.newAsyncRequest(request, getFactory()
-            .getResponseBodyConvert(String.class));
+            .getResponseBodyConvert(ResponseBody.class));
   }
   
   public <V> RequestBody createRequestBody(V src) {

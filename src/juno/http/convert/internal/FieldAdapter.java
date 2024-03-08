@@ -1,4 +1,4 @@
-package juno.http.convert.generic;
+package juno.http.convert.internal;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

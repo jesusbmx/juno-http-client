@@ -6,7 +6,6 @@ import juno.concurrent.Async;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.RequestBody;
-import juno.http.Response;
 import juno.http.convert.gson.GsonConvertFactory;
 // import com.squareup.okhttp.OkHttpClient;
 // import java.io.IOException;
@@ -26,14 +25,14 @@ public class PostDao {
     cli.setFactory(new GsonConvertFactory(gson));
   }
 
-  public Async<Response<Post[]>> getPosts() {
+  public Async<Post[]> getPosts() {
     HttpRequest request = new HttpRequest(
         "GET", "https://kylewbanks.com/rest/posts.json");
 
     return cli.newAsyncRequest(request, Post[].class);
   }
   
-  public Async<Response<String>> insert(Post p) {
+  public Async<String> insert(Post p) {
     RequestBody reqBody = cli.createRequestBody(p);
     
     HttpRequest request = new HttpRequest(

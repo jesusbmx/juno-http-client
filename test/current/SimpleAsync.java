@@ -4,7 +4,6 @@ import juno.concurrent.Async;
 import juno.concurrent.Callback;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
-import juno.http.Response;
 
 public class SimpleAsync {
 
@@ -15,12 +14,12 @@ public class SimpleAsync {
         HttpRequest request = new HttpRequest(
                 "GET", "http://127.0.0.1/test.php");
         
-        Async<Response<String>> call = client.newAsyncRequest(request);
+        Async<String> call = client.newAsyncRequest(request, String.class);
         
-        call.execute(new Callback<Response<String>>() {
+        call.execute(new Callback<String>() {
             @Override
-            public void onResponse(Response<String> response) throws Exception {
-              System.out.println(response.result);
+            public void onResponse(String response) throws Exception {
+              System.out.println(response);
             }
 
             @Override

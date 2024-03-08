@@ -173,19 +173,19 @@ public class HttpRequest {
         return execute(HttpClient.getInstance());
     }
 
-    public <V> Response<V> execute(HttpExecutor executor, ResponseBodyConvert<V> convert) throws Exception {
+    public <V> V execute(HttpExecutor executor, ResponseBodyConvert<V> convert) throws Exception {
         return executor.execute(this, convert);
     }
     
-    public <V> Response<V> execute(ResponseBodyConvert<V> convert) throws Exception {
+    public <V> V execute(ResponseBodyConvert<V> convert) throws Exception {
         return execute(HttpClient.getInstance(), convert);
     }
 
-    public <V> Response<V> execute(HttpExecutor executor, Class<V> convert) throws Exception {
+    public <V> V execute(HttpExecutor executor, Class<V> convert) throws Exception {
         return executor.execute(this, convert);
     }
     
-    public <V> Response<V> execute(Class<V> convert) throws Exception {
+    public <V> V execute(Class<V> convert) throws Exception {
         return execute(HttpClient.getInstance(), convert);
     }
 

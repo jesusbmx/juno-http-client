@@ -6,7 +6,6 @@ import java.util.UUID;
 import juno.http.AsyncRequest;
 import juno.http.HttpExecutor;
 import juno.http.HttpRequest;
-import juno.http.Response;
 import juno.http.ResponseBody;
 import juno.http.convert.ResponseBodyConvert;
 
@@ -42,10 +41,9 @@ public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
     }
    
     @Override
-    public Response<V> intercept(HttpExecutor executor, HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
+    public V intercept(HttpExecutor executor, HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
         final ResponseBody body = getResponseBody(executor, request);
-        final V result = convert.parse(body);
-        return new Response<V>(result, body);
+        return convert.parse(body);
     }
     
     public ResponseBody getResponseBody(HttpExecutor executor, HttpRequest request) throws Exception {

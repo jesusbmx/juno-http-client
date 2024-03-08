@@ -5,7 +5,6 @@ import juno.concurrent.Callback;
 import juno.http.FormBody;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
-import juno.http.Response;
 
 public class AsynTest {
     
@@ -13,7 +12,7 @@ public class AsynTest {
             .setDebug(true)
   ;
     
-  public Async<Response<String>> insert(
+  public Async<String> insert(
     String nombre, int edad, boolean soltera) {
       
     FormBody body = new FormBody()
@@ -28,13 +27,13 @@ public class AsynTest {
   }
   
    public void async() {
-    Async<Response<String>> insert = insert(
+    Async<String> insert = insert(
             "Elizabéth Magaña", 22, true);
             
-    insert.execute(new Callback<Response<String>>() {
+    insert.execute(new Callback<String>() {
         @Override
-        public void onResponse(Response<String> response) throws Exception {
-            System.out.println(response.result);
+        public void onResponse(String response) throws Exception {
+            System.out.println(response);
         }
         @Override
         public void onFailure(Exception e) {

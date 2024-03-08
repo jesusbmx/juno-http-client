@@ -5,7 +5,6 @@ import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpUrl;
 import juno.http.MultipartBody;
-import juno.http.Response;
 import juno.http.ResponseBody;
 import juno.http.convert.ResponseBodyConvert;
 import juno.http.convert.generic.FileResponseBodyConvert;
@@ -16,14 +15,14 @@ public class RestTest {
             .setDebug(true)
     ;
     
-    Response<String> get() throws Exception {
+    String get() throws Exception {
         HttpRequest request = new HttpRequest("GET", 
                 "https://api.github.com/users/defunkt");
 
         return cli.execute(request, String.class);
     }
     
-    Response<String> post(int id, String name, boolean active) throws Exception {
+    String post(int id, String name, boolean active) throws Exception {
         FormBody reqBody = new FormBody()
                 .add("id", id)
                 .add("name", name)
@@ -35,7 +34,7 @@ public class RestTest {
         return cli.execute(request, String.class);
     }
     
-    Response<String> delete(int id) throws Exception {
+    String delete(int id) throws Exception {
         FormBody body = new FormBody()
             .add("id", id);
 
@@ -45,7 +44,7 @@ public class RestTest {
         return cli.execute(request, String.class);
     }
     
-    Response<File> download() throws Exception {
+    File download() throws Exception {
         HttpRequest request = new HttpRequest(
             "GET", "https://github.com/jesusbmx/HttpCli/raw/master/dist/httpcli.jar")
             .setTimeoutMs(5000 * 2 * 2);
@@ -57,7 +56,7 @@ public class RestTest {
         //return cli.execute(request, File.class);
     }
     
-    Response<String> upload(File file) throws Exception { 
+    String upload(File file) throws Exception { 
         MultipartBody body = new MultipartBody()
           .addParam("nombre", "Elizabéth Magaña")
           .addFile("img", file);
@@ -99,20 +98,20 @@ public class RestTest {
      
         try {
             
-            Response<String> get = api.get();
-            System.out.println(get.result);
+            String get = api.get();
+            System.out.println(get);
             
-            Response<String> post = api.post(1, "My name", true);
-            System.out.println(post.result);
+            String post = api.post(1, "My name", true);
+            System.out.println(post);
             
-            Response<String> delete = api.delete(1);
-            System.out.println(delete.result);
+            String delete = api.delete(1);
+            System.out.println(delete);
             
-            Response<File> down = api.download();
-            System.out.println(down.result);
+            File down = api.download();
+            System.out.println(down);
             
-            Response<String> up = api.upload(down.result);
-            System.out.println(up.result);
+            String up = api.upload(down);
+            System.out.println(up);
             
         } catch(Exception e) {
             e.printStackTrace();
