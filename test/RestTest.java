@@ -1,12 +1,14 @@
+import java.io.File;
+import java.io.InputStream;
 import juno.http.FormBody;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpUrl;
 import juno.http.MultipartBody;
+import juno.http.Response;
 import juno.http.ResponseBody;
-import juno.http.convert.FileResponseBodyConvert;
 import juno.http.convert.ResponseBodyConvert;
-import java.io.File;
+import juno.http.convert.generic.FileResponseBodyConvert;
 
 public class RestTest {
     
@@ -14,14 +16,14 @@ public class RestTest {
             .setDebug(true)
     ;
     
-    String get() throws Exception {
+    Response<String> get() throws Exception {
         HttpRequest request = new HttpRequest("GET", 
                 "https://api.github.com/users/defunkt");
 
         return cli.execute(request, String.class);
     }
     
-    String post(int id, String name, boolean active) throws Exception {
+    Response<String> post(int id, String name, boolean active) throws Exception {
         FormBody reqBody = new FormBody()
                 .add("id", id)
                 .add("name", name)
@@ -33,7 +35,7 @@ public class RestTest {
         return cli.execute(request, String.class);
     }
     
-    String delete(int id) throws Exception {
+    Response<String> delete(int id) throws Exception {
         FormBody body = new FormBody()
             .add("id", id);
 
@@ -43,7 +45,7 @@ public class RestTest {
         return cli.execute(request, String.class);
     }
     
-    File download() throws Exception {
+    Response<File> download() throws Exception {
         HttpRequest request = new HttpRequest(
             "GET", "https://github.com/jesusbmx/HttpCli/raw/master/dist/httpcli.jar")
             .setTimeoutMs(5000 * 2 * 2);
@@ -55,7 +57,7 @@ public class RestTest {
         //return cli.execute(request, File.class);
     }
     
-    String upload(File file) throws Exception { 
+    Response<String> upload(File file) throws Exception { 
         MultipartBody body = new MultipartBody()
           .addParam("nombre", "Elizabéth Magaña")
           .addFile("img", file);
@@ -66,7 +68,7 @@ public class RestTest {
         return cli.execute(request, String.class);
     }
     
-     String run_() throws Exception {
+    InputStream run_() throws Exception {
         HttpUrl url = new HttpUrl("https://api.github.com/users/defunkt");
         
         HttpRequest request = new HttpRequest("GET", url)
@@ -86,7 +88,7 @@ public class RestTest {
 //                X-Powered-By: PHP/5.6.30
 //            ];
 //            body.in [InputStream];
-            return body.string();
+            return body.in;
         } finally {
             if (body != null) body.close();
         }
@@ -97,20 +99,20 @@ public class RestTest {
      
         try {
             
-            String get = api.get();
-            System.out.println(get);
+            Response<String> get = api.get();
+            System.out.println(get.result);
             
-            String post = api.post(1, "My name", true);
-            System.out.println(post);
+            Response<String> post = api.post(1, "My name", true);
+            System.out.println(post.result);
             
-            String delete = api.delete(1);
-            System.out.println(delete);
+            Response<String> delete = api.delete(1);
+            System.out.println(delete.result);
             
-            File down = api.download();
-            System.out.println(down);
+            Response<File> down = api.download();
+            System.out.println(down.result);
             
-            String up = api.upload(down);
-            System.out.println(up);
+            Response<String> up = api.upload(down.result);
+            System.out.println(up.result);
             
         } catch(Exception e) {
             e.printStackTrace();

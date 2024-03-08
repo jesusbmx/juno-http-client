@@ -165,27 +165,27 @@ public class HttpRequest {
         return url.toString(charset);
     }
     
-    public ResponseBody execute(HttpClient client) throws Exception {
-        return client.execute(this);
+    public ResponseBody execute(HttpExecutor executor) throws Exception {
+        return executor.execute(this);
     }
     
     public ResponseBody execute() throws Exception {
         return execute(HttpClient.getInstance());
     }
 
-    public <V> V execute(HttpClient client, ResponseBodyConvert<V> convert) throws Exception {
-        return client.execute(this, convert);
+    public <V> Response<V> execute(HttpExecutor executor, ResponseBodyConvert<V> convert) throws Exception {
+        return executor.execute(this, convert);
     }
     
-    public <V> V execute(ResponseBodyConvert<V> convert) throws Exception {
+    public <V> Response<V> execute(ResponseBodyConvert<V> convert) throws Exception {
         return execute(HttpClient.getInstance(), convert);
     }
 
-    public <V> V execute(HttpClient client, Class<V> convert) throws Exception {
-        return client.execute(this, convert);
+    public <V> Response<V> execute(HttpExecutor executor, Class<V> convert) throws Exception {
+        return executor.execute(this, convert);
     }
     
-    public <V> V execute(Class<V> convert) throws Exception {
+    public <V> Response<V> execute(Class<V> convert) throws Exception {
         return execute(HttpClient.getInstance(), convert);
     }
 

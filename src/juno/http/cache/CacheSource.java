@@ -1,12 +1,12 @@
 package juno.http.cache;
 
-import juno.http.HttpRequest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import juno.http.HttpRequest;
 import juno.io.Files;
 import org.json.JSONArray;
 

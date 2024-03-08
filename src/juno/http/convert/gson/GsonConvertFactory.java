@@ -3,9 +3,9 @@ package juno.http.convert.gson;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
-import juno.http.convert.ConvertFactory;
 import java.lang.reflect.Type;
 import java.util.Map;
+import juno.http.convert.ConvertFactory;
 import juno.http.convert.RequestBodyConvert;
 import juno.http.convert.ResponseBodyConvert;
 

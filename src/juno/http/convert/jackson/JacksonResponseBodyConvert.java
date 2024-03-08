@@ -1,8 +1,11 @@
 package juno.http.convert.jackson;
 
 import com.fasterxml.jackson.databind.ObjectReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import juno.http.ResponseBody;
 import juno.http.convert.ResponseBodyConvert;
+import juno.io.IOUtils;
 
 public class JacksonResponseBodyConvert<T> implements ResponseBodyConvert<T> {
 
@@ -14,9 +17,13 @@ public class JacksonResponseBodyConvert<T> implements ResponseBodyConvert<T> {
     
     @Override
     public T parse(ResponseBody respBody) throws Exception {
+        Reader reader = null;
         try {
-            return adapter.readValue(respBody.charStream());
+            reader = new InputStreamReader(respBody.in, respBody.charset);
+            return adapter.readValue(reader);
+            
         } finally {
+            IOUtils.closeQuietly(reader);
             respBody.close();
         }
     }

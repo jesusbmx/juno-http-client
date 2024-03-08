@@ -1,10 +1,10 @@
 package juno.http.convert.generic;
 
+import java.util.Map;
 import juno.http.convert.ConvertFactory;
 import juno.http.convert.RequestBodyConvert;
 import juno.http.convert.ResponseBodyConvert;
 import juno.http.convert.json.JSONRequestBodyConvert;
-import java.util.Map;
 
 public class GenericConvertFactory extends ConvertFactory {
     

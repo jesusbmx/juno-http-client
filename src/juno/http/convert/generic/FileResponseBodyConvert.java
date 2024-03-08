@@ -1,11 +1,12 @@
-package juno.http.convert;
+package juno.http.convert.generic;
 
-import juno.http.Headers;
-import juno.http.ResponseBody;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import juno.http.Headers;
+import juno.http.ResponseBody;
+import juno.http.convert.ResponseBodyConvert;
 import juno.io.Files;
 import juno.io.IOUtils;
 
@@ -55,7 +56,7 @@ public class FileResponseBodyConvert implements ResponseBodyConvert<File> {
     try {
       File f = newFile(respBody.headers);
       bos = new BufferedOutputStream(new FileOutputStream(f));
-      respBody.writeTo(bos);
+      IOUtils.copy(respBody.in, bos);
       return f;
     } finally {
       IOUtils.closeQuietly(bos);

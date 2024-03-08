@@ -3,19 +3,20 @@ package jackson;
 import java.util.Date;
 import juno.concurrent.Async;
 import juno.concurrent.Callback;
+import juno.http.Response;
 
 public class JacksonTest {
 
   PostDao dao = new PostDao();  
     
   public void list() {
-    Async<Post[]> call = dao.getPosts(); 
+    Async<Response<Post[]>> call = dao.getPosts(); 
     
-    call.execute(new Callback<Post[]>() {
+    call.execute(new Callback<Response<Post[]>>() {
       @Override
-      public void onResponse(Post[] result) throws Exception {
+      public void onResponse(Response<Post[]> response) throws Exception {
         //List<Post> list = Arrays.asList(result);
-        for (Post post : result) {
+        for (Post post : response.result) {
           System.out.println(post.title);
         }
       }
@@ -35,11 +36,11 @@ public class JacksonTest {
     post.url = "http://127.0.0.1";
     post.body = "My body";
     
-    Async<String> async = dao.insert(post); 
-    async.execute(new Callback<String>() {
+    Async<Response<String>> async = dao.insert(post); 
+    async.execute(new Callback<Response<String>>() {
       @Override
-      public void onResponse(String result) throws Exception {
-          System.out.println(result);
+      public void onResponse(Response<String> response) throws Exception {
+          System.out.println(response.result);
       }
       @Override
       public void onFailure(Exception e) {

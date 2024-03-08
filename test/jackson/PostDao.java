@@ -2,18 +2,18 @@ package jackson;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import juno.http.convert.jackson.JacksonConvertFactory;
+import java.text.SimpleDateFormat;
+import juno.concurrent.Async;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.RequestBody;
-import java.text.SimpleDateFormat;
-import juno.concurrent.Async;
+import juno.http.Response;
+import juno.http.convert.jackson.JacksonConvertFactory;
 // import com.squareup.okhttp.OkHttpClient;
 // import java.io.IOException;
 // import java.net.HttpURLConnection;
 // import java.net.URL;
 // import restlight.BasicHttpStack;
-
 public class PostDao {
   
   HttpClient cli = HttpClient.getInstance()
@@ -27,14 +27,14 @@ public class PostDao {
     cli.setFactory(new JacksonConvertFactory(mapper));
   }
 
-  public Async<Post[]> getPosts() {
+  public Async<Response<Post[]>> getPosts() {
     HttpRequest request = new HttpRequest(
         "GET", "https://kylewbanks.com/rest/posts.json");
 
     return cli.newAsyncRequest(request, Post[].class);
   }
   
-  public Async<String> insert(Post p) {
+  public Async<Response<String>> insert(Post p) {
     RequestBody reqBody = cli.createRequestBody(p);
     
     HttpRequest request = new HttpRequest(

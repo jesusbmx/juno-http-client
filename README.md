@@ -14,7 +14,7 @@ HttpClient client = HttpClient.getInstance()
 
 #### GET
 ```java
-String get() throws Exception {
+Response<String> get() throws Exception {
   HttpRequest request = new HttpRequest(
        "GET", "https://api.github.com/users/defunkt");
 
@@ -24,7 +24,7 @@ String get() throws Exception {
 
 #### POST
 ```java
-String post(int id, String name, boolean active) throws Exception {
+Response<String> post(int id, String name, boolean active) throws Exception {
   // application-www-www-form-urlencoded
   FormBody reqBody = new FormBody()
           .add("id", id)
@@ -40,7 +40,7 @@ String post(int id, String name, boolean active) throws Exception {
 
 #### Download
 ```java
-File download() throws Exception {
+Response<File> download() throws Exception {
   HttpRequest request = new HttpRequest(
       "GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
       .setTimeoutMs(20000);
@@ -56,7 +56,7 @@ File download() throws Exception {
 
 #### Upload
 ```java
-String upload(File file) throws Exception { 
+Response<String> upload(File file) throws Exception { 
   // multipart/form-data
   MultipartBody reqBody = new MultipartBody()
     .addParam("name", "John Doe")
@@ -69,34 +69,13 @@ String upload(File file) throws Exception {
 }
 ```
 
-#### Response Body
-```java
-String run() throws Exception {
-  HttpUrl url = new HttpUrl("https://api.github.com/users/defunkt");
-
-  HttpRequest request = new HttpRequest("GET", url)
-      .addHeader("Accept", "application/json");
-
-  try (ResponseBody body = client.execute(request)) {
-    //body.code {200}
-    //body.headers {
-    //    Keep-Alive: timeout=5, max=98
-    //    Server: Apache/2.4.25 (Win32) OpenSSL/1.0.2j PHP/5.6.30
-    //    Connection: Keep-Alive
-    //}
-    //body.in {InputStream}
-    //body.bytes() {byte[]}  => body.close()
-    return body.string(); // => body.close()
-  }
-}
-```
 
 ## [Asynchronous and Synchronous Tasks] 
 
 We prepare the request
 
 ```java
-public Async<ResponseBody> insert(
+public Async<Response<String>> insert(
     int id, String name, boolean active) {
     
   // application-www-www-form-urlencoded
@@ -108,7 +87,7 @@ public Async<ResponseBody> insert(
   HttpRequest request = new HttpRequest(
       "POST", "http://127.0.0.1/test.php", reqBody);
 
-  return client.newAsyncRequest(request, ResponseBody.class);
+  return client.newAsyncRequest(request, String.class);
 }
 ```
 
@@ -118,15 +97,12 @@ Asynchronously send the request and notify your application with a callback when
 Main UI is not blocked or interferes with it.
 
 ```java
-Async<ResponseBody> insert = insert(
+Async<Response<String>> insert = insert(
             22, "John Doe", true);
     
-insert.execute((ResponseBody result) -> {
-  String str = result.string();
+insert.execute((Response<String> response) -> {
+  String str = response.result;
   System.out.println(str);
-
-  //JSONObject json = new JSONObject(str);
-  //System.out.println(json);
 
 }, (Exception e) ->  {
    e.printStackTrace();
@@ -138,11 +114,13 @@ insert.execute((ResponseBody result) -> {
 Synchronously send the request and return your response.
 
 ```java
-Async<ResponseBody> insert = insert(
+Async<Response<String>> insert = insert(
             22, "John Doe", true);
     
-try (ResponseBody body = insert.await()) {
-    System.out.println(body.string());
+try {
+    Response<String> response = insert.await();
+    String result = response.result;
+    System.out.println(result);
     
 } catch(Exception e) {
     e.printStackTrace();
@@ -156,7 +134,7 @@ For android it is not necessary to download [org.json jar](https://github.com/st
 For other java platforms like java swing if needed.
 
 ```java
-public Async<JSONObject> insert(
+public Async<Response<JSONObject>> insert(
     String name, int age, boolean active) {
       
     // application-www-www-form-urlencoded
@@ -173,11 +151,12 @@ public Async<JSONObject> insert(
 ```
 
 ```java
-Async<JSONObject> insert = insert(
+Async<Response<JSONObject>> insert = insert(
     "John Doe", 22, true);
         
 try {
-    JSONObject json = insert.await();
+    Response<JSONObject> response = insert.await();
+    JSONObject> json = response.result;
     System.out.println(json.toString(1));
             
 } catch (Exception e) {
@@ -187,7 +166,7 @@ try {
 
 #### JSON request body
 ```java
-String run() throws Exception {
+Response<String> run() throws Exception {
   JSONObject data = new JSONObject();
   data.put("user_id", 7);
   data.put("name", "jesus");
@@ -236,14 +215,15 @@ public class MyApi implements JWT.OnAuth {
         "POST", ".../auth/login", body);
         
     // Result
-    JSONObject json = request.execute(JSONObject.class);
+    Response<JSONObject> response = request.execute(JSONObject.class);
+    JSONObject json = response.result;
     String access_token = json.optString("token");
 
     return new JWT(access_token);
   }
 
   // Request with Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-  public Async<JSONObject> region(String countryIso) {
+  public Async<Response<JSONObject>> region(String countryIso) {
     final HttpRequest request = new HttpRequest(
             "GET", ".../region/" + countryIso));
 
@@ -301,14 +281,14 @@ public class PostApi {
     client.setFactory(new GsonConvertFactory(gson));
   }
 
-  public Async<Post[]> getPosts() {
+  public Async<Response<Post[]>> getPosts() {
     HttpRequest request = new HttpRequest(
         "GET", "https://kylewbanks.com/rest/posts.json");
 
     return client.newAsyncRequest(request, Post[].class);
   }
 
-  public Async<String> insert(Post p) {
+  public Async<Response<String>> insert(Post p) {
     RequestBody reqBody = client.createRequestBody(p); // application/json
     // RequestBody reqBody = client.createFormBody(p); // application-www-www-form-urlencoded
     // RequestBody reqBody = client.createMultipartBody(p); // multipart/form-data
@@ -327,10 +307,10 @@ Asynchronously send the request and notify your application with a callback when
 ...
 PostApi api = new PostApi();
     
-Async<Post[]> async = api.getPosts(); 
+Async<Response<Post[]>> async = api.getPosts(); 
 
-async.execute((Post[] result) -> {
-  List<Post> list = Arrays.asList(result);
+async.execute((Response<Post[]> response) -> {
+  List<Post> list = Arrays.asList(response.result);
   for (Post post : list) {
     System.out.println(post.title);
   }
@@ -387,14 +367,14 @@ public class PostApi {
     client.setFactory(new JacksonConvertFactory(mapper));
   }
 
-  public Async<Post[]> getPosts() {
+  public Async<Response<Post[]>> getPosts() {
     HttpRequest request = new HttpRequest(
         "GET", "https://kylewbanks.com/rest/posts.json");
 
     return client.newAsyncRequest(request, Post[].class);
   }
   
-  public Async<String> insert(Post p) {
+  public Async<Response<String>> insert(Post p) {
     // application/json
     RequestBody reqBody = client.createRequestBody(p);
     
@@ -412,10 +392,10 @@ Asynchronously send the request and notify your application with a callback when
 ...
 PostApi api = new PostApi();
     
-Async<Post[]> async = api.getPosts(); 
+Async<Response<Post[]>> async = api.getPosts(); 
 
-async.execute((Post[] result) -> {
-  List<Post> list = Arrays.asList(result);
+async.execute((Response<Post[]> response) -> {
+  List<Post> list = Arrays.asList(response.result);
   for (Post post : list) {
     System.out.println(post.title);
   }

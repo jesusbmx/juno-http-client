@@ -1,17 +1,20 @@
 package juno.http.convert.json;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import juno.http.ResponseBody;
 import juno.http.convert.ResponseBodyConvert;
+import juno.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class JSONResponseBodyConvert implements ResponseBodyConvert<JSON>{
 
     @Override
     public JSON parse(ResponseBody respBody) throws Exception {
         try {
-            String json = respBody.string();
+            byte[] data = IOUtils.readByteArray(respBody.in);
+            String json = new String(data, respBody.charset);
             return JSON.of(json);
+            
         } finally {
             respBody.close();
         }
@@ -22,9 +25,11 @@ public class JSONResponseBodyConvert implements ResponseBodyConvert<JSON>{
         @Override
         public JSONObject parse(ResponseBody respBody) throws Exception {
             try {
-                String json = respBody.string();
+                byte[] data = IOUtils.readByteArray(respBody.in);
+                String json = new String(data, respBody.charset);
                 //System.out.println(json);
                 return JSON.newJSONObject(json);
+                
             } finally {
                 respBody.close();
             }
@@ -36,8 +41,10 @@ public class JSONResponseBodyConvert implements ResponseBodyConvert<JSON>{
         @Override
         public JSONArray parse(ResponseBody respBody) throws Exception {
             try {
-                String json = respBody.string();
+                byte[] data = IOUtils.readByteArray(respBody.in);
+                String json = new String(data, respBody.charset);
                 return JSON.newJSONArray(json);
+                
             } finally {
                 respBody.close();
             }

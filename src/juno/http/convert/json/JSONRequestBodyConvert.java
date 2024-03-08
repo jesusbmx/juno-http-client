@@ -1,11 +1,11 @@
 package juno.http.convert.json;
 
-import juno.http.RequestBody;
-import juno.http.convert.generic.ObjectAdapter;
 import java.util.Map;
+import juno.http.RequestBody;
+import juno.http.convert.RequestBodyConvert;
+import juno.http.convert.generic.ObjectAdapter;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import juno.http.convert.RequestBodyConvert;
 
 public class JSONRequestBodyConvert implements RequestBodyConvert<JSON> {
     private static final String MEDIA_TYPE = "application/json; charset=UTF-8";

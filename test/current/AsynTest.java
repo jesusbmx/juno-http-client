@@ -1,11 +1,11 @@
 package current;
 
+import juno.concurrent.Async;
+import juno.concurrent.Callback;
 import juno.http.FormBody;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
-import juno.http.ResponseBody;
-import juno.concurrent.Async;
-import juno.concurrent.Callback;
+import juno.http.Response;
 
 public class AsynTest {
     
@@ -13,7 +13,7 @@ public class AsynTest {
             .setDebug(true)
   ;
     
-  public Async<ResponseBody> insert(
+  public Async<Response<String>> insert(
     String nombre, int edad, boolean soltera) {
       
     FormBody body = new FormBody()
@@ -24,18 +24,17 @@ public class AsynTest {
     HttpRequest request = new HttpRequest(
         "POST", "http://127.0.0.1/test.php", body);
 
-    return cli.newAsyncRequest(request, ResponseBody.class);
+    return cli.newAsyncRequest(request, String.class);
   }
   
    public void async() {
-    Async<ResponseBody> insert = insert(
+    Async<Response<String>> insert = insert(
             "Elizabéth Magaña", 22, true);
             
-    insert.execute(new Callback<ResponseBody>() {
+    insert.execute(new Callback<Response<String>>() {
         @Override
-        public void onResponse(ResponseBody result) throws Exception {
-            String str = result.string();
-            System.out.println(str);
+        public void onResponse(Response<String> response) throws Exception {
+            System.out.println(response.result);
         }
         @Override
         public void onFailure(Exception e) {

@@ -1,16 +1,18 @@
 package juno.http.convert;
 
-import juno.http.FormBody;
-import juno.http.MultipartBody;
-import juno.http.RequestBody;
-import juno.http.ResponseBody;
-import juno.http.convert.json.JSON;
-import juno.http.convert.json.JSONRequestBodyConvert;
-import juno.http.convert.json.JSONResponseBodyConvert;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import juno.http.FormBody;
+import juno.http.MultipartBody;
+import juno.http.RequestBody;
+import juno.http.convert.generic.BytesResponseBodyConvert;
+import juno.http.convert.generic.FileResponseBodyConvert;
+import juno.http.convert.generic.StringResponseBodyConvert;
+import juno.http.convert.json.JSON;
+import juno.http.convert.json.JSONRequestBodyConvert;
+import juno.http.convert.json.JSONResponseBodyConvert;
 
 public abstract class ConvertFactory {
  
@@ -31,7 +33,7 @@ public abstract class ConvertFactory {
     public <V> RequestBodyConvert<V> getRequestBodyConvert(Class<V> classOf) {
       RequestBodyConvert<V> convert = requestBodyConverts.get(classOf);
       if (convert == null) {
-        convert = createaAuxResponseBodyConverter(classOf);        
+        convert = createaAuxRequestBodyConverter(classOf);        
         setRequestBodyConvert(classOf, convert);
       }
       return convert;
@@ -42,7 +44,7 @@ public abstract class ConvertFactory {
         return this;
     }
     
-    public <V> RequestBodyConvert<V> createaAuxResponseBodyConverter(Class<V> classOf) {
+    public <V> RequestBodyConvert<V> createaAuxRequestBodyConverter(Class<V> classOf) {
       final String name = classOf.getCanonicalName();
       
       if (name.equals("org.json.JSONObject")) 
@@ -86,7 +88,7 @@ public abstract class ConvertFactory {
           return (ResponseBodyConvert<V>) new JSONResponseBodyConvert();
       if (classOf == File.class)
           return (ResponseBodyConvert<V>) new FileResponseBodyConvert();
-      if (classOf == ResponseBody.class || classOf == BytesResponseBody.class)
+      if (classOf == byte[].class)
           return (ResponseBodyConvert<V>) new BytesResponseBodyConvert();
       
       return createResponseBodyConvert(classOf);

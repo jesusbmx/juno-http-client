@@ -1,13 +1,14 @@
 package juno.http.cache;
 
-import juno.http.AsyncRequest;
-import juno.http.HttpRequest;
-import juno.http.ResponseBody;
-import juno.http.convert.ResponseBodyConvert;
 import java.io.File;
 import java.util.Calendar;
 import java.util.UUID;
-import juno.http.HttpClient;
+import juno.http.AsyncRequest;
+import juno.http.HttpExecutor;
+import juno.http.HttpRequest;
+import juno.http.Response;
+import juno.http.ResponseBody;
+import juno.http.convert.ResponseBodyConvert;
 
 public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
     
@@ -41,15 +42,16 @@ public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
     }
    
     @Override
-    public V intercept(HttpClient client, HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
-        ResponseBody body = getResponseBody(client, request);
-        return convert.parse(body);
+    public Response<V> intercept(HttpExecutor executor, HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
+        final ResponseBody body = getResponseBody(executor, request);
+        final V result = convert.parse(body);
+        return new Response<V>(result, body);
     }
     
-    public ResponseBody getResponseBody(HttpClient client, HttpRequest request) throws Exception {
+    public ResponseBody getResponseBody(HttpExecutor executor, HttpRequest request) throws Exception {
         final CacheModel cache = getCacheSource().find(request);
         if (cache == null) {
-            return executeRequest(client, request, null);
+            return executeRequest(executor, request, null);
         }
         
         final long now = System.currentTimeMillis();
@@ -57,7 +59,7 @@ public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
         // Expiro la cache
         if (now > cache.expireAt) {
             System.err.println("expire '" + cache.request()+ "'");
-            return executeRequest(client, request, cache);
+            return executeRequest(executor, request, cache);
         }
         
         // Obtiene la ultima respuesta desde la cache
@@ -66,18 +68,18 @@ public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
             return cache.getResponseBody(); 
              
         } catch(Exception e) {
-            return executeRequest(client, request, cache);
+            return executeRequest(executor, request, cache);
         }
     }
     
-    public ResponseBody executeRequest(HttpClient client, HttpRequest request, CacheModel cache) throws Exception {
+    public ResponseBody executeRequest(HttpExecutor executor, HttpRequest request, CacheModel cache) throws Exception {
         if (cache == null)  {
             cache = new CacheModel();
             cache.uuid = UUID.randomUUID().toString();
         }
         
         // Executa la solicituda el el servidor
-        final ResponseBody response = client.execute(request, ResponseBody.class);
+        final ResponseBody response = executor.execute(request);
 
         if (response.code == 200) {
             cache.expireAt = getNextExpireAt().getTimeInMillis();

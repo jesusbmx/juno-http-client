@@ -5,8 +5,11 @@ import com.google.gson.JsonIOException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import juno.http.ResponseBody;
 import juno.http.convert.ResponseBodyConvert;
+import juno.io.IOUtils;
 
 public class GsonResponseBodyConvert<T> implements ResponseBodyConvert<T> {
 
@@ -20,14 +23,19 @@ public class GsonResponseBodyConvert<T> implements ResponseBodyConvert<T> {
     
     @Override
     public T parse(ResponseBody respBody) throws Exception {
-      JsonReader jsonReader = gson.newJsonReader(respBody.charStream());
+      Reader reader = null;
       try {
-        T result = adapter.read(jsonReader);
+        reader = new InputStreamReader(respBody.in, respBody.charset);
+        final JsonReader jsonReader = gson.newJsonReader(reader);
+        
+        final T result = adapter.read(jsonReader);
         if (jsonReader.peek() != JsonToken.END_DOCUMENT) {
           throw new JsonIOException("JSON document was not fully consumed.");
         }
         return result;
+        
       } finally {
+        IOUtils.closeQuietly(reader);
         respBody.close();
       }
     }

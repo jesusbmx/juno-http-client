@@ -1,11 +1,11 @@
 package juno.http;
 
-import juno.http.convert.ConvertFactory;
 import juno.concurrent.Dispatcher;
+import juno.http.convert.ConvertFactory;
 import juno.http.convert.ResponseBodyConvert;
 import juno.http.convert.generic.GenericConvertFactory;
 
-public class HttpClient {
+public class HttpClient implements HttpExecutor {
     
   /** Singleton de la clase. */
   private static HttpClient instance;
@@ -94,6 +94,7 @@ public class HttpClient {
    * @throws java.io.IOException si se produjo un problema al hablar con el
    * servidor
    */
+  @Override
   public ResponseBody execute(HttpRequest request) throws Exception {
     if (mInterceptor != null) {
         return mInterceptor.intercept(request, getHttpStack());
@@ -101,11 +102,13 @@ public class HttpClient {
     return getHttpStack().execute(request);
   }
 
-  public <V> V execute(HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
+  @Override
+  public <V> Response<V> execute(HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
     ResponseBody response = null;
     try {
       response = execute(request);
-      return convert.parse(response);
+      final V result = convert.parse(response);
+      return new Response<V>(result, response);
       
     } catch(Exception e) {
       if (response != null) {
@@ -116,7 +119,8 @@ public class HttpClient {
     }
   }
   
-  public <V> V execute(HttpRequest request, Class<V> cast) throws Exception {
+  @Override
+  public <V> Response<V> execute(HttpRequest request, Class<V> cast) throws Exception {
     return execute(request, getFactory().getResponseBodyConvert(cast));
   }
  
@@ -131,7 +135,7 @@ public class HttpClient {
    * @return una llamada
    */
   public <V> AsyncRequest<V> newAsyncRequest(HttpRequest request, ResponseBodyConvert<V> convert) {
-    return new AsyncRequest<V>(this, request, convert);
+    return new AsyncRequest<V>(getDispatcher(), this, request, convert);
   }
   
   public <V> AsyncRequest<V> newAsyncRequest(HttpRequest request, Class<V> cast) {
@@ -139,9 +143,9 @@ public class HttpClient {
             .getResponseBodyConvert(cast));
   }
   
-  public AsyncRequest<ResponseBody> newAsyncRequest(HttpRequest request) {
+  public AsyncRequest<String> newAsyncRequest(HttpRequest request) {
     return this.newAsyncRequest(request, getFactory()
-            .getResponseBodyConvert(ResponseBody.class));
+            .getResponseBodyConvert(String.class));
   }
   
   public <V> RequestBody createRequestBody(V src) {

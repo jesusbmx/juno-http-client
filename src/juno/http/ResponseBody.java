@@ -1,11 +1,7 @@
 package juno.http;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import juno.io.IOUtils;
 
@@ -32,38 +28,38 @@ public class ResponseBody implements Closeable {
     return headers.getContentType();
   }
   
-  public Reader charStream(Charset charset) throws IOException {
-    return new InputStreamReader(in, charset);
-  }
-  
-  public Reader charStream() throws IOException {
-    return charStream(charset);
-  }
-  
-  public byte[] bytes() throws IOException {
-    try {
-      return IOUtils.readByteArray(in);
-    } finally {
-      close();
-    }
-  }
-  
-  public String string(Charset charset) throws IOException {
-    byte[] data = bytes();
-    return new String(data, charset);
-  }
-  
-  public String string() throws IOException {
-    return string(charset);
-  }
-  
-  public void writeTo(OutputStream out) throws IOException {
-    try {
-      IOUtils.copy(in, out);
-    } finally {
-      close();
-    }
-  }
+//  public Reader charStream(Charset charset) throws IOException {
+//    return new InputStreamReader(in, charset);
+//  }
+//  
+//  public Reader charStream() throws IOException {
+//    return charStream(charset);
+//  }
+//  
+//  public byte[] bytes() throws IOException {
+//    try {
+//      return IOUtils.readByteArray(in);
+//    } finally {
+//      close();
+//    }
+//  }
+//  
+//  public String string(Charset charset) throws IOException {
+//    byte[] data = bytes();
+//    return new String(data, charset);
+//  }
+//  
+//  public String string() throws IOException {
+//    return string(charset);
+//  }
+//  
+//  public void writeTo(OutputStream out) throws IOException {
+//    try {
+//      IOUtils.copy(in, out);
+//    } finally {
+//      close();
+//    }
+//  }
   
   @Override public void close() {
     if (!closed) {

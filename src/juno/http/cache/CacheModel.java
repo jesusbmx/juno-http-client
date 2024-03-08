@@ -1,14 +1,14 @@
 package juno.http.cache;
 
-import juno.http.Headers;
-import juno.http.HttpRequest;
-import juno.http.ResponseBody;
-import juno.http.convert.json.JSON;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import juno.http.Headers;
+import juno.http.HttpRequest;
+import juno.http.ResponseBody;
+import juno.http.convert.json.JSON;
 import juno.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -118,7 +118,7 @@ public class CacheModel {
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(tmpData);
-            response.writeTo(out);
+            IOUtils.copy(response.in, out);
         } finally {
             IOUtils.closeQuietly(out);
         }
