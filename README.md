@@ -81,7 +81,8 @@ ResponseBody getResponseBody() throws Exception {
 
   HttpRequest request = new HttpRequest("POST", url);
 
-  Headers headers = Headers.of("");
+  Headers headers = new Headers();
+  headers.add("User-Agent: nombre-cliente");
   request.setHeaders(headers);
 
   return client.execute(request, ResponseBody.class);
