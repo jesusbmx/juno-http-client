@@ -58,6 +58,12 @@ public final class Debug {
         }
     }
     
+    public void debug(ResponseBody responseBody) {
+        if (isDebug) {
+            System.out.println(responseBody);
+        }
+    }
+    
     private boolean isLegibleContentType(String contentType) {
         for (String legibleContentType : LEGIBLE_CONTENT_TYPES) {
             if (contentType.contains(legibleContentType)) {

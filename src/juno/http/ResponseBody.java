@@ -58,7 +58,26 @@ public class ResponseBody implements Closeable {
 
     @Override
     public String toString() {
-        return "ResponseBody{" + "code=" + code + ", status=" + status + ", headers=" + headers + ", charset=" + charset + '}';
+        final StringBuilder sb = new StringBuilder();
+        // Response Line
+        sb.append("HTTP/1.1 ")
+                .append(code)
+                .append(" OK").append("\n");
+
+        // Headers:
+        for (int i = 0; i < headers.size(); i++) {
+            sb.append(headers.getName(i));
+            sb.append(": ");
+            sb.append(headers.getValue(i));
+            sb.append("\n");
+        }
+
+        sb.append("\n");
+        
+        // Response body
+        sb.append("---");
+
+        return sb.toString();
     }
   
   
