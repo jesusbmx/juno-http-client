@@ -6,6 +6,7 @@ import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpUrl;
 import juno.http.MultipartBody;
+import juno.http.RequestBody;
 import juno.http.ResponseBody;
 import juno.http.convert.generic.FileResponseBodyConvert;
 
@@ -58,7 +59,20 @@ public class Samples {
         return client.execute(request, String.class);
     }
     
-    ResponseBody getResponseBody() throws Exception { 
+    String request() throws Exception {
+        String json = "{\"id\": \"7\", \"name\": \"bar\", \"active\": \"true\"}";
+        
+        // application/json
+        RequestBody reqBody = RequestBody.create(
+                "application/json", json);
+        
+        HttpRequest request = new HttpRequest(
+                "POST", "https://postman-echo.com/post", reqBody);
+
+        return client.execute(request, String.class);
+    }
+    
+    ResponseBody getIpLocation() throws Exception { 
         HttpUrl url = new HttpUrl("http://ip-api.com/{returnType}/{ip}")
             .setPath("returnType", "json")
             .setPath("ip", "24.48.0.1")
@@ -84,6 +98,7 @@ public class Samples {
         //System.out.println(f);
         //System.out.println(samples.upload(f));
         
-        System.out.println(samples.getResponseBody().readString());
+        System.out.println(samples.request());
+        //System.out.println(samples.getIpLocation().readString());
     }
 }

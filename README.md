@@ -93,6 +93,31 @@ String upload(File file) throws Exception {
 }
 ```
 
+#### RequestBody
+```markdown
+POST https://postman-echo.com/post
+
+Content-Type: application/json; charset=UTF-8
+Content-Length: 44
+
+{"id": "7", "name": "bar", "active": "true"}
+
+```
+```java
+String request() throws Exception {
+    String json = "{\"id\": \"7\", \"name\": \"bar\", \"active\": \"true\"}";
+    
+    // application/json
+    RequestBody reqBody = RequestBody.create(
+            "application/json", json)
+    ;
+    HttpRequest request = new HttpRequest(
+            "POST", "https://postman-echo.com/post", reqBody)
+    ;
+    return client.execute(request, String.class);
+}
+```
+
 #### Url, Headers
 ```markdown
 GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en
@@ -100,7 +125,7 @@ GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2
 User-Agent: nombre-cliente
 ```
 ```java
-ResponseBody getResponseBody() throws Exception { 
+ResponseBody getIpLocation() throws Exception { 
   HttpUrl url = new HttpUrl("http://ip-api.com/{returnType}/{ip}")
     .setPath("returnType", "json")
     .setPath("ip", "24.48.0.1")
@@ -117,10 +142,10 @@ ResponseBody getResponseBody() throws Exception {
   return client.execute(request, ResponseBody.class);
 }
 ```
-#### Response Body
+#### ResponseBody
 
 ```java
-try (ResponseBody body = getResponseBody() ) {
+try ( ResponseBody body = getIpLocation() ) {
   int code = body.code;  
   String status = body.status;
   Headers headers = body.headers;
