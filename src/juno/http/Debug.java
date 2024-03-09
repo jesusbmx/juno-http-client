@@ -10,6 +10,7 @@ public final class Debug {
     private static final List<String> LEGIBLE_CONTENT_TYPES = Arrays.asList(
             "application/json",
             "application/xml",
+            "application/x-www-form-urlencoded",
             "text/plain",
             "text/html"
     );
