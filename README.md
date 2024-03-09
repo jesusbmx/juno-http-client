@@ -50,6 +50,31 @@ String post(int id, String name, boolean active) throws Exception {
 }
 ```
 
+#### RequestBody
+```markdown
+POST https://postman-echo.com/post
+
+Content-Type: application/json; charset=UTF-8
+Content-Length: 44
+
+{"id": "7", "name": "bar", "active": "true"}
+
+```
+```java
+String request() throws Exception {
+    String json = "{\"id\": \"7\", \"name\": \"bar\", \"active\": \"true\"}";
+    
+    // application/json
+    RequestBody reqBody = RequestBody.create(
+            "application/json", json)
+    ;
+    HttpRequest request = new HttpRequest(
+            "POST", "https://postman-echo.com/post", reqBody)
+    ;
+    return client.execute(request, String.class);
+}
+```
+
 #### Download
 ```markdown
 GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar
@@ -90,31 +115,6 @@ String upload(File file) throws Exception {
     "POST", "https://postman-echo.com/post", reqBody)
   ;
   return client.execute(request, String.class);
-}
-```
-
-#### RequestBody
-```markdown
-POST https://postman-echo.com/post
-
-Content-Type: application/json; charset=UTF-8
-Content-Length: 44
-
-{"id": "7", "name": "bar", "active": "true"}
-
-```
-```java
-String request() throws Exception {
-    String json = "{\"id\": \"7\", \"name\": \"bar\", \"active\": \"true\"}";
-    
-    // application/json
-    RequestBody reqBody = RequestBody.create(
-            "application/json", json)
-    ;
-    HttpRequest request = new HttpRequest(
-            "POST", "https://postman-echo.com/post", reqBody)
-    ;
-    return client.execute(request, String.class);
 }
 ```
 
