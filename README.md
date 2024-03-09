@@ -93,7 +93,7 @@ String upload(File file) throws Exception {
 }
 ```
 
-#### Response Body
+#### Url, Headers, Response Body
 ```markdown
 GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en
 
