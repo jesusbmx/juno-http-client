@@ -5,7 +5,7 @@ Download [juno-http-client.jar](https://github.com/jesusbmx/java-http-client/raw
 
 Download [juno.jar](https://github.com/jesusbmx/juno/raw/master/dist/juno.jar)
 
-## Samples [link](test/Samples.java)
+## [Samples](test/Samples.java)
 
 ```java
 HttpClient client = HttpClient.getInstance()
@@ -100,7 +100,7 @@ try (ResponseBody body = getResponseBody() ) {
 ```
 
 
-## Asynchronous and Synchronous Tasks [link](test/AsynTest.java)
+## [Asynchronous and Synchronous Tasks](test/AsynTest.java)
 
 We prepare the request
 
