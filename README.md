@@ -16,8 +16,8 @@ HttpClient client = HttpClient.getInstance()
 ```java
 String get() throws Exception {
   HttpRequest request = new HttpRequest(
-       "GET", "https://api.github.com/users/defunkt");
-
+       "GET", "https://postman-echo.com/get")
+  ;
   return client.execute(request, String.class);
 }
 ```
@@ -29,11 +29,11 @@ String post(int id, String name, boolean active) throws Exception {
   FormBody reqBody = new FormBody()
           .add("id", id)
           .add("name", name)
-          .add("active", active);
-  
+          .add("active", active)
+  ;
   HttpRequest request = new HttpRequest(
-      "POST", "http://127.0.0.1/test.php", reqBody);
-
+      "POST", "https://postman-echo.com/post", reqBody)
+  ;
   return client.execute(request, String.class);
 }
 ```
@@ -46,9 +46,9 @@ File download() throws Exception {
       .setTimeoutMs(20000);
   
   FileResponseBodyConvert convert = new FileResponseBodyConvert()
-      .setDir("C:\\Users\\Jesus\\Downloads\\")
-      //.setName("httpclient.jar");
-  
+      .setDir(System.getProperty("user.home") + "\\Downloads\\") 
+      //.setName("httpclient.jar")
+  ;  
   return client.execute(request, convert);
   //return client.execute(request, File.class);
 }
@@ -60,11 +60,11 @@ String upload(File file) throws Exception {
   // multipart/form-data
   MultipartBody reqBody = new MultipartBody()
     .addParam("name", "John Doe")
-    .addFile("img", file);
-
+    .addFile("file", file)
+  ;
   HttpRequest request = new HttpRequest(
-    "POST", "http://127.0.0.1/test.php", reqBody);
-
+    "POST", "https://postman-echo.com/post", reqBody)
+  ;
   return client.execute(request, String.class);
 }
 ```
