@@ -13,7 +13,7 @@ HttpClient client = HttpClient.getInstance()
 ```
 
 #### GET
-```
+```markdown
 GET https://postman-echo.com/get
 ```
 ```java
@@ -26,7 +26,7 @@ String get() throws Exception {
 ```
 
 #### POST
-```
+```markdown
 POST https://postman-echo.com/post
 
 Content-Type: application/x-www-form-urlencoded; charset=UTF-8
@@ -51,7 +51,7 @@ String post(int id, String name, boolean active) throws Exception {
 ```
 
 #### Download
-```
+```markdown
 GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar
 ```
 ```java
@@ -70,7 +70,7 @@ File download() throws Exception {
 ```
 
 #### Upload
-```
+```markdown
 POST https://postman-echo.com/post
 
 Content-Type: multipart/form-data; boundary=30704407372601
