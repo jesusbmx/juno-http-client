@@ -1,9 +1,12 @@
 
 import java.io.File;
 import juno.http.FormBody;
+import juno.http.Headers;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
+import juno.http.HttpUrl;
 import juno.http.MultipartBody;
+import juno.http.ResponseBody;
 import juno.http.convert.generic.FileResponseBodyConvert;
 
 public class Samples {
@@ -54,14 +57,33 @@ public class Samples {
 
         return client.execute(request, String.class);
     }
+    
+    ResponseBody getResponseBody() throws Exception { 
+        HttpUrl url = new HttpUrl("http://ip-api.com/{returnType}/{ip}")
+            .setPath("returnType", "json")
+            .setPath("ip", "24.48.0.1")
+            .addQueryParameter("fields", "status,message,query,country,city")
+            .addQueryParameter("lang", "en")
+      ;
+      HttpRequest request = new HttpRequest("GET", url);
+
+      Headers headers = new Headers()
+            .add("User-Agent: nombre-cliente")
+      ;
+      request.setHeaders(headers);
+
+      return client.execute(request, ResponseBody.class);
+    }
 
     public static void main(String[] args) throws Exception {
         Samples samples = new Samples();
         //System.out.println(samples.get());
-        System.out.println(samples.post(7, "bar", true));
+        //System.out.println(samples.post(7, "bar", true));
         
         //File f = samples.download();
         //System.out.println(f);
         //System.out.println(samples.upload(f));
+        
+        System.out.println(samples.getResponseBody().readString());
     }
 }

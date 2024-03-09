@@ -43,8 +43,8 @@ String post(int id, String name, boolean active) throws Exception {
 File download() throws Exception {
   HttpRequest request = new HttpRequest(
       "GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
-      .setTimeoutMs(20000);
-  
+      .setTimeoutMs(20000)
+  ;
   FileResponseBodyConvert convert = new FileResponseBodyConvert()
       .setDir(System.getProperty("user.home") + "\\Downloads\\") 
       //.setName("httpclient.jar")
