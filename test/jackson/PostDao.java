@@ -37,7 +37,7 @@ public class PostDao {
     RequestBody reqBody = cli.createRequestBody(p);
     
     HttpRequest request = new HttpRequest(
-            "POST", "http://127.0.0.1/test.php", reqBody);
+            "POST", "https://postman-echo.com/post", reqBody);
     
     return cli.newAsyncRequest(request, String.class);
   }

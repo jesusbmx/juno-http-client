@@ -115,7 +115,7 @@ public Async<String> insert(
       .add("active", active);
   
   HttpRequest request = new HttpRequest(
-      "POST", "http://127.0.0.1/test.php", reqBody);
+      "POST", "https://postman-echo.com/post", reqBody);
 
   return client.newAsyncRequest(request, String.class);
 }
@@ -173,7 +173,7 @@ public Async<JSONObject> insert(
         .add("active", active);
 
     HttpRequest request = new HttpRequest(
-        "POST", "http://127.0.0.1/test.php", reqBody);
+        "POST", "https://postman-echo.com/post", reqBody);
         
     return client.newAsyncRequest(request, JSONObject.class);
 }
@@ -203,7 +203,7 @@ String run() throws Exception {
         "application/json", data.toString());
 
   HttpRequest request = new HttpRequest(
-        "GET", "http://127.0.0.1/test.php", reqBody);
+        "POST", "https://postman-echo.com/post", reqBody);
 
   return client.execute(request, String.class);
 }
@@ -321,7 +321,7 @@ public class PostApi {
     // RequestBody reqBody = client.createMultipartBody(p); // multipart/form-data
     
     HttpRequest request = new HttpRequest(
-            "POST", "http://127.0.0.1/test.php", reqBody);
+            "POST", "https://postman-echo.com/post", reqBody);
     
     return client.newAsyncRequest(request, String.class);
   }
@@ -406,7 +406,7 @@ public class PostApi {
     RequestBody reqBody = client.createRequestBody(p);
     
     HttpRequest request = new HttpRequest(
-            "POST", "http://127.0.0.1/test.php", reqBody);
+            "POST", "https://postman-echo.com/post", reqBody);
     
     return client.newAsyncRequest(request, String.class);
   }
