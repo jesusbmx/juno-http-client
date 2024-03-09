@@ -1,4 +1,4 @@
-package jackson;
+package convert.jackson;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;

@@ -184,7 +184,7 @@ Async<JSONObject> insert = insert(
     "John Doe", 22, true);
         
 try {
-    JSONObject> response = insert.await();
+    JSONObject response = insert.await();
     System.out.println(response.toString(1));
             
 } catch (Exception e) {

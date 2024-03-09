@@ -1,4 +1,4 @@
-package jackson;
+package convert.jackson;
 
 import java.util.Date;
 import juno.concurrent.Async;

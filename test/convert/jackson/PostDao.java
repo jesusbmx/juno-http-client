@@ -1,12 +1,13 @@
-package gson;
+package convert.jackson;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.text.SimpleDateFormat;
 import juno.concurrent.Async;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.RequestBody;
-import juno.http.convert.gson.GsonConvertFactory;
+import juno.http.convert.jackson.JacksonConvertFactory;
 // import com.squareup.okhttp.OkHttpClient;
 // import java.io.IOException;
 // import java.net.HttpURLConnection;
@@ -18,11 +19,11 @@ public class PostDao {
           .setDebug(true);  
     
   public PostDao() {
-    Gson gson = new GsonBuilder()
-            .setDateFormat("M/d/yy hh:mm a")
-            .create();
+    ObjectMapper mapper = new ObjectMapper()
+            .setDateFormat(new SimpleDateFormat("M/d/yy hh:mm a"))
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     
-    cli.setFactory(new GsonConvertFactory(gson));
+    cli.setFactory(new JacksonConvertFactory(mapper));
   }
 
   public Async<Post[]> getPosts() {

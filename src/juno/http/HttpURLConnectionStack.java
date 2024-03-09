@@ -98,7 +98,7 @@ public class HttpURLConnectionStack implements HttpStack {
       // Length:
       final long contentLength = requestBody.contentLength(
               request.getCharset());
-      conn.setFixedLengthStreamingMode((int) contentLength);
+      setFixedLengthStreamingMode(conn, contentLength);
 
       // Write params:
       BufferedOutputStream bos = null;
@@ -111,6 +111,12 @@ public class HttpURLConnectionStack implements HttpStack {
         IOUtils.closeQuietly(bos);
       }
     }
+  }
+  
+  public void setFixedLengthStreamingMode(
+          HttpURLConnection conn, long contentLength) throws IOException {
+    
+    conn.setFixedLengthStreamingMode((int) contentLength);
   }
   
   /**

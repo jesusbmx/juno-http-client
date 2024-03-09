@@ -1,4 +1,4 @@
-package gson;
+package convert.gson;
 
 import java.util.Date;
 import juno.concurrent.Async;
