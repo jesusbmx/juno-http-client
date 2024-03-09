@@ -1,13 +1,13 @@
 package juno.http;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+import juno.io.IOUtils;
 
 public final class Debug {
-    private static Debug instance;
-    
     private static final List<String> LEGIBLE_CONTENT_TYPES = Arrays.asList(
             "application/json",
             "application/xml",
@@ -15,56 +15,61 @@ public final class Debug {
             "text/html"
     );
     
-    private boolean isDebug;
+    private static boolean isDebug;
     
     private Debug() {
         
     }
 
-    public static Debug getInstance() {
-        if (instance == null) {
-            instance = new Debug();
-        }
-        return instance;
-    }
-
-    public boolean isDebug() {
+    public static boolean isDebug() {
         return isDebug;
     }
 
-    public void setDebug(boolean isDebug) {
-        this.isDebug = isDebug;
+    public static void setDebug(boolean isDebug) {
+        Debug.isDebug = isDebug;
     }
-
-    public void debug(String format, Object... args) {
+    
+    public static void debug(String method, String url) {
         if (isDebug) {
-            System.out.printf(format + "\n", args);
-        }
-    }
-
-    public void debug(RequestBody rb, String contentType, long contentLength, Charset charset) throws IOException {
-        if (isDebug) {
-            debug("%s: %s", Headers.CONTENT_TYPE, contentType);
-            debug("%s: %s", Headers.CONTENT_LENGTH, contentLength);
-            if (isLegibleContentType(contentType)) {
-                System.out.println();
-                rb.writeTo(System.out, charset);
-                System.out.println();
-            } else {
-                System.out.println();
-                System.out.println("-- binary --");
-                System.out.println();
-            }
+            System.out.println(method + " " + url + "\n");
         }
     }
     
-    public void debug(ResponseBody responseBody) {
+    public static void debug(Headers headers) {
+        if (isDebug) {
+            System.out.println(headers);
+        }
+    }
+
+    public static void debug(RequestBody rb, String contentType, long contentLength, Charset charset) throws IOException {
+        if (isDebug) {
+            final StringBuilder debugInfo = new StringBuilder();
+            debugInfo.append(Headers.CONTENT_TYPE).append(": ").append(contentType).append("\n")
+                    .append(Headers.CONTENT_LENGTH).append(": ").append(contentLength).append("\n\n");
+
+            if (isLegibleContentType(contentType)) {
+                final ByteArrayOutputStream outputStream = IOUtils.arrayOutputStream();
+                rb.writeTo(outputStream, charset);
+                final String requestBodyString = outputStream.toString();
+                outputStream.close();
+                
+                debugInfo.append(requestBodyString).append("\n");
+
+            } else {
+                debugInfo.append("-- binary --\n\n");
+            }
+
+            System.out.println(debugInfo);
+        }
+    }
+    
+    public static void debug(ResponseBody responseBody) {
         if (isDebug) {
             System.out.println(responseBody);
         }
     }
     
-    private boolean isLegibleContentType(String contentType) {
+    private static boolean isLegibleContentType(String contentType) {
         for (String legibleContentType : LEGIBLE_CONTENT_TYPES) {
             if (contentType.contains(legibleContentType)) {
                 return true;

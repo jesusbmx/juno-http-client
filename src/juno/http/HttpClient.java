@@ -46,11 +46,11 @@ public class HttpClient implements HttpExecutor {
   }
 
   public boolean isDebug() {
-    return Debug.getInstance().isDebug();
+    return Debug.isDebug();
   }
   
   public HttpClient setDebug(boolean b) {
-    Debug.getInstance().setDebug(b);
+    Debug.setDebug(b);
     return this;
   }
 
