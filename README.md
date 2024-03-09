@@ -93,7 +93,7 @@ String upload(File file) throws Exception {
 }
 ```
 
-#### Url, Headers, Response Body
+#### Url, Headers
 ```markdown
 GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en
 
@@ -117,6 +117,7 @@ ResponseBody getResponseBody() throws Exception {
   return client.execute(request, ResponseBody.class);
 }
 ```
+#### Response Body
 
 ```java
 try (ResponseBody body = getResponseBody() ) {
@@ -125,6 +126,9 @@ try (ResponseBody body = getResponseBody() ) {
   Headers headers = body.headers;
   Charset charset = body.charset;
   InputStream in = body.in;
+
+  String str = in.readString(); // in.close()
+  byte[] bytes = in.readBytes(); // in.close()
 }
 ```
 
