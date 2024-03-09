@@ -5,7 +5,7 @@ Download [juno-http-client.jar](https://github.com/jesusbmx/java-http-client/raw
 
 Download [juno.jar](https://github.com/jesusbmx/juno/raw/master/dist/juno.jar)
 
-## Samples
+## [Samples](test/Samples.java)
 
 ```java
 HttpClient client = HttpClient.getInstance()
