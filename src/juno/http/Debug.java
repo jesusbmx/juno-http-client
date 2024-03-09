@@ -28,28 +28,49 @@ public final class Debug {
     public static void setDebug(boolean isDebug) {
         Debug.isDebug = isDebug;
     }
-    
-    public static void debug(String method, String url) {
-        if (isDebug) {
-            System.out.println(method + " " + url + "\n");
-        }
-    }
-    
-    public static void debug(Headers headers) {
-        if (isDebug) {
-            System.out.println(headers);
-        }
-    }
+//    
+//    public static void debug(String method, String url) {
+//        if (isDebug) {
+//            System.out.println(method + " " + url + "\n");
+//        }
+//    }
+//    
+//    public static void debug(Headers headers) {
+//        if (isDebug) {
+//            System.out.println(headers);
+//        }
+//    }
 
-    public static void debug(RequestBody rb, String contentType, long contentLength, Charset charset) throws IOException {
+    public static void debug(HttpRequest request) throws IOException {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
-            debugInfo.append(Headers.CONTENT_TYPE).append(": ").append(contentType).append("\n")
+            debugInfo.append(request.getMethod()).append(" ").append(request.urlAndParams()).append("\n");
+            
+            final Headers headers = request.headers;
+            if (headers != null) {
+                debugInfo.append("\n").append(headers);
+            }
+            
+            System.out.println(debugInfo);
+        }
+    }
+    
+    public static void debug(HttpRequest request, RequestBody rb, String contentType, long contentLength) throws IOException {
+        if (isDebug) {
+            final StringBuilder debugInfo = new StringBuilder();
+            debugInfo.append(request.getMethod()).append(" ").append(request.urlAndParams()).append("\n");
+            
+            final Headers headers = request.headers;
+            if (headers != null) {
+                debugInfo.append("\n").append(headers);
+            }
+            
+            debugInfo.append("\n").append(Headers.CONTENT_TYPE).append(": ").append(contentType).append("\n")
                     .append(Headers.CONTENT_LENGTH).append(": ").append(contentLength).append("\n\n");
 
             if (isLegibleContentType(contentType)) {
                 final ByteArrayOutputStream outputStream = IOUtils.arrayOutputStream();
-                rb.writeTo(outputStream, charset);
+                rb.writeTo(outputStream, request.charset);
                 final String requestBodyString = outputStream.toString();
                 outputStream.close();
                 

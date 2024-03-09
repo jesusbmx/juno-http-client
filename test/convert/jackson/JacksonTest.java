@@ -50,7 +50,7 @@ public class JacksonTest {
     
   public static void main(String[] args) {
     JacksonTest gsonTest = new JacksonTest();
-    gsonTest.list();
-    //gsonTest.insert();
+    //gsonTest.list();
+    gsonTest.insert();
   }
 }

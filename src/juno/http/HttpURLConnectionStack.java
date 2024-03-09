@@ -39,9 +39,8 @@ public class HttpURLConnectionStack implements HttpStack {
    */
   public HttpURLConnection open(HttpRequest request) throws IOException {
     final String url = request.urlAndParams();
-    Debug.debug(request.getMethod(), url);
-    
     final URL src = new URL(url);
+    
     final HttpURLConnection conn = open(src);
     conn.setConnectTimeout(request.getTimeoutMs());
     conn.setReadTimeout(request.getTimeoutMs());
@@ -64,7 +63,6 @@ public class HttpURLConnectionStack implements HttpStack {
   throws IOException {    
     final Headers headers = request.getHeaders();
     if (headers != null) {
-      Debug.debug(headers);
       for (int i = 0, size = headers.size(); i < size; i++) {
         conn.addRequestProperty(
                 headers.getName(i), headers.getValue(i));
@@ -83,6 +81,7 @@ public class HttpURLConnectionStack implements HttpStack {
   public void writeBody(HttpURLConnection conn, HttpRequest request) 
   throws IOException {
     if (!request.requiresRequestBody()) {
+      Debug.debug(request);
       return;
     }
      
@@ -103,7 +102,7 @@ public class HttpURLConnectionStack implements HttpStack {
       BufferedOutputStream bos = null;
       try {
         bos = new BufferedOutputStream(conn.getOutputStream());
-        Debug.debug(requestBody, contentType, contentLength, request.charset);
+        Debug.debug(request, requestBody, contentType, contentLength);
         requestBody.writeTo(bos, request.getCharset());
         
       } finally {
