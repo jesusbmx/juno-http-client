@@ -80,10 +80,10 @@ public class Samples {
         //System.out.println(samples.get());
         //System.out.println(samples.post(7, "bar", true));
         
-        File f = samples.download();
+        //File f = samples.download();
         //System.out.println(f);
-        System.out.println(samples.upload(f));
+        //System.out.println(samples.upload(f));
         
-        //System.out.println(samples.getResponseBody().readString());
+        System.out.println(samples.getResponseBody().readString());
     }
 }

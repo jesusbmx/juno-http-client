@@ -94,6 +94,11 @@ String upload(File file) throws Exception {
 ```
 
 #### Response Body
+```markdown
+GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en
+
+User-Agent: nombre-cliente
+```
 ```java
 ResponseBody getResponseBody() throws Exception { 
   HttpUrl url = new HttpUrl("http://ip-api.com/{returnType}/{ip}")
