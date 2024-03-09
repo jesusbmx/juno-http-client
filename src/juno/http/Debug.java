@@ -2,7 +2,6 @@ package juno.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import juno.io.IOUtils;
@@ -28,18 +27,6 @@ public final class Debug {
     public static void setDebug(boolean isDebug) {
         Debug.isDebug = isDebug;
     }
-//    
-//    public static void debug(String method, String url) {
-//        if (isDebug) {
-//            System.out.println(method + " " + url + "\n");
-//        }
-//    }
-//    
-//    public static void debug(Headers headers) {
-//        if (isDebug) {
-//            System.out.println(headers);
-//        }
-//    }
 
     public static void debug(HttpRequest request) throws IOException {
         if (isDebug) {
@@ -65,8 +52,9 @@ public final class Debug {
                 debugInfo.append("\n").append(headers);
             }
             
-            debugInfo.append("\n").append(Headers.CONTENT_TYPE).append(": ").append(contentType).append("\n")
-                    .append(Headers.CONTENT_LENGTH).append(": ").append(contentLength).append("\n\n");
+            debugInfo.append("\n")
+                     .append(Headers.CONTENT_TYPE).append(": ").append(contentType).append("\n")
+                     .append(Headers.CONTENT_LENGTH).append(": ").append(contentLength).append("\n\n");
 
             if (isLegibleContentType(contentType)) {
                 final ByteArrayOutputStream outputStream = IOUtils.arrayOutputStream();

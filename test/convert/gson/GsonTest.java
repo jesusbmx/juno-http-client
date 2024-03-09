@@ -52,6 +52,6 @@ public class GsonTest {
   public static void main(String[] args) {
     GsonTest gsonTest = new GsonTest();
     gsonTest.list();
-    //gsonTest.insert();
+    gsonTest.insert();
   }
 }
