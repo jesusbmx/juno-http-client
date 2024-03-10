@@ -158,8 +158,8 @@ try ( ResponseBody body = getIpLocation() ) {
   Charset charset = body.charset;
   InputStream in = body.in;
 
-  String str = in.readString(); // in.close()
-  byte[] bytes = in.readBytes(); // in.close()
+  String str = in.readString(); // body.close()
+  byte[] bytes = in.readBytes(); // body.close()
 }
 ```
 
