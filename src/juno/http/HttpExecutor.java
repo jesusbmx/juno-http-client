@@ -4,7 +4,7 @@ import juno.http.convert.ResponseBodyConvert;
 
 public interface HttpExecutor {
     
-    public ResponseBody execute(HttpRequest request) throws Exception;
+    public HttpResponse execute(HttpRequest request) throws Exception;
  
     public <V> V execute(HttpRequest request, ResponseBodyConvert<V> convert) throws Exception;
     

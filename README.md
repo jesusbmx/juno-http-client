@@ -125,7 +125,7 @@ User-Agent: nombre-cliente
 ```
 
 ```java
-ResponseBody getIpLocation() throws Exception { 
+HttpResponse getIpLocation() throws Exception { 
   HttpUrl url = new HttpUrl("http://ip-api.com/{returnType}/{ip}")
     .setPath("returnType", "json")
     .setPath("ip", "24.48.0.1")
@@ -139,21 +139,21 @@ ResponseBody getIpLocation() throws Exception {
   ;
   request.setHeaders(headers);
 
-  return client.execute(request, ResponseBody.class);
+  return client.execute(request, HttpResponse.class);
 }
 ```
-#### ResponseBody
+#### HttpResponse
 
 ```java
-try ( ResponseBody body = getIpLocation() ) {
-  int code = body.code;  
-  String status = body.status;
-  Headers headers = body.headers;
-  Charset charset = body.charset;
-  InputStream in = body.in;
+try ( HttpResponse response = getIpLocation() ) {
+  int code = response.code;  
+  String status = response.status;
+  Headers headers = response.headers;
+  Charset charset = response.charset;
+  InputStream content = response.content;
 
-  String str = body.readString(); // in.close()
-  byte[] bytes = body.readBytes(); // in.close()
+  String str = response.readString(); // content.close()
+  byte[] bytes = response.readBytes(); // content.close()
 }
 ```
 

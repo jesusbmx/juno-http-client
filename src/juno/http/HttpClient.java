@@ -23,7 +23,7 @@ public class HttpClient implements HttpExecutor {
   private Dispatcher mDispatcher = Dispatcher.getInstance();
   
   public interface OnInterceptor {
-    ResponseBody intercept(HttpRequest request, HttpStack httpStack) throws Exception;
+    HttpResponse intercept(HttpRequest request, HttpStack httpStack) throws Exception;
   }
   
   public HttpClient(HttpStack stack) {
@@ -95,7 +95,7 @@ public class HttpClient implements HttpExecutor {
    * servidor
    */
   @Override
-  public ResponseBody execute(HttpRequest request) throws Exception {
+  public HttpResponse execute(HttpRequest request) throws Exception {
     if (mInterceptor != null) {
         return mInterceptor.intercept(request, getHttpStack());
     }
@@ -104,7 +104,7 @@ public class HttpClient implements HttpExecutor {
 
   @Override
   public <V> V execute(HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
-    ResponseBody response = null;
+    HttpResponse response = null;
     try {
       response = execute(request);
       return convert.parse(response);
@@ -142,9 +142,9 @@ public class HttpClient implements HttpExecutor {
             .getResponseBodyConvert(cast));
   }
   
-  public AsyncRequest<ResponseBody> newAsyncRequest(HttpRequest request) {
+  public AsyncRequest<HttpResponse> newAsyncRequest(HttpRequest request) {
     return this.newAsyncRequest(request, getFactory()
-            .getResponseBodyConvert(ResponseBody.class));
+            .getResponseBodyConvert(HttpResponse.class));
   }
   
   public <V> RequestBody createRequestBody(V src) {

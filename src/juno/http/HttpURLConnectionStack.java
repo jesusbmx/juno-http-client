@@ -124,7 +124,7 @@ public class HttpURLConnectionStack implements HttpStack {
    * @return
    * @throws IOException 
    */
-  public ResponseBody getResponse(HttpURLConnection conn, HttpRequest request) 
+  public HttpResponse getResponse(HttpURLConnection conn, HttpRequest request) 
   throws IOException {
     final int responseCode = conn.getResponseCode();
     final String status = conn.getResponseMessage();
@@ -146,16 +146,17 @@ public class HttpURLConnectionStack implements HttpStack {
       throw new IOException("code: " + responseCode + ", status: " + status 
               + ", message: The container is empty");
     }
+    final InputStream content = new UrlConnectionInputStream(conn, in);
+    
+    // Haeders
+    final Headers headers = new Headers()
+            .addHeadersMapList(conn.getHeaderFields());
     
     // Create Http Response
-    final ResponseBody response = new ResponseBody(
-            new UrlConnectionInputStream(conn, in));
+    final HttpResponse response = new HttpResponse(
+            responseCode, status, headers, content);
     
-    response.charset = request.charset;
-    response.code = responseCode;
-    response.status = status;
-    response.headers.addHeadersMapList(conn.getHeaderFields());
-    
+    response.charset = request.charset;    
     Debug.debug(request, response);
     
     return response;
@@ -189,7 +190,7 @@ public class HttpURLConnectionStack implements HttpStack {
    * 
    * @throws java.io.IOException
    */
-  @Override public ResponseBody execute(HttpRequest request) throws IOException {
+  @Override public HttpResponse execute(HttpRequest request) throws IOException {
     HttpURLConnection conn = null;
     try {
       conn = open(request);

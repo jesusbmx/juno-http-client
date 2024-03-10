@@ -13,5 +13,5 @@ public interface HttpStack {
    *
    * @throws java.io.IOException
    */
-  public ResponseBody execute(HttpRequest request) throws IOException;
+  public HttpResponse execute(HttpRequest request) throws IOException;
 }

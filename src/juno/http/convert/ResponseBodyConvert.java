@@ -1,8 +1,8 @@
 package juno.http.convert;
 
-import juno.http.ResponseBody;
+import juno.http.HttpResponse;
 
 public interface ResponseBodyConvert<T> {
     
-    public T parse(ResponseBody respBody) throws Exception;
+    public T parse(HttpResponse response) throws Exception;
 }

@@ -165,11 +165,11 @@ public class HttpRequest {
         return url.toString(charset);
     }
     
-    public ResponseBody execute(HttpExecutor executor) throws Exception {
+    public HttpResponse execute(HttpExecutor executor) throws Exception {
         return executor.execute(this);
     }
     
-    public ResponseBody execute() throws Exception {
+    public HttpResponse execute() throws Exception {
         return execute(HttpClient.getInstance());
     }
 

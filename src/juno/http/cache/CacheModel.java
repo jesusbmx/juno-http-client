@@ -1,13 +1,12 @@
 package juno.http.cache;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import juno.http.Headers;
 import juno.http.HttpRequest;
-import juno.http.ResponseBody;
+import juno.http.HttpResponse;
 import juno.http.convert.json.JSON;
 import juno.io.IOUtils;
 import org.json.JSONException;
@@ -50,7 +49,7 @@ public class CacheModel {
     
     public int responseCode;
     public Headers responseHeaders = new Headers();
-    public File responseData;
+    public File responseContent;
     
     public CacheModel() {
         
@@ -75,7 +74,7 @@ public class CacheModel {
         }
         
         final String data = response.getString("data");
-        this.responseData = new File(data);
+        this.responseContent = new File(data);
     }
     
     public JSONObject toJson() throws JSONException {
@@ -90,7 +89,7 @@ public class CacheModel {
         
         final JSONObject response = new JSONObject();
         response.put("code", this.responseCode);
-        response.put("data", this.responseData.toString());
+        response.put("data", this.responseContent.toString());
         
         JSONObject headers = new JSONObject();
         for (int i = 0; i < this.responseHeaders.size(); i++) {
@@ -113,25 +112,23 @@ public class CacheModel {
         this.requestUrl = request.urlAndParams();
     }
     
-    public void setResponse(ResponseBody response, File tmpData) throws IOException {
+    public void setResponse(HttpResponse response, File tmpData) throws IOException {
         // Write Tmp File
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(tmpData);
-            IOUtils.copy(response.in, out);
+            IOUtils.copy(response.content, out);
         } finally {
             IOUtils.closeQuietly(out);
         }
         
         this.responseCode = response.code;
         this.responseHeaders = response.headers;
-        this.responseData = tmpData;
+        this.responseContent = tmpData;
     }
     
-    public ResponseBody getResponseBody() throws Exception {
-        ResponseBody body = new ResponseBody(new FileInputStream(responseData));
-        body.code = this.responseCode;
-        body.headers.addHeaders(this.responseHeaders);
-        return body;
+    public HttpResponse getResponseBody() throws Exception {
+        return new HttpResponse(
+                responseCode, "OK", responseHeaders, responseContent);
     }
 }

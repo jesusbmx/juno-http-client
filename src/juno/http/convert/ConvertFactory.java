@@ -7,10 +7,10 @@ import java.util.Map;
 import juno.http.FormBody;
 import juno.http.MultipartBody;
 import juno.http.RequestBody;
-import juno.http.ResponseBody;
+import juno.http.HttpResponse;
 import juno.http.convert.generic.BytesResponseBodyConvert;
 import juno.http.convert.generic.FileResponseBodyConvert;
-import juno.http.convert.generic.RBResponseBodyConvert;
+import juno.http.convert.generic.SimpleResponseBodyConvert;
 import juno.http.convert.generic.StringResponseBodyConvert;
 import juno.http.convert.json.JSON;
 import juno.http.convert.json.JSONRequestBodyConvert;
@@ -92,8 +92,8 @@ public abstract class ConvertFactory {
           return (ResponseBodyConvert<V>) new FileResponseBodyConvert();
       if (classOf == byte[].class)
           return (ResponseBodyConvert<V>) new BytesResponseBodyConvert();
-      if (classOf == ResponseBody.class) {
-          return (ResponseBodyConvert<V>) new RBResponseBodyConvert();
+      if (classOf == HttpResponse.class) {
+          return (ResponseBodyConvert<V>) new SimpleResponseBodyConvert();
       }
       
       return createResponseBodyConvert(classOf);

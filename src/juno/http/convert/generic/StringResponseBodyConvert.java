@@ -1,15 +1,15 @@
 package juno.http.convert.generic;
 
-import juno.http.ResponseBody;
+import juno.http.HttpResponse;
 import juno.http.convert.ResponseBodyConvert;
 
 public class StringResponseBodyConvert implements ResponseBodyConvert<String> {
 
-    @Override public String parse(ResponseBody respBody) throws Exception {
+    @Override public String parse(HttpResponse response) throws Exception {
         try {
-            return respBody.readString();
+            return response.readString();
         } finally {
-            respBody.close();
+            response.close();
         }
     }
 }

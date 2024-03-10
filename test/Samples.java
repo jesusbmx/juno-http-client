@@ -7,7 +7,7 @@ import juno.http.HttpRequest;
 import juno.http.HttpUrl;
 import juno.http.MultipartBody;
 import juno.http.RequestBody;
-import juno.http.ResponseBody;
+import juno.http.HttpResponse;
 import juno.http.convert.generic.FileResponseBodyConvert;
 
 public class Samples {
@@ -106,7 +106,7 @@ public class Samples {
 
     User-Agent: nombre-cliente
     */
-    ResponseBody getIpLocation() throws Exception { 
+    HttpResponse getIpLocation() throws Exception { 
         HttpUrl url = new HttpUrl("http://ip-api.com/{returnType}/{ip}")
             .setPath("returnType", "json")
             .setPath("ip", "24.48.0.1")
@@ -120,7 +120,7 @@ public class Samples {
       ;
       request.setHeaders(headers);
 
-      return client.execute(request, ResponseBody.class);
+      return client.execute(request, HttpResponse.class);
     }
 
     public static void main(String[] args) throws Exception {

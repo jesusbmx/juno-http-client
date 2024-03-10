@@ -6,7 +6,7 @@ import java.util.UUID;
 import juno.http.AsyncRequest;
 import juno.http.HttpExecutor;
 import juno.http.HttpRequest;
-import juno.http.ResponseBody;
+import juno.http.HttpResponse;
 import juno.http.convert.ResponseBodyConvert;
 
 public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
@@ -42,11 +42,11 @@ public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
    
     @Override
     public V intercept(HttpExecutor executor, HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
-        final ResponseBody body = getResponseBody(executor, request);
+        final HttpResponse body = getResponseBody(executor, request);
         return convert.parse(body);
     }
     
-    public ResponseBody getResponseBody(HttpExecutor executor, HttpRequest request) throws Exception {
+    public HttpResponse getResponseBody(HttpExecutor executor, HttpRequest request) throws Exception {
         final CacheModel cache = getCacheSource().find(request);
         if (cache == null) {
             return executeRequest(executor, request, null);
@@ -70,14 +70,14 @@ public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
         }
     }
     
-    public ResponseBody executeRequest(HttpExecutor executor, HttpRequest request, CacheModel cache) throws Exception {
+    public HttpResponse executeRequest(HttpExecutor executor, HttpRequest request, CacheModel cache) throws Exception {
         if (cache == null)  {
             cache = new CacheModel();
             cache.uuid = UUID.randomUUID().toString();
         }
         
         // Executa la solicituda el el servidor
-        final ResponseBody response = executor.execute(request);
+        final HttpResponse response = executor.execute(request);
 
         if (response.code == 200) {
             cache.expireAt = getNextExpireAt().getTimeInMillis();

@@ -78,7 +78,7 @@ public final class Debug {
         }
     }
     
-    public static void debug(HttpRequest request, ResponseBody responseBody) {
+    public static void debug(HttpRequest request, HttpResponse responseBody) {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
             //debugInfo.append("@Response: ").append(request.hashCode()).append("\n");

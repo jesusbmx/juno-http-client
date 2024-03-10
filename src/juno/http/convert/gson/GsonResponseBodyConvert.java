@@ -7,7 +7,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import juno.http.ResponseBody;
+import juno.http.HttpResponse;
 import juno.http.convert.ResponseBodyConvert;
 import juno.io.IOUtils;
 
@@ -22,10 +22,10 @@ public class GsonResponseBodyConvert<T> implements ResponseBodyConvert<T> {
     }
     
     @Override
-    public T parse(ResponseBody respBody) throws Exception {
+    public T parse(HttpResponse response) throws Exception {
       Reader reader = null;
       try {
-        reader = new InputStreamReader(respBody.in, respBody.charset);
+        reader = new InputStreamReader(response.content, response.charset);
         final JsonReader jsonReader = gson.newJsonReader(reader);
         
         final T result = adapter.read(jsonReader);
@@ -36,7 +36,7 @@ public class GsonResponseBodyConvert<T> implements ResponseBodyConvert<T> {
         
       } finally {
         IOUtils.closeQuietly(reader);
-        respBody.close();
+        response.close();
       }
     }
     

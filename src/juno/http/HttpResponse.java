@@ -1,24 +1,39 @@
 package juno.http;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import juno.io.IOUtils;
 
-public class ResponseBody implements Closeable {
+public class HttpResponse implements Closeable {
     /** Codificación predeterminada. */
    public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
 
-   public int code;  
-   public String status;
-   public final Headers headers = new Headers();
-   public boolean closed;
+   protected boolean closed;
    public Charset charset = DEFAULT_ENCODING;
-   public final InputStream in;
+   public final int code;  
+   public final String status;
+   public final Headers headers;
+   public final InputStream content;
 
-   public ResponseBody(InputStream in) {
-     this.in = in;
+   public HttpResponse(int code, String status, Headers headers, InputStream content) {
+    this.code = code;
+    this.status = status;
+    this.headers = headers;
+    this.content = content;
+   }
+   
+   public HttpResponse(int code, String status, Headers headers, File content) throws FileNotFoundException {
+     this(code, status, headers, new FileInputStream(content));
+   }
+   
+   public HttpResponse(int code, String status, Headers headers, byte[] content) {
+     this(code, status, headers, new ByteArrayInputStream(content));
    }
 
    public long getContentLength() {
@@ -31,7 +46,7 @@ public class ResponseBody implements Closeable {
 
    public byte[] readBytes() throws IOException {
      try {
-       return IOUtils.readByteArray(in);
+       return IOUtils.readByteArray(content);
      } finally {
        close();
      }
@@ -39,7 +54,7 @@ public class ResponseBody implements Closeable {
 
    public String readString(Charset charset) throws IOException {
      try {
-       return IOUtils.readString(in, charset);
+       return IOUtils.readString(content, charset);
      } finally {
        close();
      }
@@ -52,7 +67,7 @@ public class ResponseBody implements Closeable {
    @Override public void close() {
      if (!closed) {
        closed = true;
-       IOUtils.closeQuietly(in);
+       IOUtils.closeQuietly(content);
      }
    }   
 
