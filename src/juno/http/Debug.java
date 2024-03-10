@@ -32,30 +32,34 @@ public final class Debug {
     public static void debug(HttpRequest request) throws IOException {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
-            debugInfo.append(request.getMethod()).append(" ").append(request.urlAndParams()).append("\n");
+            //debugInfo.append("@Request: ").append(request.hashCode()).append("\n");
+            debugInfo.append(request.getMethod()).append(" ")
+                    .append(request.urlAndParams()).append(" HTTP/1.1").append("\r\n");
             
             final Headers headers = request.headers;
             if (headers != null) {
-                debugInfo.append("\n").append(headers);
+                debugInfo.append(headers);
             }
             
-            System.out.println(debugInfo);
+            debugInfo.append("---------------------------\n");
+            System.out.print(debugInfo);
         }
     }
     
     public static void debug(HttpRequest request, RequestBody rb, String contentType, long contentLength) throws IOException {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
-            debugInfo.append(request.getMethod()).append(" ").append(request.urlAndParams()).append("\n");
+            //debugInfo.append("@Request: ").append(request.hashCode()).append("\n");
+            debugInfo.append(request.getMethod()).append(" ")
+                    .append(request.urlAndParams()).append(" HTTP/1.1").append("\r\n");
             
             final Headers headers = request.headers;
             if (headers != null) {
-                debugInfo.append("\n").append(headers);
+                debugInfo.append(headers);
             }
             
-            debugInfo.append("\n")
-                     .append(Headers.CONTENT_TYPE).append(": ").append(contentType).append("\n")
-                     .append(Headers.CONTENT_LENGTH).append(": ").append(contentLength).append("\n\n");
+            debugInfo.append(Headers.CONTENT_TYPE).append(": ").append(contentType).append("\r\n")
+                     .append(Headers.CONTENT_LENGTH).append(": ").append(contentLength).append("\r\n");
 
             if (isLegibleContentType(contentType)) {
                 final ByteArrayOutputStream outputStream = IOUtils.arrayOutputStream();
@@ -63,19 +67,24 @@ public final class Debug {
                 final String requestBodyString = outputStream.toString();
                 outputStream.close();
                 
-                debugInfo.append(requestBodyString).append("\n");
+                debugInfo.append("\r\n").append(requestBodyString).append("\r\n");
 
             } else {
-                debugInfo.append("-- binary --\n\n");
+                debugInfo.append("\r\n").append("-- binary --\r\n");
             }
 
-            System.out.println(debugInfo);
+            debugInfo.append("---------------------------\n");
+            System.out.print(debugInfo);
         }
     }
     
-    public static void debug(ResponseBody responseBody) {
+    public static void debug(HttpRequest request, ResponseBody responseBody) {
         if (isDebug) {
-            System.out.println(responseBody);
+            final StringBuilder debugInfo = new StringBuilder();
+            //debugInfo.append("@Response: ").append(request.hashCode()).append("\n");
+            debugInfo.append(responseBody).append("\r\n");
+            debugInfo.append("---------------------------\n");
+            System.out.print(debugInfo);
         }
     }
     

@@ -16,7 +16,7 @@ public class Samples {
             .setDebug(true);
 
     /*
-    GET https://postman-echo.com/get
+    GET https://postman-echo.com/get HTTP/1.1
     */
     String get() throws Exception {
         HttpRequest request = new HttpRequest(
@@ -26,8 +26,7 @@ public class Samples {
     }
 
     /*
-    POST https://postman-echo.com/post
-
+    POST https://postman-echo.com/post HTTP/1.1
     Content-Type: application/x-www-form-urlencoded; charset=UTF-8
     Content-Length: 25
 
@@ -47,8 +46,7 @@ public class Samples {
     }
     
     /*
-    POST https://postman-echo.com/post
-
+    POST https://postman-echo.com/post HTTP/1.1
     Content-Type: application/json; charset=UTF-8
     Content-Length: 44
 
@@ -69,8 +67,7 @@ public class Samples {
     }
     
     /*
-    POST https://postman-echo.com/post
-
+    POST https://postman-echo.com/post HTTP/1.1
     Content-Type: multipart/form-data; boundary=30704407372601
     Content-Length: 73152
 
@@ -90,7 +87,7 @@ public class Samples {
     }
 
     /*
-    GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar
+    GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar HTTP/1.1
     */
     File download() throws Exception {
         HttpRequest request = new HttpRequest(
@@ -105,7 +102,7 @@ public class Samples {
     }
     
     /*
-    GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en
+    GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en HTTP/1.1
 
     User-Agent: nombre-cliente
     */
@@ -128,14 +125,14 @@ public class Samples {
 
     public static void main(String[] args) throws Exception {
         Samples samples = new Samples();
-        //System.out.println(samples.get());
+        System.out.println(samples.get());
         //System.out.println(samples.post(7, "bar", true));
         
         //File f = samples.download();
         //System.out.println(f);
         //System.out.println(samples.upload(f));
         
-        System.out.println(samples.request());
+        //System.out.println(samples.request());
         //System.out.println(samples.getIpLocation().readString());
     }
 }

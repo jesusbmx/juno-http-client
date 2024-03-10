@@ -75,7 +75,7 @@ public class ResponseBody implements Closeable {
         sb.append("\n");
         
         // Response body
-        sb.append("---");
+        sb.append("--- content ---");
 
         return sb.toString();
     }

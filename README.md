@@ -14,7 +14,7 @@ HttpClient client = HttpClient.getInstance()
 
 #### GET
 ```http
-GET https://postman-echo.com/get
+GET https://postman-echo.com/get HTTP/1.1
 ```
 
 ```java
@@ -28,13 +28,11 @@ String get() throws Exception {
 
 #### POST
 ```http
-POST https://postman-echo.com/post
-
+POST https://postman-echo.com/post HTTP/1.1
 Content-Type: application/x-www-form-urlencoded; charset=UTF-8
 Content-Length: 25
 
 id=7&name=bar&active=true
-
 ```
 
 ```java
@@ -54,13 +52,11 @@ String post(int id, String name, boolean active) throws Exception {
 
 #### RequestBody
 ```http
-POST https://postman-echo.com/post
-
+POST https://postman-echo.com/post HTTP/1.1
 Content-Type: application/json; charset=UTF-8
 Content-Length: 44
 
 {"id": "7", "name": "bar", "active": "true"}
-
 ```
 
 ```java
@@ -80,13 +76,11 @@ String request() throws Exception {
 
 #### Upload
 ```http
-POST https://postman-echo.com/post
-
+POST https://postman-echo.com/post HTTP/1.1
 Content-Type: multipart/form-data; boundary=30704407372601
 Content-Length: 73152
 
 -- binary --
-
 ```
 
 ```java
@@ -105,7 +99,7 @@ String upload(File file) throws Exception {
 
 #### Download
 ```http
-GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar
+GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar HTTP/1.1
 ```
 
 ```java
@@ -125,7 +119,7 @@ File download() throws Exception {
 
 #### Url, Headers
 ```http
-GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en
+GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en HTTP/1.1
 
 User-Agent: nombre-cliente
 ```

@@ -156,7 +156,7 @@ public class HttpURLConnectionStack implements HttpStack {
     response.status = status;
     response.headers.addHeadersMapList(conn.getHeaderFields());
     
-    Debug.debug(response);
+    Debug.debug(request, response);
     
     return response;
   }
