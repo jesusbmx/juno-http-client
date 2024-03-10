@@ -1,5 +1,6 @@
 package juno.http;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,6 @@ import juno.util.Convert;
 import juno.util.Strings;
 
 public class Headers {
-
   public static final String CONTENT_DISPOSITION = "Content-Disposition";
   public static final String CONTENT_TYPE = "Content-Type";
   public static final String CONTENT_LENGTH = "Content-Length";
@@ -55,7 +55,7 @@ public class Headers {
     values.remove(i);
   }
   
-  public int indexOf(String key) {
+  public int getIndexByName(String key) {
     for (int i = 0; i < values.size(); i++) {
       if (key.equalsIgnoreCase(getName(i))) {
         return i;
@@ -66,7 +66,7 @@ public class Headers {
   
   public boolean containsName(String name) {
     if (name == null) return false;
-    int i = indexOf(name);
+    int i = getIndexByName(name);
     return i != -1;
   }
 
@@ -89,7 +89,7 @@ public class Headers {
   }
   
   public String getValue(String name, String defaultval) {
-    int i = indexOf(name);
+    int i = getIndexByName(name);
     return i != -1 ? getValue(i) : defaultval;
   }
   
@@ -117,12 +117,33 @@ public class Headers {
     return getValue(CONTENT_DISPOSITION, null);
   }
   
-  public String getFileName() {
+  public String getFileNameFromContentDisposition() {
     final String contentDisposition = getContentDisposition(); 
     if (contentDisposition != null) {
       return Strings.subStr(contentDisposition, "filename=\"", "\"");
     }
     return null;
+  }
+  
+  public static Charset getCharsetFromContentType(String contentType, Charset defValue) {
+    if (contentType == null) return defValue; // Return default if content type is null
+    int charsetIndex = contentType.indexOf("charset=");
+    if (charsetIndex != -1) {
+        // Charset specified in content type
+        int semicolonIndex = contentType.indexOf(';', charsetIndex);
+        if (semicolonIndex != -1) {
+            String charset = contentType.substring(charsetIndex + 8, semicolonIndex).trim();
+            return Charset.forName(charset);
+        } else {
+            String charset = contentType.substring(charsetIndex + 8).trim();
+            return Charset.forName(charset);
+        }
+    }
+    return defValue; // Return default if no charset specified
+  }
+  
+  public Charset getCharsetFromContentType(Charset defValue) {
+    return getCharsetFromContentType(getContentType(), defValue);
   }
   
   public List<String> getValues(String name) {

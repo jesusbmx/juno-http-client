@@ -19,7 +19,9 @@ public class JacksonResponseBodyConvert<T> implements ResponseBodyConvert<T> {
     public T parse(HttpResponse response) throws Exception {
         Reader reader = null;
         try {
-            reader = new InputStreamReader(response.content, response.charset);
+            reader = new InputStreamReader(
+                    response.content, response.getCharsetFromContentType());
+            
             return adapter.readValue(reader);
             
         } finally {

@@ -17,7 +17,7 @@ public class JacksonRequestBodyConvert<T> implements RequestBodyConvert<T> {
     @Override
     public RequestBody parse(T value) throws Exception {
         byte[] bytes = adapter.writeValueAsBytes(value);
-        return RequestBody.create(MEDIA_TYPE, bytes, true);
+        return RequestBody.create(MEDIA_TYPE, bytes);
     }
       
 }

@@ -1,70 +1,71 @@
 package juno.http;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import juno.io.Files;
+import juno.io.IOUtils;
 
 public abstract class RequestBody {
+  public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
 
-  public abstract String contentType(Charset charset) throws IOException;
+  public abstract String contentType() throws IOException;
 
-  public abstract long contentLength(Charset charset) throws IOException;
+  public abstract long contentLength() throws IOException;
 
-  public abstract void writeTo(OutputStream out, Charset charset) throws IOException;
+  public abstract void writeTo(OutputStream out) throws IOException;
   
   public static RequestBody create(final String contentType, final String content) {
     return new RequestBody() {
-      @Override public String contentType(Charset charset) throws IOException {
-        return generateContentType(contentType, charset);
+      @Override public String contentType() throws IOException {
+        return contentType;
       }
-      @Override public long contentLength(Charset charset) throws IOException {
-        return content.getBytes(charset).length;
+      @Override public long contentLength() throws IOException {
+        ByteArrayOutputStream baos = null;
+        try {
+          baos = IOUtils.arrayOutputStream();
+          writeTo(baos);
+          return baos.size();
+        } finally {
+          IOUtils.closeQuietly(baos);
+        }
       }
-      @Override public void writeTo(OutputStream out, Charset charset) throws IOException {
-        out.write(content.getBytes(charset));
+      @Override public void writeTo(OutputStream out) throws IOException {
+        final Charset charset = Headers.getCharsetFromContentType(
+                contentType, DEFAULT_ENCODING);
+        byte[] data = content.getBytes(charset);
+        out.write(data);
       }
     };
   }
   
-  public static RequestBody create(final String contentType, final byte[] content,
-          final boolean encoding) {
+  public static RequestBody create(final String contentType, final byte[] content) {
     return new RequestBody() {
-      @Override public String contentType(Charset charset) throws IOException {
-        return (encoding) ? generateContentType(contentType, charset) : contentType;
+      @Override public String contentType() throws IOException {
+        return contentType;
       }
-      @Override public long contentLength(Charset charset) throws IOException {
+      @Override public long contentLength() throws IOException {
         return content.length;
       }
-      @Override public void writeTo(OutputStream out, Charset charset) throws IOException {
+      @Override public void writeTo(OutputStream out) throws IOException {
         out.write(content);
       }
     };
   }
   
-  public static RequestBody create(final String contentType, final File content,
-          final boolean encoding) {
+  public static RequestBody create(final String contentType, final File content) {
     return new RequestBody() {
-      @Override public String contentType(Charset charset) throws IOException {
-        return (encoding) ? generateContentType(contentType, charset) : contentType;
+      @Override public String contentType() throws IOException {
+        return contentType;
       }
-      @Override public long contentLength(Charset charset) throws IOException {
+      @Override public long contentLength() throws IOException {
         return content.length();
       }
-      @Override public void writeTo(OutputStream out, Charset charset) throws IOException {
+      @Override public void writeTo(OutputStream out) throws IOException {
         Files.copy(content, out);
       }
     };
-  }
-  
-  public static String generateContentType(String contentType, Charset charset) {
-    if (!contentType.contains("; charset=")) {
-      String charsetName = charset.name();
-      return new StringBuilder(contentType.length() + 10 + charsetName.length())
-              .append(contentType).append("; charset=").append(charsetName)
-              .toString();
-    }
-    return contentType;
   }
 }

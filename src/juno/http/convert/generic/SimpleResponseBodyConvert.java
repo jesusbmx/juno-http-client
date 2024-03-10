@@ -11,11 +11,12 @@ public class SimpleResponseBodyConvert implements ResponseBodyConvert<HttpRespon
         try {
             byte[] content = IOUtils.readByteArray(response.content);
 
-            final HttpResponse result = new HttpResponse(
-                    response.code, response.status, response.headers, content);
-            result.charset = response.charset;
-            return result;
-            
+            return new HttpResponse(
+                    response.code, 
+                    response.status, 
+                    response.headers, 
+                    content);
+
         } finally {
             response.close();
         }

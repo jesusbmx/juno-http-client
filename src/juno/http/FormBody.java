@@ -22,6 +22,8 @@ public class FormBody extends RequestBody {
 
   protected final List<Pair<String, Object>> values 
           = new ArrayList<Pair<String, Object>>();
+  
+  protected Charset charset = DEFAULT_ENCODING;
 
   public FormBody() {
   }
@@ -29,32 +31,39 @@ public class FormBody extends RequestBody {
   public FormBody(Map<String, Object> map) {
     addMap(map);
   } 
+
+  public Charset getCharset() {
+    return charset;
+  }
+
+  public void setCharset(Charset charset) {
+    this.charset = charset;
+  }
   
   /**
-   * @param charset
    * @return el tipo de contenido para POST o PUT.
    */
-  @Override public String contentType(Charset charset) {
+  @Override public String contentType() {
     return "application/x-www-form-urlencoded; charset=" + charset.name();
   }
   
-  @Override public long contentLength(Charset charset) throws IOException {
+  @Override public long contentLength() throws IOException {
     ByteArrayOutputStream baos = null;
     try {
       baos = IOUtils.arrayOutputStream();
-      writeTo(baos, charset);
+      writeTo(baos);
       return baos.size();
     } finally {
       IOUtils.closeQuietly(baos);
     }
   }
 
-  @Override public void writeTo(OutputStream out, Charset chrst) throws IOException {
+  @Override public void writeTo(OutputStream out) throws IOException {
     for (int i = 0, size = size(); i < size; i++) {
       if (i > 0) out.write('&');
-      out.write(URLEncoder.encode(key(i), chrst.name()).getBytes());
+      out.write(URLEncoder.encode(key(i), charset.name()).getBytes());
       out.write('=');
-      out.write(URLEncoder.encode(valueAsString(i), chrst.name()).getBytes());
+      out.write(URLEncoder.encode(valueAsString(i), charset.name()).getBytes());
     }
   }
   
@@ -62,7 +71,7 @@ public class FormBody extends RequestBody {
     ByteArrayOutputStream baos = null;
     try {
       baos = IOUtils.arrayOutputStream();
-      writeTo(baos, chrst);
+      writeTo(baos);
       return new String(baos.toByteArray(), chrst);
     } finally {
       IOUtils.closeQuietly(baos);
@@ -100,7 +109,7 @@ public class FormBody extends RequestBody {
 
   @Override public String toString() {
     try {
-      return encodedUrlParams(HttpRequest.DEFAULT_ENCODING);
+      return encodedUrlParams(charset);
     } catch(Exception e) {
       return "";
     }

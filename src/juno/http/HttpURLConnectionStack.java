@@ -87,15 +87,14 @@ public class HttpURLConnectionStack implements HttpStack {
      
     final RequestBody requestBody = request.getBody();
     if (requestBody != null) {
-      final String contentType = requestBody.contentType(request.getCharset()); 
+      final String contentType = requestBody.contentType(); 
         
       // Setup connection:
       conn.setDoOutput(true);
       conn.addRequestProperty(Headers.CONTENT_TYPE, contentType);
 
       // Length:
-      final long contentLength = requestBody.contentLength(
-              request.getCharset());
+      final long contentLength = requestBody.contentLength();
       setFixedLengthStreamingMode(conn, contentLength);
 
       // Write params:
@@ -103,7 +102,7 @@ public class HttpURLConnectionStack implements HttpStack {
       try {
         bos = new BufferedOutputStream(conn.getOutputStream());
         Debug.debug(request, requestBody, contentType, contentLength);
-        requestBody.writeTo(bos, request.getCharset());
+        requestBody.writeTo(bos);
         
       } finally {
         IOUtils.closeQuietly(bos);
@@ -156,7 +155,6 @@ public class HttpURLConnectionStack implements HttpStack {
     final HttpResponse response = new HttpResponse(
             responseCode, status, headers, content);
     
-    response.charset = request.charset;    
     Debug.debug(request, response);
     
     return response;

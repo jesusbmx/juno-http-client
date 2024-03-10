@@ -126,13 +126,13 @@ public class Samples {
     public static void main(String[] args) throws Exception {
         Samples samples = new Samples();
         System.out.println(samples.get());
-        //System.out.println(samples.post(7, "bar", true));
+        System.out.println(samples.post(7, "bar", true));
         
         //File f = samples.download();
         //System.out.println(f);
         //System.out.println(samples.upload(f));
         
-        //System.out.println(samples.request());
-        //System.out.println(samples.getIpLocation().readString());
+        System.out.println(samples.request());
+        System.out.println(samples.getIpLocation().readString());
     }
 }

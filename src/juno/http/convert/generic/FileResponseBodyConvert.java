@@ -33,7 +33,7 @@ public class FileResponseBodyConvert implements ResponseBodyConvert<File> {
     String fileName = name;
     
     if (fileName == null) {
-      fileName = headers.getFileName();
+      fileName = headers.getFileNameFromContentDisposition();
       
       if (fileName == null) {
         fileName = "file_" + System.currentTimeMillis() + ".download";

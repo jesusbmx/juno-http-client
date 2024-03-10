@@ -25,7 +25,9 @@ public class GsonResponseBodyConvert<T> implements ResponseBodyConvert<T> {
     public T parse(HttpResponse response) throws Exception {
       Reader reader = null;
       try {
-        reader = new InputStreamReader(response.content, response.charset);
+        reader = new InputStreamReader(
+                response.content, response.getCharsetFromContentType());
+        
         final JsonReader jsonReader = gson.newJsonReader(reader);
         
         final T result = adapter.read(jsonReader);

@@ -149,7 +149,7 @@ try ( HttpResponse response = getIpLocation() ) {
   int code = response.code;  
   String status = response.status;
   Headers headers = response.headers;
-  Charset charset = response.charset;
+  Charset charset = response.getCharsetFromContentType();
   InputStream content = response.content;
 
   String str = response.readString(); // content.close()

@@ -11,65 +11,73 @@ import java.nio.charset.Charset;
 import juno.io.IOUtils;
 
 public class HttpResponse implements Closeable {
-    /** Codificación predeterminada. */
-   public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
 
-   protected boolean closed;
-   public Charset charset = DEFAULT_ENCODING;
-   public final int code;  
-   public final String status;
-   public final Headers headers;
-   public final InputStream content;
+    /**
+     * Codificación predeterminada.
+     */
+    public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
 
-   public HttpResponse(int code, String status, Headers headers, InputStream content) {
-    this.code = code;
-    this.status = status;
-    this.headers = headers;
-    this.content = content;
-   }
-   
-   public HttpResponse(int code, String status, Headers headers, File content) throws FileNotFoundException {
-     this(code, status, headers, new FileInputStream(content));
-   }
-   
-   public HttpResponse(int code, String status, Headers headers, byte[] content) {
-     this(code, status, headers, new ByteArrayInputStream(content));
-   }
+    protected boolean closed;
+    public final int code;
+    public final String status;
+    public final Headers headers;
+    public final InputStream content;
 
-   public long getContentLength() {
-     return headers.getContentLength();
-   }
+    public HttpResponse(int code, String status, Headers headers, InputStream content) {
+        this.code = code;
+        this.status = status;
+        this.headers = headers;
+        this.content = content;
+    }
 
-   public String getContentType() {
-     return headers.getContentType();
-   }
+    public HttpResponse(int code, String status, Headers headers, File content) throws FileNotFoundException {
+        this(code, status, headers, new FileInputStream(content));
+    }
 
-   public byte[] readBytes() throws IOException {
-     try {
-       return IOUtils.readByteArray(content);
-     } finally {
-       close();
-     }
-   }
+    public HttpResponse(int code, String status, Headers headers, byte[] content) {
+        this(code, status, headers, new ByteArrayInputStream(content));
+    }
 
-   public String readString(Charset charset) throws IOException {
-     try {
-       return IOUtils.readString(content, charset);
-     } finally {
-       close();
-     }
-   }
+    public long getContentLength() {
+        return headers.getContentLength();
+    }
 
-   public String readString() throws IOException {
-     return readString(charset);
-   }
+    public String getContentType() {
+        return headers.getContentType();
+    }
+    
+    public Charset getCharsetFromContentType() {
+        return headers.getCharsetFromContentType(
+                DEFAULT_ENCODING);
+    }
 
-   @Override public void close() {
-     if (!closed) {
-       closed = true;
-       IOUtils.closeQuietly(content);
-     }
-   }   
+    public byte[] readBytes() throws IOException {
+        try {
+            return IOUtils.readByteArray(content);
+        } finally {
+            close();
+        }
+    }
+
+    public String readString(Charset charset) throws IOException {
+        try {
+            return IOUtils.readString(content, charset);
+        } finally {
+            close();
+        }
+    }
+
+    public String readString() throws IOException {
+        return readString(getCharsetFromContentType());
+    }
+
+    @Override
+    public void close() {
+        if (!closed) {
+            closed = true;
+            IOUtils.closeQuietly(content);
+        }
+    }
 
     @Override
     public String toString() {
@@ -88,12 +96,11 @@ public class HttpResponse implements Closeable {
         }
 
         sb.append("\n");
-        
+
         // Response body
         sb.append("--- content ---");
 
         return sb.toString();
     }
-  
-  
+
 }

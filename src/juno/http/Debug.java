@@ -63,7 +63,7 @@ public final class Debug {
 
             if (isLegibleContentType(contentType)) {
                 final ByteArrayOutputStream outputStream = IOUtils.arrayOutputStream();
-                rb.writeTo(outputStream, request.charset);
+                rb.writeTo(outputStream);
                 final String requestBodyString = outputStream.toString();
                 outputStream.close();
                 

@@ -10,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,32 +55,32 @@ public class MultipartBody extends RequestBody {
     return boundary;
   }
   
-  @Override public String contentType(Charset charset) {
+  @Override public String contentType() {
     return "multipart/form-data; boundary=" + boundary;
   }
   
-  @Override public long contentLength(Charset charset) throws IOException {
+  @Override public long contentLength() throws IOException {
     long len = 0;
     for (int i = 0; i < parts.size(); i++) {
       final Part part = parts.get(i);
-      len += part.body.contentLength(charset);
+      len += part.body.contentLength();
     }
     ByteArrayOutputStream baos = null;
     try {
       baos = IOUtils.arrayOutputStream();
-      doWrite(baos, charset, Boolean.FALSE);
+      doWrite(baos, false);
       return baos.size() + len;
     } finally {
       IOUtils.closeQuietly(baos);
     }
   }
 
-  @Override public void writeTo(OutputStream out, Charset charset) throws IOException {
-    doWrite(out, charset, Boolean.TRUE);
+  @Override public void writeTo(OutputStream out) throws IOException {
+    doWrite(out, true);
   }
   
-  private void doWrite(OutputStream out, Charset charset, boolean write) throws IOException {
-    final byte[] boundaryToCharArray = boundary.getBytes();
+  private void doWrite(OutputStream out, boolean write) throws IOException {
+    byte[] boundaryToCharArray = boundary.getBytes();
 
     for (Part part : parts) {      
       out.write(TWO_DASHES);
@@ -90,19 +89,19 @@ public class MultipartBody extends RequestBody {
 
       // Write Format Multipart Header:
       for (int i = 0, size = part.headers.size(); i < size; i++) {
-        out.write(part.headers.getName(i).getBytes(charset));
+        out.write(part.headers.getName(i).getBytes());
         out.write(COLON_SPACE);
-        out.write(part.headers.getValue(i).getBytes(charset));
+        out.write(part.headers.getValue(i).getBytes());
         out.write(CR_LF);
       }
-      out.write(Headers.CONTENT_TYPE.getBytes(charset));
+      out.write(Headers.CONTENT_TYPE.getBytes());
       out.write(COLON_SPACE);
-      out.write(part.body.contentType(charset).getBytes(charset));
+      out.write(part.body.contentType().getBytes());
       out.write(CR_LF);
       
       // Write Body:
       out.write(CR_LF);
-      if (write) part.body.writeTo(out, charset);
+      if (write) part.body.writeTo(out);
       out.write(CR_LF);
     }
 
@@ -126,11 +125,14 @@ public class MultipartBody extends RequestBody {
     return addPart(new Part(body, new Headers()));
   }
   
-  public MultipartBody addParam(String name, Object value) {
-    final String newValue = value == null ? "" : value.toString();
+  public MultipartBody addParam(String name, String value) {
     final RequestBody body = RequestBody.create(
-            "text/plain", newValue);
+            "text/plain", value);
     return addPart(Part.createFormData(name, body));
+  }
+  
+  public MultipartBody addParam(String name, Object value) {
+    return addParam(name, (value == null) ? "" : value.toString());
   }
 
   public MultipartBody addFile(String name, File file) {
@@ -139,13 +141,13 @@ public class MultipartBody extends RequestBody {
   
   public MultipartBody addFile(String name, File file, String filename) {
     final RequestBody body = RequestBody.create(
-            "application/octet-stream", file, Boolean.FALSE);
+            "application/octet-stream", file);
     return addPart(Part.createFormData(name, filename, body));
   }
   
   public MultipartBody addFile(String name, byte[] value, String filename) {
     final RequestBody body = RequestBody.create(
-            "application/octet-stream", value, Boolean.FALSE);
+            "application/octet-stream", value);
     return addPart(Part.createFormData(name, filename, body));
   }
   

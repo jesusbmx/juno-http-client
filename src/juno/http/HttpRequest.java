@@ -1,14 +1,8 @@
 package juno.http;
 
-import java.nio.charset.Charset;
 import juno.http.convert.ResponseBodyConvert;
 
 public class HttpRequest {
-
-    /**
-     * Codificación predeterminada.
-     */
-    public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
 
     /**
      * Tiempo limite de espera por default.
@@ -50,10 +44,6 @@ public class HttpRequest {
      */
     int timeoutMs = DEFAULT_TIMEOUT;
 
-    /**
-     * Codificacion.
-     */
-    Charset charset = DEFAULT_ENCODING;
 
     public HttpRequest() {
     }
@@ -131,15 +121,6 @@ public class HttpRequest {
         return this;
     }
 
-    public Charset getCharset() {
-        return charset;
-    }
-
-    public HttpRequest setCharset(Charset charset) {
-        this.charset = charset;
-        return this;
-    }
-
     public Object getTag() {
         return tag;
     }
@@ -157,12 +138,12 @@ public class HttpRequest {
         if (!requiresRequestBody()) {
             if (body != null) {
                 if (body instanceof FormBody) {
-                    return url.toString((FormBody) body, charset);
+                    return url.toString((FormBody) body);
                 }
             }
         }
 
-        return url.toString(charset);
+        return url.toString();
     }
     
     public HttpResponse execute(HttpExecutor executor) throws Exception {
@@ -193,7 +174,7 @@ public class HttpRequest {
     public String toString() {
         return "Request@" + hashCode() + " " + method + " " + url + "\nheaders:\n"
                 + headers + "\nbody: " + body + "\n\ntag=" + tag + ", timeoutMs=" + timeoutMs
-                + ", charset=" + charset + "\n---";
+                + "\n---";
     }
     
 //  public static void main(String[] args) {
