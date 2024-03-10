@@ -13,9 +13,10 @@ HttpClient client = HttpClient.getInstance()
 ```
 
 #### GET
-```markdown
+```http
 GET https://postman-echo.com/get
 ```
+
 ```java
 String get() throws Exception {
   HttpRequest request = new HttpRequest(
@@ -26,7 +27,7 @@ String get() throws Exception {
 ```
 
 #### POST
-```markdown
+```http
 POST https://postman-echo.com/post
 
 Content-Type: application/x-www-form-urlencoded; charset=UTF-8
@@ -35,6 +36,7 @@ Content-Length: 25
 id=7&name=bar&active=true
 
 ```
+
 ```java
 String post(int id, String name, boolean active) throws Exception {
   // application-www-www-form-urlencoded
@@ -51,7 +53,7 @@ String post(int id, String name, boolean active) throws Exception {
 ```
 
 #### RequestBody
-```markdown
+```http
 POST https://postman-echo.com/post
 
 Content-Type: application/json; charset=UTF-8
@@ -60,6 +62,7 @@ Content-Length: 44
 {"id": "7", "name": "bar", "active": "true"}
 
 ```
+
 ```java
 String request() throws Exception {
     String json = "{\"id\": \"7\", \"name\": \"bar\", \"active\": \"true\"}";
@@ -76,7 +79,7 @@ String request() throws Exception {
 ```
 
 #### Upload
-```markdown
+```http
 POST https://postman-echo.com/post
 
 Content-Type: multipart/form-data; boundary=30704407372601
@@ -85,6 +88,7 @@ Content-Length: 73152
 -- binary --
 
 ```
+
 ```java
 String upload(File file) throws Exception { 
   // multipart/form-data
@@ -100,9 +104,10 @@ String upload(File file) throws Exception {
 ```
 
 #### Download
-```markdown
+```http
 GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar
 ```
+
 ```java
 File download() throws Exception {
   HttpRequest request = new HttpRequest(
@@ -119,11 +124,12 @@ File download() throws Exception {
 ```
 
 #### Url, Headers
-```markdown
+```http
 GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en
 
 User-Agent: nombre-cliente
 ```
+
 ```java
 ResponseBody getIpLocation() throws Exception { 
   HttpUrl url = new HttpUrl("http://ip-api.com/{returnType}/{ip}")
