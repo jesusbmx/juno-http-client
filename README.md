@@ -75,25 +75,6 @@ String request() throws Exception {
 }
 ```
 
-#### Download
-```markdown
-GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar
-```
-```java
-File download() throws Exception {
-  HttpRequest request = new HttpRequest(
-      "GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
-      .setTimeoutMs(20000)
-  ;
-  FileResponseBodyConvert convert = new FileResponseBodyConvert()
-      .setDir(System.getProperty("user.home") + "\\Downloads\\") 
-      //.setName("httpclient.jar")
-  ;  
-  return client.execute(request, convert);
-  //return client.execute(request, File.class);
-}
-```
-
 #### Upload
 ```markdown
 POST https://postman-echo.com/post
@@ -115,6 +96,25 @@ String upload(File file) throws Exception {
     "POST", "https://postman-echo.com/post", reqBody)
   ;
   return client.execute(request, String.class);
+}
+```
+
+#### Download
+```markdown
+GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar
+```
+```java
+File download() throws Exception {
+  HttpRequest request = new HttpRequest(
+      "GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
+      .setTimeoutMs(20000)
+  ;
+  FileResponseBodyConvert convert = new FileResponseBodyConvert()
+      .setDir(System.getProperty("user.home") + "\\Downloads\\") 
+      //.setName("httpclient.jar")
+  ;  
+  return client.execute(request, convert);
+  //return client.execute(request, File.class);
 }
 ```
 
