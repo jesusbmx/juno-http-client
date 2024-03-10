@@ -15,6 +15,9 @@ public class Samples {
     HttpClient client = HttpClient.getInstance()
             .setDebug(true);
 
+    /*
+    GET https://postman-echo.com/get
+    */
     String get() throws Exception {
         HttpRequest request = new HttpRequest(
                 "GET", "https://postman-echo.com/get");
@@ -22,6 +25,14 @@ public class Samples {
         return client.execute(request, String.class);
     }
 
+    /*
+    POST https://postman-echo.com/post
+
+    Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+    Content-Length: 25
+
+    id=7&name=bar&active=true
+    */
     String post(int id, String name, boolean active) throws Exception {
         // application-www-www-form-urlencoded
         FormBody reqBody = new FormBody()
@@ -34,31 +45,16 @@ public class Samples {
 
         return client.execute(request, String.class);
     }
-
-    File download() throws Exception {
-        HttpRequest request = new HttpRequest(
-                "GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
-                .setTimeoutMs(20000);
-
-        FileResponseBodyConvert convert = new FileResponseBodyConvert()
-                .setDir(System.getProperty("user.home") + "\\Downloads\\") //.setName("httpclient.jar")
-        ;
-        return client.execute(request, convert);
-        //return client.execute(request, File.class);
-    }
-
-    String upload(File file) throws Exception {
-        // multipart/form-data
-        MultipartBody reqBody = new MultipartBody()
-                .addParam("name", "John Doe")
-                .addFile("file", file)
-        ;
-        HttpRequest request = new HttpRequest(
-                "POST", "https://postman-echo.com/post", reqBody);
-
-        return client.execute(request, String.class);
-    }
     
+    /*
+    POST https://postman-echo.com/post
+
+    Content-Type: application/json; charset=UTF-8
+    Content-Length: 44
+
+    {"id": "7", "name": "bar", "active": "true"}
+
+    */
     String request() throws Exception {
         String json = "{\"id\": \"7\", \"name\": \"bar\", \"active\": \"true\"}";
         
@@ -72,6 +68,47 @@ public class Samples {
         return client.execute(request, String.class);
     }
     
+    /*
+    POST https://postman-echo.com/post
+
+    Content-Type: multipart/form-data; boundary=30704407372601
+    Content-Length: 73152
+
+    -- binary --
+
+    */
+    String upload(File file) throws Exception {
+        // multipart/form-data
+        MultipartBody reqBody = new MultipartBody()
+                .addParam("name", "John Doe")
+                .addFile("file", file)
+        ;
+        HttpRequest request = new HttpRequest(
+                "POST", "https://postman-echo.com/post", reqBody);
+
+        return client.execute(request, String.class);
+    }
+
+    /*
+    GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar
+    */
+    File download() throws Exception {
+        HttpRequest request = new HttpRequest(
+                "GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
+                .setTimeoutMs(20000);
+
+        FileResponseBodyConvert convert = new FileResponseBodyConvert()
+                .setDir(System.getProperty("user.home") + "\\Downloads\\") //.setName("httpclient.jar")
+        ;
+        return client.execute(request, convert);
+        //return client.execute(request, File.class);
+    }
+    
+    /*
+    GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en
+
+    User-Agent: nombre-cliente
+    */
     ResponseBody getIpLocation() throws Exception { 
         HttpUrl url = new HttpUrl("http://ip-api.com/{returnType}/{ip}")
             .setPath("returnType", "json")
