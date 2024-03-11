@@ -11,6 +11,7 @@ public final class Debug {
             "application/json",
             "application/xml",
             "application/x-www-form-urlencoded",
+            "multipart/form-data",
             "text/plain",
             "text/html"
     );
@@ -90,7 +91,7 @@ public final class Debug {
     
     private static boolean isLegibleContentType(String contentType) {
         for (String legibleContentType : LEGIBLE_CONTENT_TYPES) {
-            if (contentType.contains(legibleContentType)) {
+            if (contentType.startsWith(legibleContentType)) {
                 return true;
             }
         }

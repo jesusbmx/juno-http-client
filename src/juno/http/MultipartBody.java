@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -125,14 +126,15 @@ public class MultipartBody extends RequestBody {
     return addPart(new Part(body, new Headers()));
   }
   
-  public MultipartBody addParam(String name, String value) {
+  public MultipartBody addParam(String name, Object value, Charset charset) {
+    final String newValue = (value == null) ? "" : value.toString();
     final RequestBody body = RequestBody.create(
-            "text/plain", value);
+            "text/plain; charset=" + charset.name(), newValue);
     return addPart(Part.createFormData(name, body));
   }
   
   public MultipartBody addParam(String name, Object value) {
-    return addParam(name, (value == null) ? "" : value.toString());
+    return addParam(name, value, DEFAULT_ENCODING);
   }
 
   public MultipartBody addFile(String name, File file) {
