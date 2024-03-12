@@ -11,7 +11,7 @@ public final class Debug {
             "application/json",
             "application/xml",
             "application/x-www-form-urlencoded",
-            "multipart/form-data",
+            //"multipart/form-data",
             "text/plain",
             "text/html"
     );
