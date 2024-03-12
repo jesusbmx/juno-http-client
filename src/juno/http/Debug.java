@@ -33,7 +33,7 @@ public final class Debug {
     public static void debug(HttpRequest request) throws IOException {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
-            //debugInfo.append("@Request: ").append(request.hashCode()).append("\n");
+            debugInfo.append("```http-request-").append(request.hashCode()).append("\n");
             debugInfo.append(request.getMethod()).append(" ")
                     .append(request.urlAndParams()).append(" HTTP/1.1").append("\r\n");
             
@@ -42,7 +42,7 @@ public final class Debug {
                 debugInfo.append(headers);
             }
             
-            debugInfo.append("---------------------------\n");
+            debugInfo.append("```\n");
             System.out.print(debugInfo);
         }
     }
@@ -50,7 +50,7 @@ public final class Debug {
     public static void debug(HttpRequest request, RequestBody rb, String contentType, long contentLength) throws IOException {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
-            //debugInfo.append("@Request: ").append(request.hashCode()).append("\n");
+            debugInfo.append("```http-request-").append(request.hashCode()).append("\n");
             debugInfo.append(request.getMethod()).append(" ")
                     .append(request.urlAndParams()).append(" HTTP/1.1").append("\r\n");
             
@@ -74,7 +74,7 @@ public final class Debug {
                 debugInfo.append("\r\n").append("-- binary --\r\n");
             }
 
-            debugInfo.append("---------------------------\n");
+            debugInfo.append("```\n");
             System.out.print(debugInfo);
         }
     }
@@ -82,9 +82,9 @@ public final class Debug {
     public static void debug(HttpRequest request, HttpResponse responseBody) {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
-            //debugInfo.append("@Response: ").append(request.hashCode()).append("\n");
+            debugInfo.append("```http-response-").append(request.hashCode()).append("\n");
             debugInfo.append(responseBody).append("\r\n");
-            debugInfo.append("---------------------------\n");
+            debugInfo.append("```\n");
             System.out.print(debugInfo);
         }
     }
