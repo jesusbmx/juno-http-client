@@ -9,7 +9,7 @@ import juno.http.HttpResponse;
 import juno.http.HttpStack;
 import juno.http.OnInterceptor;
 
-public class CacheInterceptor<V> implements OnInterceptor {
+public class CacheInterceptor implements OnInterceptor {
     
     public final String name;
     public final File dirStorage;
