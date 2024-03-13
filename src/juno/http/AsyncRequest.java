@@ -5,41 +5,52 @@ import juno.concurrent.Dispatcher;
 import juno.http.convert.ResponseBodyConvert;
 
 public class AsyncRequest<T> extends AbstractAsync<T> {
-    public final HttpExecutor executor;
+    public final HttpStack stack;
     public final HttpRequest request;
     public final ResponseBodyConvert<T> convert;
-    protected OnInterceptor<T> interceptor;
+    protected OnInterceptor interceptor;
 
     /**
      * Inyección de Dependencias: Dispatcher, HttpClient, ResponseBodyConvert
      */
     public AsyncRequest(
-        Dispatcher dispatcher, HttpExecutor executor, HttpRequest request, ResponseBodyConvert<T> convert
+        Dispatcher dispatcher, HttpStack stack, HttpRequest request, ResponseBodyConvert<T> convert
     ) {
         super(dispatcher);
-        this.executor = executor;
+        this.stack = stack;
         this.request = request;
         this.convert = convert;
+    }
+    
+    private HttpResponse execute(HttpRequest request) throws Exception {
+        if (interceptor == null) {
+            return stack.execute(request);
+        } 
+        return interceptor.intercept(request, stack);
     }
 
     @Override
     public T call() throws Exception {
-        if (interceptor == null)
-            return executor.execute(request, convert);
-        
-        return interceptor.intercept(executor, request, convert);
+        HttpResponse response = null;
+        try {
+          response = execute(request);
+          return convert.parse(response);
+
+        } catch(Exception e) {
+          if (response != null) {
+            response.close();
+          }
+
+          throw e;
+        }
     }
 
-    public OnInterceptor<T> getInterceptor() {
+    public OnInterceptor getInterceptor() {
         return interceptor;
     }
     
-    public AsyncRequest<T> setInterceptor(OnInterceptor<T> interceptor) {
+    public AsyncRequest<T> setInterceptor(OnInterceptor interceptor) {
         this.interceptor = interceptor;
         return this;
-    }
-    
-    public interface OnInterceptor<V> {
-        V intercept(HttpExecutor executor, HttpRequest request, ResponseBodyConvert<V> convert) throws Exception;
     }
 }

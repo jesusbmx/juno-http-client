@@ -3,13 +3,12 @@ package juno.http.cache;
 import java.io.File;
 import java.util.Calendar;
 import java.util.UUID;
-import juno.http.AsyncRequest;
-import juno.http.HttpExecutor;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
-import juno.http.convert.ResponseBodyConvert;
+import juno.http.HttpStack;
+import juno.http.OnInterceptor;
 
-public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
+public class CacheInterceptor<V> implements OnInterceptor {
     
     public final String name;
     public final File dirStorage;
@@ -41,15 +40,10 @@ public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
     }
    
     @Override
-    public V intercept(HttpExecutor executor, HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
-        final HttpResponse body = getResponseBody(executor, request);
-        return convert.parse(body);
-    }
-    
-    public HttpResponse getResponseBody(HttpExecutor executor, HttpRequest request) throws Exception {
+    public HttpResponse intercept(HttpRequest request, HttpStack stack) throws Exception {
         final CacheModel cache = getCacheSource().find(request);
         if (cache == null) {
-            return executeRequest(executor, request, null);
+            return executeRequest(stack, request, null);
         }
         
         final long now = System.currentTimeMillis();
@@ -57,7 +51,7 @@ public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
         // Expiro la cache
         if (now > cache.expireAt) {
             System.err.println("expire '" + cache.request()+ "'");
-            return executeRequest(executor, request, cache);
+            return executeRequest(stack, request, cache);
         }
         
         // Obtiene la ultima respuesta desde la cache
@@ -66,18 +60,18 @@ public class CacheInterceptor<V> implements AsyncRequest.OnInterceptor<V> {
             return cache.getResponseBody(); 
              
         } catch(Exception e) {
-            return executeRequest(executor, request, cache);
+            return executeRequest(stack, request, cache);
         }
     }
     
-    public HttpResponse executeRequest(HttpExecutor executor, HttpRequest request, CacheModel cache) throws Exception {
+    public HttpResponse executeRequest(HttpStack stack, HttpRequest request, CacheModel cache) throws Exception {
         if (cache == null)  {
             cache = new CacheModel();
             cache.uuid = UUID.randomUUID().toString();
         }
         
         // Executa la solicituda el el servidor
-        final HttpResponse response = executor.execute(request);
+        final HttpResponse response = stack.execute(request);
 
         if (response.code == 200) {
             cache.expireAt = getNextExpireAt().getTimeInMillis();

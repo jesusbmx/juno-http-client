@@ -188,7 +188,7 @@ public class HttpURLConnectionStack implements HttpStack {
    * 
    * @throws java.io.IOException
    */
-  @Override public HttpResponse execute(HttpRequest request) throws IOException {
+  @Override public HttpResponse execute(HttpRequest request) throws Exception {
     HttpURLConnection conn = null;
     try {
       conn = open(request);

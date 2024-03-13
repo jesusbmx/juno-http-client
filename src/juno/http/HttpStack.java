@@ -1,7 +1,5 @@
 package juno.http;
 
-import java.io.IOException;
-
 public interface HttpStack {
 
   /**
@@ -13,5 +11,5 @@ public interface HttpStack {
    *
    * @throws java.io.IOException
    */
-  public HttpResponse execute(HttpRequest request) throws IOException;
+  public HttpResponse execute(HttpRequest request) throws Exception;
 }

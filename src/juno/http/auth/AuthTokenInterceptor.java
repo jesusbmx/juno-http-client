@@ -1,11 +1,11 @@
 package juno.http.auth;
 
-import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpStack;
 import juno.http.HttpResponse;
+import juno.http.OnInterceptor;
 
-public class AuthTokenInterceptor implements HttpClient.OnInterceptor {
+public class AuthTokenInterceptor implements OnInterceptor {
     
     public final JWTManager tokenManager;
     public final String header;

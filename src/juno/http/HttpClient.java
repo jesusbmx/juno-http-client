@@ -5,7 +5,7 @@ import juno.http.convert.ConvertFactory;
 import juno.http.convert.ResponseBodyConvert;
 import juno.http.convert.generic.GenericConvertFactory;
 
-public class HttpClient implements HttpExecutor {
+public class HttpClient implements HttpStack {
     
   /** Singleton de la clase. */
   private static HttpClient instance;
@@ -21,11 +21,7 @@ public class HttpClient implements HttpExecutor {
   
   /** Procesa la peticiones en segundo plano. */
   private Dispatcher mDispatcher = Dispatcher.getInstance();
-  
-  public interface OnInterceptor {
-    HttpResponse intercept(HttpRequest request, HttpStack httpStack) throws Exception;
-  }
-  
+    
   public HttpClient(HttpStack stack) {
     mHttpStack = stack;
   }
@@ -102,7 +98,6 @@ public class HttpClient implements HttpExecutor {
     return getHttpStack().execute(request);
   }
 
-  @Override
   public <V> V execute(HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
     HttpResponse response = null;
     try {
@@ -117,8 +112,7 @@ public class HttpClient implements HttpExecutor {
       throw e;
     }
   }
-  
-  @Override
+ 
   public <V> V execute(HttpRequest request, Class<V> cast) throws Exception {
     return execute(request, getFactory().getResponseBodyConvert(cast));
   }

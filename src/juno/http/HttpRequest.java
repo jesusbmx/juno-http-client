@@ -146,24 +146,24 @@ public class HttpRequest {
         return url.toString();
     }
     
-    public HttpResponse execute(HttpExecutor executor) throws Exception {
-        return executor.execute(this);
+    public HttpResponse execute(HttpStack stack) throws Exception {
+        return stack.execute(this);
     }
     
     public HttpResponse execute() throws Exception {
         return execute(HttpClient.getInstance());
     }
 
-    public <V> V execute(HttpExecutor executor, ResponseBodyConvert<V> convert) throws Exception {
-        return executor.execute(this, convert);
+    public <V> V execute(HttpClient client, ResponseBodyConvert<V> convert) throws Exception {
+        return client.execute(this, convert);
     }
     
     public <V> V execute(ResponseBodyConvert<V> convert) throws Exception {
         return execute(HttpClient.getInstance(), convert);
     }
 
-    public <V> V execute(HttpExecutor executor, Class<V> convert) throws Exception {
-        return executor.execute(this, convert);
+    public <V> V execute(HttpClient client, Class<V> convert) throws Exception {
+        return client.execute(this, convert);
     }
     
     public <V> V execute(Class<V> convert) throws Exception {
