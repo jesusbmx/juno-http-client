@@ -22,7 +22,7 @@ public class AuthTokenInterceptor implements OnInterceptor {
     }
    
     @Override
-    public HttpResponse intercept(HttpRequest request, HttpStack httpStack) throws Exception {
+    public HttpResponse intercept(HttpRequest request, HttpStack httpStack) throws Exception {        
         // Validamos si estamos logeados para relizar peticiones.
         final JWT jwt = tokenManager.getToken();
         // Agregamos la autorizacion a la peticiòn.

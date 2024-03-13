@@ -172,9 +172,7 @@ public class HttpRequest {
 
     @Override
     public String toString() {
-        return "Request@" + hashCode() + " " + method + " " + url + "\nheaders:\n"
-                + headers + "\nbody: " + body + "\n\ntag=" + tag + ", timeoutMs=" + timeoutMs
-                + "\n---";
+        return "HttpRequest{" + "method=" + method + ", url=" + url + ", headers=" + headers + ", body=" + body + ", tag=" + tag + ", timeoutMs=" + timeoutMs + '}';
     }
     
 //  public static void main(String[] args) {

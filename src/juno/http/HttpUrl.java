@@ -107,13 +107,16 @@ public class HttpUrl {
     public String toString(FormBody body) {
         try {
             final String encodedUrl = encodedUrl(charset, '/');
-            final String encodedParams = body.encodedUrlParams(charset);
-
-            return new StringBuilder(encodedUrl.length() + 1 + encodedParams.length())
-                    .append(encodedUrl)
-                    .append(encodedUrl.endsWith("?") ? '&' : '?')
-                    .append(encodedParams)
-                    .toString();
+            final StringBuilder sb = new StringBuilder()
+                    .append(encodedUrl);
+            
+            if (getQueryParameterSize() > 0) {
+                final String encodedParams = body.encodedUrlParams(charset);
+                sb.append(encodedUrl.endsWith("?") ? '&' : '?');
+                sb.append(encodedParams);
+            }
+                    
+            return sb.toString();
 
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);

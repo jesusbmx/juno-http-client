@@ -3,6 +3,7 @@ package juno.http.cache;
 import java.io.File;
 import java.util.Calendar;
 import java.util.UUID;
+import juno.http.Debug;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
 import juno.http.HttpStack;
@@ -41,6 +42,8 @@ public class CacheInterceptor<V> implements OnInterceptor {
    
     @Override
     public HttpResponse intercept(HttpRequest request, HttpStack stack) throws Exception {
+        Debug.debug("CacheInterceptor", request.toString());
+        
         final CacheModel cache = getCacheSource().find(request);
         if (cache == null) {
             return executeRequest(stack, request, null);
@@ -50,13 +53,13 @@ public class CacheInterceptor<V> implements OnInterceptor {
 
         // Expiro la cache
         if (now > cache.expireAt) {
-            System.err.println("expire '" + cache.request()+ "'");
+            Debug.debug("CacheInterceptor", "expire '" + cache.request()+ "'");
             return executeRequest(stack, request, cache);
         }
         
         // Obtiene la ultima respuesta desde la cache
         try {
-            System.out.println("get cache '" + cache.request() + "'");
+            Debug.debug("CacheInterceptor", "get cache '" + cache.request() + "'");
             return cache.getResponseBody(); 
              
         } catch(Exception e) {

@@ -30,6 +30,14 @@ public final class Debug {
         Debug.isDebug = isDebug;
     }
 
+    public static void debug(String tag, String message) {
+        if (isDebug) {
+            final StringBuilder debugInfo = new StringBuilder();
+            debugInfo.append("[").append(tag).append("] => ").append(message).append("\n");
+            System.out.print(debugInfo);
+        }
+    }
+    
     public static void debug(HttpRequest request) throws IOException {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();

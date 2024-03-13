@@ -8,6 +8,7 @@ import juno.http.Headers;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
 import juno.http.convert.json.JSON;
+import juno.io.Files;
 import juno.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -128,7 +129,8 @@ public class CacheModel {
     }
     
     public HttpResponse getResponseBody() throws Exception {
+        byte[] content = Files.readByteArray(responseContent);
         return new HttpResponse(
-                responseCode, "OK", responseHeaders, responseContent);
+                responseCode, "OK", responseHeaders, content);
     }
 }
