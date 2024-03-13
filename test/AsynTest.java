@@ -14,9 +14,9 @@ public class AsynTest {
     ;
 
     public Async<HttpResponse> getIpLocation() {
-      HttpUrl url = new HttpUrl("http://ip-api.com/{returnType}/{ip}")
-              .setPath("returnType", "json")
-              .setPath("ip", "24.48.0.1")
+      HttpUrl url = new HttpUrl("http://ip-api.com/")
+                .addPath("json")
+                .addPath("24.48.0.1")
       ;
       FormBody body = new FormBody()
           .add("fields", "status,message,query,country,city")

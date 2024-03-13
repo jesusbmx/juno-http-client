@@ -104,9 +104,10 @@ GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-clien
 
 ```java
 File download() throws Exception {
-  HttpRequest request = new HttpRequest(
-      "GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
-      .setTimeoutMs(20000)
+  HttpRequest request = new HttpRequest("GET", 
+    "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar"
+  )
+  .setTimeoutMs(20000)
   ;
   FileResponseBodyConvert convert = new FileResponseBodyConvert()
       .setDir(System.getProperty("user.home") + "\\Downloads\\") 
@@ -126,9 +127,9 @@ User-Agent: nombre-cliente
 
 ```java
 HttpResponse getIpLocation() throws Exception { 
-  HttpUrl url = new HttpUrl("http://ip-api.com/{returnType}/{ip}")
-    .setPath("returnType", "json")
-    .setPath("ip", "24.48.0.1")
+  HttpUrl url = new HttpUrl("http://ip-api.com/")
+    .addPath("json")
+    .addPath("24.48.0.1")
     .addQueryParameter("fields", "status,message,query,country,city")
     .addQueryParameter("lang", "en")
   ;

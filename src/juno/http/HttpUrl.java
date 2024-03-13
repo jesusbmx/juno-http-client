@@ -3,30 +3,21 @@ package juno.http;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HttpUrl {
     public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
 
     Charset charset = DEFAULT_ENCODING;
-    final String url;
-    final Map<String, String> pathVars = new HashMap<String, String>();
-    final FormBody parameters;
+    final String baseUrl;
+    final List<String> paths = new ArrayList<String>();
+    final FormBody parameters = new FormBody();
 
-    public HttpUrl(String url, FormBody parameters) {
-        this.url = url;
-        this.parameters = parameters;
+    public HttpUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
-
-    public HttpUrl(String url) {
-        this(url, new FormBody());
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
+    
     public void setCharset(Charset charset) {
         this.charset = charset;
     }
@@ -35,37 +26,53 @@ public class HttpUrl {
         return charset;
     }
 
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+    
     /**
      * "http://ip-api.com/json/{ip}"
      *
      * @param chrst
+     * @param separator '/'
      * @return "http://ip-api.com/json/24.48.0.1"
      * @throws java.io.IOException
      */
-    public String encodedUrlPaths(Charset chrst) throws IOException {
-        String result = url;
-        for (Map.Entry<String, String> path : pathVars.entrySet()) {
-            String target = "{" + path.getKey() + "}";
-            String value = path.getValue();
-            value = value == null ? "" : value;
-            String replacement = URLEncoder.encode(value, chrst.name());
-            result = result.replace(target, replacement);
+    public String encodedUrl(Charset chrst, char separator) throws IOException {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(baseUrl);
+        if (sb.charAt(sb.length() - 1) != separator) {
+            sb.append(separator);
         }
-        return result;
+        
+        for (int i = 0; i < paths.size(); i++) {
+            if (i > 0 && sb.charAt(sb.length() - 1) != separator) {
+                sb.append(separator);
+            }
+            final String value = paths.get(i);
+            final String valueEncode = URLEncoder.encode(value, chrst.name());
+            sb.append(valueEncode);
+        }
+        
+        return sb.toString();
     }
 
-    public HttpUrl setPath(String key, String value) {
-        pathVars.put(key, value);
+    ////////////////////////////////////////////////////////////////////////////
+
+    public HttpUrl addPath(String path) {
+        paths.add(path);
         return this;
     }
 
-    public String path(String key) {
-        return pathVars.get(key);
+    public String getPath(int index) {
+        return paths.get(index);
     }
 
-    public int pathSize() {
-        return pathVars.size();
+    public int getPathSize() {
+        return paths.size();
     }
+    
+    ////////////////////////////////////////////////////////////////////////////
 
     public HttpUrl addQueryParameter(String key, Object value) {
         parameters.add(key, value);
@@ -79,31 +86,30 @@ public class HttpUrl {
         return this;
     }
 
-    public String queryParameterName(int index) {
+    public String getQueryParameterName(int index) {
         return parameters.key(index);
     }
 
-    public Object queryParameterValue(int index) {
+    public Object getQueryParameterValue(int index) {
         return parameters.value(index);
     }
 
-    public int queryParameterSize() {
+    public int getQueryParameterSize() {
         return parameters.size();
     }
+    
+    ////////////////////////////////////////////////////////////////////////////
 
     public String toString(FormBody body) {
         try {
-            final String encodedUrlPaths = encodedUrlPaths(charset);
-            if (body.size() == 0) {
-                return encodedUrlPaths;
-            }
-
+            final String encodedUrl = encodedUrl(charset, '/');
             final String encodedParams = body.encodedUrlParams(charset);
 
-            return new StringBuilder(encodedUrlPaths.length() + 1 + encodedParams.length())
-                    .append(encodedUrlPaths)
-                    .append(encodedUrlPaths.endsWith("?") ? '&' : '?')
-                    .append(encodedParams).toString();
+            return new StringBuilder(encodedUrl.length() + 1 + encodedParams.length())
+                    .append(encodedUrl)
+                    .append(encodedUrl.endsWith("?") ? '&' : '?')
+                    .append(encodedParams)
+                    .toString();
 
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -115,16 +121,13 @@ public class HttpUrl {
         return toString(parameters);
     }
 
-//  public static void main(String[] args) {
-//    HttpUrl url = new HttpUrl(
-//        "http://ip-api.com/{returnType}/{ip}");
-//
-//    url.setPath("returnType", "json");
-//    url.setPath("ip", "24.48.0.1");
-//
-//    url.addQueryParameter("fields", "status,message,query,country,city");
-//    url.addQueryParameter("lang", "en");
-//    
-//    System.out.println(url.toString());
-//  }
+    public static void main(String[] args) {
+        HttpUrl url = new HttpUrl("http://ip-api.com/")
+                .addPath("json")
+                .addPath("24.48.0.1")
+                .addQueryParameter("fields", "status,message,query,country,city")
+                .addQueryParameter("lang", "en");
+
+        System.out.println(url.toString());
+    }
 }

@@ -68,6 +68,9 @@ public class FormBody extends RequestBody {
   }
   
   public String encodedUrlParams(Charset chrst) throws IOException {
+    if (size() == 0) {
+        return "";
+    }
     ByteArrayOutputStream baos = null;
     try {
       baos = IOUtils.arrayOutputStream();
