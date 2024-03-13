@@ -104,10 +104,8 @@ GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-clien
 
 ```java
 File download() throws Exception {
-  HttpRequest request = new HttpRequest("GET", 
-    "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar"
-  )
-  .setTimeoutMs(20000)
+  HttpRequest request = new HttpRequest("GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
+      .setTimeoutMs(20000)
   ;
   FileResponseBodyConvert convert = new FileResponseBodyConvert()
       .setDir(System.getProperty("user.home") + "\\Downloads\\") 
