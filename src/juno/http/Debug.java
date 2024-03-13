@@ -30,10 +30,17 @@ public final class Debug {
         Debug.isDebug = isDebug;
     }
 
-    public static void debug(String tag, String message) {
+    public static void debug(String tag, Object... message) {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
-            debugInfo.append("[").append(tag).append("] => ").append(message).append("\n");
+            debugInfo.append("[Debug] ").append(tag).append(" ");
+            for (int i = 0; i < message.length; i++) {
+                if (i > 0) {
+                    debugInfo.append(" ");
+                }
+                debugInfo.append(message[i]);
+            }
+            debugInfo.append("\n");
             System.out.print(debugInfo);
         }
     }

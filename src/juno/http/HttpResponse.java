@@ -32,7 +32,7 @@ public class HttpResponse implements Closeable {
 //    }
 
     public HttpResponse(int code, String status, Headers headers, byte[] content) {
-        this(code, status, headers, new ByteArrayInputStream(content));
+        this(code, status, headers, new ByteArrayInputStream(content, 0, content.length));
     }
 
     public long getContentLength() {

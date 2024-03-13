@@ -42,27 +42,28 @@ public class CacheInterceptor<V> implements OnInterceptor {
    
     @Override
     public HttpResponse intercept(HttpRequest request, HttpStack stack) throws Exception {
-        Debug.debug("CacheInterceptor", request.toString());
-        
         final CacheModel cache = getCacheSource().find(request);
         if (cache == null) {
+            Debug.debug("CacheInterceptor", "executeRequest", request);
             return executeRequest(stack, request, null);
         }
         
         final long now = System.currentTimeMillis();
+        Debug.debug("CacheInterceptor", "cache", cache);
 
         // Expiro la cache
         if (now > cache.expireAt) {
-            Debug.debug("CacheInterceptor", "expire '" + cache.request()+ "'");
+            Debug.debug("CacheInterceptor", "expire", cache.request());
             return executeRequest(stack, request, cache);
         }
         
         // Obtiene la ultima respuesta desde la cache
         try {
-            Debug.debug("CacheInterceptor", "get cache '" + cache.request() + "'");
+            Debug.debug("CacheInterceptor", "get cache", cache.request());
             return cache.getResponseBody(); 
              
         } catch(Exception e) {
+            Debug.debug("CacheInterceptor", "error getting cache", cache.request());
             return executeRequest(stack, request, cache);
         }
     }
@@ -81,10 +82,12 @@ public class CacheInterceptor<V> implements OnInterceptor {
             cache.setRequest(request);
                         
             final File tmpData = new File(getDirStorage(), cache.uuid + ".data");
-            cache.setResponse(response, tmpData);
+            cache.write(response, tmpData);
 
             // Guarda los datos de la respuesta en la cache
             getCacheSource().save(cache);
+            
+            return cache.getResponseBody();
         }
 
         return response;

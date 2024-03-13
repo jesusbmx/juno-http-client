@@ -113,7 +113,7 @@ public class CacheModel {
         this.requestUrl = request.urlAndParams();
     }
     
-    public void setResponse(HttpResponse response, File tmpData) throws IOException {
+    public void write(HttpResponse response, File tmpData) throws IOException {
         // Write Tmp File
         FileOutputStream out = null;
         try {
@@ -133,4 +133,11 @@ public class CacheModel {
         return new HttpResponse(
                 responseCode, "OK", responseHeaders, content);
     }
+
+    @Override
+    public String toString() {
+        return "CacheModel{" + "uuid=" + uuid + ", expireAt=" + expireAt + ", requestMethod=" + requestMethod + ", requestUrl=" + requestUrl + ", responseCode=" + responseCode + ", responseHeaders=" + responseHeaders + ", responseContent=" + responseContent + '}';
+    }
+    
+    
 }
