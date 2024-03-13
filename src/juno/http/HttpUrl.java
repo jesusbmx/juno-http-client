@@ -41,17 +41,21 @@ public class HttpUrl {
     public String encodedUrl(Charset chrst, char separator) throws IOException {
         final StringBuilder sb = new StringBuilder();
         sb.append(baseUrl);
-        if (sb.charAt(sb.length() - 1) != separator) {
-            sb.append(separator);
-        }
         
-        for (int i = 0; i < paths.size(); i++) {
-            if (i > 0 && sb.charAt(sb.length() - 1) != separator) {
+        if (!paths.isEmpty()) {
+            
+            if (sb.charAt(sb.length() - 1) != separator) {
                 sb.append(separator);
             }
-            final String value = paths.get(i);
-            final String valueEncode = URLEncoder.encode(value, chrst.name());
-            sb.append(valueEncode);
+        
+            for (int i = 0; i < paths.size(); i++) {
+                if (i > 0 && sb.charAt(sb.length() - 1) != separator) {
+                    sb.append(separator);
+                }
+                final String value = paths.get(i);
+                final String valueEncode = URLEncoder.encode(value, chrst.name());
+                sb.append(valueEncode);
+            }
         }
         
         return sb.toString();
@@ -121,13 +125,13 @@ public class HttpUrl {
         return toString(parameters);
     }
 
-    public static void main(String[] args) {
-        HttpUrl url = new HttpUrl("http://ip-api.com/")
-                .addPath("json")
-                .addPath("24.48.0.1")
-                .addQueryParameter("fields", "status,message,query,country,city")
-                .addQueryParameter("lang", "en");
-
-        System.out.println(url.toString());
-    }
+//    public static void main(String[] args) {
+//        HttpUrl url = new HttpUrl("http://ip-api.com/")
+//                .addPath("json")
+//                .addPath("24.48.0.1")
+//                .addQueryParameter("fields", "status,message,query,country,city")
+//                .addQueryParameter("lang", "en");
+//
+//        System.out.println(url.toString());
+//    }
 }
