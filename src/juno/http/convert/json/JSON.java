@@ -157,7 +157,16 @@ public class JSON {
     
     public static JSONObject newJSONObject(String json) throws JSONException {
         try {
+            if (json == null) {
+                throw new JSONException("json == null");
+            }
+
+            if (json.isEmpty()) {
+                throw new JSONException("json is empty");
+            }
+    
             return new JSONObject(json);
+            
         } catch(JSONException e) {
             throw new JSONException(json);
         }
@@ -165,7 +174,16 @@ public class JSON {
     
     public static JSONArray newJSONArray(String json) throws JSONException {
         try {
+            if (json == null) {
+                throw new JSONException("json == null");
+            }
+
+            if (json.isEmpty()) {
+                throw new JSONException("json is empty");
+            }
+            
             return new JSONArray(json);
+            
         } catch(JSONException e) {
             throw new JSONException(json);
         }
