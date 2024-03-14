@@ -110,7 +110,7 @@ public class HttpUrl {
             final StringBuilder sb = new StringBuilder()
                     .append(encodedUrl);
             
-            if (getQueryParameterSize() > 0) {
+            if (body.size() > 0) {
                 final String encodedParams = body.encodedUrlParams(charset);
                 sb.append(encodedUrl.endsWith("?") ? '&' : '?');
                 sb.append(encodedParams);

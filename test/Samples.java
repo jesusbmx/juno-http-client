@@ -19,8 +19,14 @@ public class Samples {
     GET https://postman-echo.com/get HTTP/1.1
     */
     String get() throws Exception {
+        FormBody reqBody = new FormBody()
+                .add("id", "1")
+                .add("name", "f")
+                .add("active", true)
+        ;
+        
         HttpRequest request = new HttpRequest(
-                "GET", "https://postman-echo.com/get");
+                "GET", "https://postman-echo.com/get", reqBody);
 
         return client.execute(request, String.class);
     }
@@ -122,13 +128,13 @@ public class Samples {
     public static void main(String[] args) throws Exception {
         Samples samples = new Samples();
         System.out.println(samples.get());
-        System.out.println(samples.post(7, "bar", true));
-        
-        File f = samples.download();
-        System.out.println(f);
-        System.out.println(samples.upload(f));
-        
-        System.out.println(samples.request());
-        System.out.println(samples.getIpLocation().readString());
+//        System.out.println(samples.post(7, "bar", true));
+//        
+//        File f = samples.download();
+//        System.out.println(f);
+//        System.out.println(samples.upload(f));
+//        
+//        System.out.println(samples.request());
+//        System.out.println(samples.getIpLocation().readString());
     }
 }
