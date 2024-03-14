@@ -80,13 +80,9 @@ public class HttpURLConnectionStack implements HttpStack {
    */
   public void writeBody(HttpURLConnection conn, HttpRequest request) 
   throws IOException {
-    if (!request.requiresRequestBody()) {
-      Debug.debug(request);
-      return;
-    }
-     
     final RequestBody requestBody = request.getBody();
-    if (requestBody != null) {
+    
+    if (request.requiresRequestBody() && requestBody != null) {
       final String contentType = requestBody.contentType(); 
         
       // Setup connection:
@@ -107,6 +103,9 @@ public class HttpURLConnectionStack implements HttpStack {
       } finally {
         IOUtils.closeQuietly(bos);
       }
+      
+    } else {
+        Debug.debug(request);
     }
   }
   

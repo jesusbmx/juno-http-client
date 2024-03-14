@@ -3,49 +3,43 @@ package auth;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
-import juno.http.HttpUrl;
 import juno.http.auth.AuthorizationToken;
 import juno.http.auth.DataStorage;
 import juno.http.auth.DataStorageMap;
 import juno.http.auth.JWTManager;
 import juno.http.auth.Token;
 
-public class AuthTest implements Token.OnAuth {
+public class AuthTest {
     
     HttpClient client;
 
     public AuthTest() {
         // You can create you own storage
         DataStorage tokenStorage = new DataStorageMap();
-        JWTManager tokenManager = new JWTManager(tokenStorage, this);
+        JWTManager tokenManager = new JWTManager(tokenStorage, onAuth);
 
         // Add the JWT Manager to interceptor
         client = new HttpClient()
                 .setAuthorization(new AuthorizationToken("Bearer", tokenManager))
                 .setDebug(true);
     }
-
-    @Override
-    public Token auth() throws Exception {
-        return new MyToken();
-    }
     
+    final Token.OnAuth onAuth = new Token.OnAuth() {
+        @Override
+        public Token auth() throws Exception {
+            return new MyToken();
+        }
+    };
+
     private HttpResponse request() throws Exception{
-        HttpUrl url = new HttpUrl("http://ip-api.com/")
-                .addPath("json")
-                .addPath("24.48.0.1")
-                .addQueryParameter("fields", "status,message,query,country,city")
-                .addQueryParameter("lang", "en")
-      ;
-      HttpRequest request = new HttpRequest("GET", url);
+      HttpRequest request = new HttpRequest(
+              "POST", "https://postman-echo.com/post");
 
       return client.execute(request, HttpResponse.class);
     }
     
-    
     public static void main(String[] args) throws Exception {
         HttpResponse response = new AuthTest().request();
-        System.out.println(response);
         System.out.println(response.readString());
     }
     

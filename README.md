@@ -270,28 +270,21 @@ String run() throws Exception {
 
 Store, clear, transmit and automatically refresh JWT authentication tokens.
 
+Create you own storage and add the JWT Manager
 ```java
-public class MyApi implements Token.OnAuth {
-  public static final MyApi INSTANCE = new MyApi();  
+DataStorage tokenStorage = new DataStorageFile(new File(".../MyApi.jwt"));
+JWTManager tokenManager = new JWTManager(tokenStorage, onAuth);
 
-  // Client with authentication
-  public final HttpClient client;
-  
-  // Configuration for the client
-  private MyApi() {
-    // You can create you own storage
-    DataStorage tokenStorage = new DataStorageFile(new File(".../MyApi.jwt"));
-    JWTManager tokenManager = new JWTManager(tokenStorage, this);
+HttpClient client = new HttpClient()
+    .setAuthorization(new AuthorizationToken("Bearer", tokenManager))
+    .setDebug(true);
+```
 
-    // Add the JWT Manager to interceptor
-    client = new HttpClient()
-        .setAuthorization(new AuthorizationToken("Bearer", tokenManager))
-        .setDebug(true);
-  }
-
-  // Define token auth function.
-  @Override
-  public Token auth() throws Exception {        
+Define token auth function.
+```java
+final Token.OnAuth onAuth = new Token.OnAuth() {
+      
+  @Override public Token auth() throws Exception {
     FormBody body = new FormBody()
         .add("email", "myMail@domain.com")
         .add("password", "myPassword");
@@ -305,15 +298,20 @@ public class MyApi implements Token.OnAuth {
 
     return new JWT(access_token);
   }
+};
+```
 
-  // Request with Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-  public Async<JSONObject> region(String countryIso) {
-    final HttpRequest request = new HttpRequest(
-            "GET", ".../region/" + countryIso));
+```http
+POST https://postman-echo.com/post HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+```
 
-    return client.newAsyncRequest(request, JSONObject.class);
-  }
-}
+```java
+public HttpResponse request() throws Exception{
+  HttpRequest request = new HttpRequest(
+      "POST", "https://postman-echo.com/post");
+
+  return client.execute(request, HttpResponse.class);
 ```
 
 ## [GSON](https://github.com/google/gson) 
