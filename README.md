@@ -77,8 +77,19 @@ String request() throws Exception {
 #### Upload
 ```http
 POST https://postman-echo.com/post HTTP/1.1
-Content-Type: multipart/form-data; boundary=30704407372601
-Content-Length: 73152
+Content-Type: multipart/form-data; boundary=30707575573640
+Content-Length: 71162
+
+--30707575573640
+Content-Disposition: form-data; name="name"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+
+John Doe
+--30707575573640
+Content-Disposition: form-data; name="file"; filename="file_1710436579164.png"
+Content-Transfer-Encoding: binary
+Content-Type: application/octet-stream
 
 -- binary --
 ```
@@ -131,13 +142,9 @@ HttpResponse getIpLocation() throws Exception {
     .addQueryParameter("fields", "status,message,query,country,city")
     .addQueryParameter("lang", "en")
   ;
-  HttpRequest request = new HttpRequest("GET", url);
-
-  Headers headers = new Headers()
-    .add("User-Agent: nombre-cliente")
+  HttpRequest request = new HttpRequest("GET", url)
+    .addHeader("User-Agent", "nombre-cliente")
   ;
-  request.setHeaders(headers);
-
   return client.execute(request, HttpResponse.class);
 }
 ```

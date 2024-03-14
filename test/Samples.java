@@ -108,18 +108,14 @@ public class Samples {
     */
     HttpResponse getIpLocation() throws Exception { 
       HttpUrl url = new HttpUrl("http://ip-api.com/")
-                .addPath("json")
-                .addPath("24.48.0.1")
-                .addQueryParameter("fields", "status,message,query,country,city")
-                .addQueryParameter("lang", "en")
+        .addPath("json")
+        .addPath("24.48.0.1")
+        .addQueryParameter("fields", "status,message,query,country,city")
+        .addQueryParameter("lang", "en")
       ;
-      HttpRequest request = new HttpRequest("GET", url);
-
-      Headers headers = new Headers()
-            .add("User-Agent: nombre-cliente")
+      HttpRequest request = new HttpRequest("GET", url)
+        .addHeader("User-Agent", "nombre-cliente")
       ;
-      request.setHeaders(headers);
-
       return client.execute(request, HttpResponse.class);
     }
 
