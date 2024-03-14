@@ -284,22 +284,19 @@ HttpClient client = new HttpClient()
 
 Define token auth function.
 ```java
-final Token.OnAuth onAuth = new Token.OnAuth() {
-      
-  @Override public Token auth() throws Exception {
+Token.OnAuth onAuth = () -> {
     FormBody body = new FormBody()
-        .add("email", "myMail@domain.com")
-        .add("password", "myPassword");
-        
+            .add("email", "myMail@domain.com")
+            .add("password", "myPassword");
+
     HttpRequest request = new HttpRequest(
-        "POST", ".../auth/login", body);
-        
+            "POST", ".../auth/login", body);
+
     // Result
     JSONObject response = request.execute(JSONObject.class);
     String access_token = response.optString("token");
 
     return new JWT(access_token);
-  }
 };
 ```
 
