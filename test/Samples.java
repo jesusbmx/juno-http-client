@@ -4,10 +4,10 @@ import juno.http.FormBody;
 import juno.http.Headers;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
+import juno.http.HttpResponse;
 import juno.http.HttpUrl;
 import juno.http.MultipartBody;
 import juno.http.RequestBody;
-import juno.http.HttpResponse;
 import juno.http.convert.generic.FileResponseBodyConvert;
 
 public class Samples {

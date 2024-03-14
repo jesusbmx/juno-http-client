@@ -8,7 +8,7 @@ import org.json.JSONObject;
 /**
  * https://jwt.io/
  */
-public class JWT {
+public class JWT implements Token {
     
     public final String token;
     
@@ -71,6 +71,7 @@ public class JWT {
         return getDate("exp");
     }
 
+    @Override
     public boolean isValid() {
         Date expireAt = expireAt();
         if (expireAt == null) {
@@ -86,21 +87,10 @@ public class JWT {
         return now < expAt;
     }
 
+    @Override
     public String getToken() {
         return token;
     }
-    
-    public interface OnAuth {
-    
-        /** 
-         * logea el app con el webservice. 
-         * 
-         * @return 
-         * @throws java.lang.Exception
-         */
-        JWT auth() throws Exception;
-    }
-
     
 //    public static void main(String[] args) throws JSONException {
 //        JWT jwt = new JWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");

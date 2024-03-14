@@ -4,8 +4,8 @@ import juno.concurrent.Callback;
 import juno.http.FormBody;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
-import juno.http.HttpUrl;
 import juno.http.HttpResponse;
+import juno.http.HttpUrl;
 
 public class AsynTest {
     

@@ -1,70 +1,65 @@
 package juno.http.auth;
 
-import java.io.File;
 import java.io.IOException;
-import org.json.JSONException;
 
-public class JWTManager implements JWT.OnAuth {
+public class JWTManager implements Token.OnAuth {
     
     public final DataStorage storage;
-    public final JWT.OnAuth onAuth;
-    protected JWT accessJwt;
+    public final Token.OnAuth onAuth;
+    protected Token accessToken;
     
-    public JWTManager(DataStorage storage, JWT.OnAuth onAuth) {
+    public JWTManager(DataStorage storage, Token.OnAuth onAuth) {
         this.storage = storage;
         this.onAuth = onAuth;
     }
-    
-    public JWTManager(File file, JWT.OnAuth onAuth) {
-        this(new DataStorageFile(file), onAuth);
-    }
-    
+        
     @Override
-    public JWT auth() throws Exception {
+    public Token auth() throws Exception {
         return onAuth.auth();
     }
-  
-    public void saveToken(JWT token) throws IOException {
+
+    public void saveToken(Token token) throws IOException {
         storage.save("accessToken", token.getToken());
-        this.accessJwt = token;
+        this.accessToken = token;
     }
     
-    public JWT readToken() throws IOException {
-        if (accessJwt == null) {
-            String accessToken = storage.read("accessToken");
+    public Token readToken() throws IOException {
+        if (accessToken == null) {
+            String token = storage.read("accessToken");
             if (accessToken != null) {
                 try {
-                    accessJwt = new JWT(accessToken);
-                } catch (JSONException ex) {
+                    accessToken = new JWT(token);
+                } catch (Exception ex) {
                     ex.printStackTrace();
                     return null;
                 }
             }
         }
-        return accessJwt;
+        return accessToken;
     }
     
     public void deleteToken() throws IOException {
         storage.delete("accessToken");
-        accessJwt = null;
+        accessToken = null;
     }
        
-    public synchronized JWT getToken() throws Exception {
-        JWT jwt = readToken();
+    public synchronized Token getAccessToken() throws Exception {
+        Token token = readToken();
         
-        if (jwt == null) {
-            jwt = auth();
-            saveToken(jwt);
-            return jwt;
+        if (token == null) {
+            token = auth();
+            saveToken(token);
+            return token;
         }
         
-        if (jwt.isValid()) {
-            return jwt;
+        if (token.isValid()) {
+            return token;
         }
         
-        jwt = auth();
-        saveToken(jwt);
+        token = auth();
+        saveToken(token);
         
-        return jwt;
+        return token;
     }
+
 }

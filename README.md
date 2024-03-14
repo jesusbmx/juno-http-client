@@ -271,7 +271,7 @@ String run() throws Exception {
 Store, clear, transmit and automatically refresh JWT authentication tokens.
 
 ```java
-public class MyApi implements JWT.OnAuth {
+public class MyApi implements Token.OnAuth {
   public static final MyApi INSTANCE = new MyApi();  
 
   // Client with authentication
@@ -280,18 +280,18 @@ public class MyApi implements JWT.OnAuth {
   // Configuration for the client
   private MyApi() {
     // You can create you own storage
-    File tokenStorage = new File(".../MyApi.jwt");
-    JWTManager jwtManager = new JWTManager(tokenStorage, this);
+    DataStorage tokenStorage = new DataStorageFile(new File(".../MyApi.jwt"));
+    JWTManager tokenManager = new JWTManager(tokenStorage, this);
 
     // Add the JWT Manager to interceptor
     client = new HttpClient()
-        .setInterceptor(new AuthTokenInterceptor(jwtManager, "Authorization", "Bearer "))
+        .setAuthorization(new AuthorizationToken("Bearer", tokenManager))
         .setDebug(true);
   }
 
   // Define token auth function.
   @Override
-  public JWT auth() throws Exception {        
+  public Token auth() throws Exception {        
     FormBody body = new FormBody()
         .add("email", "myMail@domain.com")
         .add("password", "myPassword");

@@ -13,6 +13,9 @@ public class HttpClient implements HttpStack {
   /** Procesara las peticiones a internet. */
   protected final HttpStack mHttpStack;
  
+  /** Authorization */
+  protected Authorization mAuthorization;
+  
   /** Interceptor de peticiones. */
   protected OnInterceptor mInterceptor;
   
@@ -53,6 +56,15 @@ public class HttpClient implements HttpStack {
   public HttpStack getHttpStack() {
     return mHttpStack;
   }
+
+  public Authorization getAuthorization() {
+    return mAuthorization;
+  }
+
+  public HttpClient setAuthorization(Authorization mAuthorization) {
+    this.mAuthorization = mAuthorization;
+    return this;
+  }
   
   public OnInterceptor getInterceptor() {
     return mInterceptor;
@@ -92,6 +104,9 @@ public class HttpClient implements HttpStack {
    */
   @Override
   public HttpResponse execute(HttpRequest request) throws Exception {
+    if (mAuthorization != null) {
+        request.addHeader("Authorization", mAuthorization.getAuthorization());
+    }
     if (mInterceptor != null) {
         return mInterceptor.intercept(request, getHttpStack());
     }
