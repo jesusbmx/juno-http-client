@@ -266,7 +266,9 @@ String run() throws Exception {
 }
 ```
 
-## [JWT](https://jwt.io/)
+## Authorization
+
+[JWT](https://jwt.io/)
 
 Store, clear, transmit and automatically refresh JWT authentication tokens.
 
