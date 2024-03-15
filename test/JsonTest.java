@@ -38,7 +38,7 @@ public class JsonTest {
         }
     }
     
-    String jsonRequest() throws Exception {
+    JSONObject jsonRequest() throws Exception {
         JSONObject data = new JSONObject();
         data.put("user_id", 7);
         data.put("name", "jesus");
@@ -49,7 +49,7 @@ public class JsonTest {
         HttpRequest request = new HttpRequest(
                 "POST", "https://postman-echo.com/post", reqBody);
 
-        return client.execute(request, String.class);
+        return client.execute(request, JSONObject.class);
     }
 
     public static void main(String[] args) throws Exception {

@@ -246,7 +246,7 @@ public Async<JSONObject> insert(
 
 #### JSON request body
 ```java
-String run() throws Exception {
+JSONObject jsonRequest() throws Exception {
   JSONObject data = new JSONObject();
   data.put("user_id", 7);
   data.put("name", "jesus");
@@ -257,7 +257,7 @@ String run() throws Exception {
   HttpRequest request = new HttpRequest(
         "POST", "https://postman-echo.com/post", reqBody);
 
-  return client.execute(request, String.class);
+  return client.execute(request, JSONObject.class);
 }
 ```
 
