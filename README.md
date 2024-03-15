@@ -226,6 +226,7 @@ try {
 For android it is not necessary to download [org.json jar](https://github.com/stleary/JSON-java)
 For other java platforms like java swing if needed.
 
+#### JSON response
 ```java
 public Async<JSONObject> insert(
     String name, int age, boolean active) {
