@@ -243,19 +243,6 @@ public Async<JSONObject> insert(
 }
 ```
 
-```java
-Async<JSONObject> insert = insert(
-    "John Doe", 22, true);
-        
-try {
-    JSONObject response = insert.await();
-    System.out.println(response.toString(1));
-            
-} catch (Exception e) {
-    e.printStackTrace();
-}
-```
-
 #### JSON request body
 ```java
 String run() throws Exception {
