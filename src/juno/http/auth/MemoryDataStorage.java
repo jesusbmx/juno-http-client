@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DataStorageMap implements DataStorage {
+public class MemoryDataStorage implements DataStorage {
 
     Map<String, String> values = new HashMap<String, String>();
 

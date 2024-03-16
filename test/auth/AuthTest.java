@@ -5,7 +5,7 @@ import juno.http.HttpRequest;
 import juno.http.HttpResponse;
 import juno.http.auth.AuthorizationToken;
 import juno.http.auth.DataStorage;
-import juno.http.auth.DataStorageMap;
+import juno.http.auth.MemoryDataStorage;
 import juno.http.auth.JWTManager;
 import juno.http.auth.Token;
 
@@ -15,7 +15,7 @@ public class AuthTest {
 
     public AuthTest() {
         // You can create you own storage
-        DataStorage tokenStorage = new DataStorageMap();
+        DataStorage tokenStorage = new MemoryDataStorage();
         JWTManager tokenManager = new JWTManager(tokenStorage, onAuth);
 
         // Add the JWT Manager to interceptor

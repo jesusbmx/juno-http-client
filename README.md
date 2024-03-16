@@ -269,7 +269,7 @@ Store, clear, transmit and automatically refresh JWT authentication tokens.
 
 Create you own storage and add the JWT Manager
 ```java
-DataStorage tokenStorage = new DataStorageFile(new File(".../MyApi.jwt"));
+DataStorage tokenStorage = new FileDataStorage(new File(".../MyApi.jwt"));
 JWTManager tokenManager = new JWTManager(tokenStorage, onAuth);
 
 HttpClient client = new HttpClient()

@@ -9,12 +9,12 @@ import java.io.OutputStream;
 import java.util.Properties;
 import juno.io.IOUtils;
 
-public class DataStorageFile implements DataStorage {
+public class FileDataStorage implements DataStorage {
 
     public final File src;
     private Properties storage;
 
-    public DataStorageFile(File src) {
+    public FileDataStorage(File src) {
         this.src = src;
     }
     
