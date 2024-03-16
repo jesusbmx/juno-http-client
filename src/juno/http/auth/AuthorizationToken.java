@@ -4,19 +4,17 @@ import juno.http.Authorization;
 
 public class AuthorizationToken implements Authorization {
     
-    public final JWTManager tokenManager;
-    public final String type;
+    private final TokenManager tokenManager;
+    private final String type;
 
-    public AuthorizationToken(String type, JWTManager tokenManager) {
+    public AuthorizationToken(String type, TokenManager tokenManager) {
         this.tokenManager = tokenManager;
         this.type = type;
     }
 
     @Override
     public String getAuthorization() throws Exception {
-        // Validamos si estamos logeados para relizar peticiones.
-        final Token token = tokenManager.getAccessToken();
+        Token token = tokenManager.getAccessToken();
         return type + " " + token.getToken();
     }
-    
 }

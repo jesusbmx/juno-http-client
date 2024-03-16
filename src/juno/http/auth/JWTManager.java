@@ -2,64 +2,34 @@ package juno.http.auth;
 
 import java.io.IOException;
 
-public class JWTManager implements Token.OnAuth {
+public class JWTManager implements TokenManager {
     
-    public final DataStorage storage;
-    public final Token.OnAuth onAuth;
-    protected Token accessToken;
+    private final DataStorage storage;
+    private final Token.OnAuth onAuth;
     
     public JWTManager(DataStorage storage, Token.OnAuth onAuth) {
         this.storage = storage;
         this.onAuth = onAuth;
     }
-        
-    @Override
-    public Token auth() throws Exception {
-        return onAuth.auth();
-    }
 
-    public void saveToken(Token token) throws IOException {
-        storage.save("accessToken", token.getToken());
-        this.accessToken = token;
-    }
-    
-    public Token readToken() throws IOException {
-        if (accessToken == null) {
-            String token = storage.read("accessToken");
-            if (accessToken != null) {
-                try {
-                    accessToken = new JWT(token);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return null;
-                }
-            }
+    @Override
+    public Token getAccessToken() throws Exception {
+        Token accessToken = readToken();
+        
+        if (accessToken == null || !accessToken.isValid()) {
+            accessToken = onAuth.auth();
+            saveToken(accessToken);
         }
+        
         return accessToken;
     }
-    
-    public void deleteToken() throws IOException {
-        storage.delete("accessToken");
-        accessToken = null;
-    }
-       
-    public synchronized Token getAccessToken() throws Exception {
-        Token token = readToken();
-        
-        if (token == null) {
-            token = auth();
-            saveToken(token);
-            return token;
-        }
-        
-        if (token.isValid()) {
-            return token;
-        }
-        
-        token = auth();
-        saveToken(token);
-        
-        return token;
+
+    private Token readToken() throws Exception {
+        String token = storage.read("accessToken");
+        return token != null ? new JWT(token) : null;
     }
 
+    private void saveToken(Token token) throws IOException {
+        storage.save("accessToken", token.getToken());
+    }
 }
