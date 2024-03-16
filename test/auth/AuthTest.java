@@ -4,8 +4,8 @@ import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
 import juno.http.auth.AuthorizationToken;
-import juno.http.auth.DataStorage;
-import juno.http.auth.MemoryDataStorage;
+import juno.util.DataStorage;
+import juno.util.MemoryDataStorage;
 import juno.http.auth.JWTManager;
 import juno.http.auth.Token;
 

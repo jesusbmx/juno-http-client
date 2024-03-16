@@ -1,5 +1,6 @@
 package juno.http.auth;
 
+import juno.util.DataStorage;
 import java.io.IOException;
 
 public class JWTManager implements TokenManager {
