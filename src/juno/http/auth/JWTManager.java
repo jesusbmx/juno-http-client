@@ -1,7 +1,6 @@
 package juno.http.auth;
 
-import juno.util.DataStorage;
-import java.io.IOException;
+import juno.content.DataStorage;
 
 public class JWTManager implements TokenManager {
     
@@ -26,11 +25,11 @@ public class JWTManager implements TokenManager {
     }
 
     private Token readToken() throws Exception {
-        String token = storage.read("accessToken");
+        String token = storage.getString("accessToken", null);
         return token != null ? new JWT(token) : null;
     }
 
-    private void saveToken(Token token) throws IOException {
-        storage.save("accessToken", token.getToken());
+    private void saveToken(Token token) throws Exception {
+        storage.putString("accessToken", token.getToken());
     }
 }

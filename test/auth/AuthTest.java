@@ -4,8 +4,8 @@ import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
 import juno.http.auth.AuthorizationToken;
-import juno.util.DataStorage;
-import juno.util.MemoryDataStorage;
+import juno.content.DataStorage;
+import juno.content.MemoryDataStorage;
 import juno.http.auth.Token;
 import juno.http.auth.TokenManager;
 
@@ -61,11 +61,11 @@ public class AuthTest implements Token.OnAuth {
             return accessToken;
         }
         private Token readToken() throws Exception {
-            String token = storage.read("accessToken");
+            String token = storage.getString("accessToken", null);
             return token != null ? new SimpleToken(token) : null;
         }
         private void saveToken(Token token) throws Exception {
-            storage.save("accessToken", token.getToken());
+            storage.putString("accessToken", token.getToken());
         }
     }
 
