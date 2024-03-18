@@ -16,14 +16,26 @@ public class CacheInterceptor implements OnInterceptor {
     private CacheSource _cacheSource;
     public final Calendar nextExpireAt;
 
-    public CacheInterceptor(String name, File dirStorage, Calendar nextExpireAt) {
-        this.name = name;
+    public CacheInterceptor(File dirStorage, Calendar nextExpireAt, String name) {
         this.dirStorage = dirStorage;
         this.nextExpireAt = nextExpireAt;
+        this.name = name;
     }
     
     public CacheInterceptor(File dirStorage, Calendar nextExpireAt) {
-        this("HttpCacheInterceptor.json", dirStorage, nextExpireAt);
+        this(dirStorage, nextExpireAt, "HttpCacheInterceptor.xml");
+    }
+    
+    public CacheInterceptor(File dirStorage) {
+        this(dirStorage, defaultNextExpireAt());
+    }
+    
+    private static Calendar defaultNextExpireAt() {
+        Calendar nextExpireAt = Calendar.getInstance();
+        // Sumar un día
+        nextExpireAt.add(Calendar.DAY_OF_YEAR, 1);
+        
+        return nextExpireAt;
     }
     
     public File getDirStorage() {
@@ -81,8 +93,8 @@ public class CacheInterceptor implements OnInterceptor {
             cache.expireAt = getNextExpireAt().getTimeInMillis();
             cache.setRequest(request);
                         
-            final File tmpData = new File(getDirStorage(), cache.uuid + ".data");
-            cache.write(response, tmpData);
+            final File tmpContent = new File(getDirStorage(), cache.uuid + ".content");
+            cache.write(response, tmpContent);
 
             // Guarda los datos de la respuesta en la cache
             getCacheSource().save(cache);

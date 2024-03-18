@@ -1,17 +1,17 @@
 package juno.http.cache;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Map;
 import juno.http.Headers;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
-import juno.http.convert.json.JSON;
 import juno.io.Files;
 import juno.io.IOUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.w3c.dom.Node;
 
 /*
 {
@@ -36,7 +36,7 @@ import org.json.JSONObject;
             "X-Powered-By": "Express",
             "Content-Type": "application/json; charset=utf-8"
         },
-        "data": "/Users/.../8eaed87c-8a00-43b7-96f4-7cfef4339359.data"
+        "content": "/Users/.../8eaed87c-8a00-43b7-96f4-7cfef4339359.data"
     }
 }
 */
@@ -56,52 +56,62 @@ public class CacheModel {
         
     }
     
-    public CacheModel(final JSONObject it) throws JSONException {
-        this.uuid = it.getString("uuid");
-        this.expireAt = it.getLong("expireAt");
+    public CacheModel(final Element element) {
+        this.uuid = element.getAttribute("uuid");
+        this.expireAt = Long.parseLong(element.getAttribute("expireAt"));
+
+        // Request
+        Element requestElement = (Element) element.getElementsByTagName("request").item(0);
+        this.requestMethod = requestElement.getAttribute("method");
+        this.requestUrl = requestElement.getAttribute("url");
+
+        // Response
+        Element responseElement = (Element) element.getElementsByTagName("response").item(0);
+        this.responseCode = Integer.parseInt(responseElement.getAttribute("code"));
+        this.responseContent = new File(responseElement.getAttribute("content"));  
         
-        final JSONObject request = it.getJSONObject("request");
-        this.requestMethod = request.getString("method");
-        this.requestUrl = request.getString("url");
-        
-        final JSONObject response = it.getJSONObject("response");
-        this.responseCode = response.getInt("code");
-        
-        Map<String, Object> headers = JSON.toMap(
-                response.getJSONObject("headers"));
-        
-        for (Map.Entry<String, Object> entry : headers.entrySet()) {
-            this.responseHeaders.add(entry.getKey(), String.valueOf(entry.getValue()));
+        Element headersElement = (Element) responseElement.getElementsByTagName("headers").item(0);
+        for (int i = 0; i < headersElement.getChildNodes().getLength(); i++) {
+            Node headerNode = headersElement.getChildNodes().item(i);
+            if (headerNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element headerElement = (Element) headerNode;
+                String name = headerElement.getAttribute("name");
+                String value = headerElement.getTextContent();
+                this.responseHeaders.add(name, value);
+            }
         }
-        
-        final String data = response.getString("data");
-        this.responseContent = new File(data);
     }
     
-    public JSONObject toJson() throws JSONException {
-        final JSONObject r = new JSONObject();
-        r.put("uuid", this.uuid);
-        r.put("expireAt", this.expireAt);
-        
-        final JSONObject request = new JSONObject();
-        request.put("method", this.requestMethod);
-        request.put("url", this.requestUrl);
-        r.put("request", request);
-        
-        final JSONObject response = new JSONObject();
-        response.put("code", this.responseCode);
-        response.put("data", this.responseContent.toString());
-        
-        JSONObject headers = new JSONObject();
+    public Element toXmlElement(Document doc) {
+        Element modelElement = doc.createElement("CacheModel");
+        modelElement.setAttribute("uuid", this.uuid);
+        modelElement.setAttribute("expireAt", String.valueOf(this.expireAt));
+
+        // Request
+        Element requestElement = doc.createElement("request");
+        requestElement.setAttribute("method", this.requestMethod);
+        requestElement.setAttribute("url", this.requestUrl);
+        modelElement.appendChild(requestElement);
+
+        // response
+        Element responseElement = doc.createElement("response");
+        responseElement.setAttribute("code", String.valueOf(this.responseCode));
+        responseElement.setAttribute("content", this.responseContent.getAbsolutePath());
+
+        Element headersElement = doc.createElement("headers");
         for (int i = 0; i < this.responseHeaders.size(); i++) {
-            headers.put(this.responseHeaders.getName(i), 
-                    this.responseHeaders.getValue(i));
+            String name = this.responseHeaders.getName(i);
+            String value = this.responseHeaders.getValue(i);
+            Element headerElement = doc.createElement("header");
+            headerElement.setAttribute("name", name);
+            headerElement.setTextContent(value);
+            headersElement.appendChild(headerElement);
         }
-        response.put("headers", headers);
-        
-        r.put("response", response);
-        
-        return r;
+        responseElement.appendChild(headersElement);
+
+        modelElement.appendChild(responseElement);
+
+        return modelElement;
     }
     
     public String request() {
