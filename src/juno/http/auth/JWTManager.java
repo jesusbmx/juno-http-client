@@ -25,11 +25,11 @@ public class JWTManager implements TokenManager {
     }
 
     private Token readToken() throws Exception {
-        String token = storage.getString("accessToken", null);
+        String token = storage.getItem("accessToken", null);
         return token != null ? new JWT(token) : null;
     }
 
     private void saveToken(Token token) throws Exception {
-        storage.putString("accessToken", token.getToken());
+        storage.setItem("accessToken", token.getToken());
     }
 }
