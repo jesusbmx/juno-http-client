@@ -52,7 +52,7 @@ public class CacheSource {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.newDocument();
 
-            Element rootElement = doc.createElement("CacheModels");
+            Element rootElement = doc.createElement("CacheSource");
             doc.appendChild(rootElement);
 
             for (CacheModel model : list) {
