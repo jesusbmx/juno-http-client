@@ -31,11 +31,9 @@ public class CacheTest {
     
     /*
     GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en HTTP/1.1
-
-    User-Agent: nombre-cliente
     */
     Async<String> get2() throws Exception {
-        HttpUrl url = new HttpUrl("http://ip-api.com/")
+      HttpUrl url = new HttpUrl("http://ip-api.com/")
         .addPath("json")
         .addPath("24.48.0.1")
         .addQueryParameter("fields", "status,message,query,country,city")
