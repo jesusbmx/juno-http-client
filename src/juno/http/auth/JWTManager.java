@@ -1,6 +1,8 @@
 package juno.http.auth;
 
+import java.io.File;
 import juno.content.DataStorage;
+import juno.content.FileDataStorage;
 
 public class JWTManager implements TokenManager {
     
@@ -10,6 +12,10 @@ public class JWTManager implements TokenManager {
     public JWTManager(DataStorage storage, Token.OnAuth onAuth) {
         this.storage = storage;
         this.onAuth = onAuth;
+    }
+    
+    public JWTManager(File storage, Token.OnAuth onAuth) {
+        this(new FileDataStorage(storage), onAuth);
     }
 
     @Override
