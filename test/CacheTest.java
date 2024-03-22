@@ -9,40 +9,41 @@ import juno.http.cache.CacheInterceptor;
 
 public class CacheTest {
     
-    HttpClient client = HttpClient.getInstance()
+    final HttpClient client = HttpClient.getInstance()
             .setDebug(true);
     
-    File dirStorage = new File(System.getProperty("user.home") + "\\Downloads\\cache\\");
+    final File cacheStorage = new File(
+            System.getProperty("user.home") + "\\Downloads\\cache\\HttpCacheInterceptor.xml");
 
     /*
     GET https://postman-echo.com/get HTTP/1.1
     */
     Async<String> get() throws Exception {
-        HttpRequest request = new HttpRequest(
+        final HttpRequest request = new HttpRequest(
                 "GET", "https://postman-echo.com/get");
 
-        Calendar nextExpireAt = Calendar.getInstance();
+        final Calendar nextExpireAt = Calendar.getInstance();
         // Sumar un día
         nextExpireAt.add(Calendar.DAY_OF_YEAR, 1);
 
         return client.newAsyncRequest(request, String.class)
-                .setInterceptor(new CacheInterceptor(dirStorage, nextExpireAt));
+                .setInterceptor(new CacheInterceptor(cacheStorage, nextExpireAt));
     }
     
     /*
     GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en HTTP/1.1
     */
     Async<String> get2() throws Exception {
-      HttpUrl url = new HttpUrl("http://ip-api.com/")
+      final HttpUrl url = new HttpUrl("http://ip-api.com/")
         .addPath("json")
         .addPath("24.48.0.1")
         .addQueryParameter("fields", "status,message,query,country,city")
         .addQueryParameter("lang", "en")
       ;
-      HttpRequest request = new HttpRequest("GET", url);
+      final HttpRequest request = new HttpRequest("GET", url);
       
       return client.newAsyncRequest(request, String.class)
-              .setInterceptor(new CacheInterceptor(dirStorage));
+              .setInterceptor(new CacheInterceptor(cacheStorage));
     }
     
     public static void main(String[] args) throws Exception {

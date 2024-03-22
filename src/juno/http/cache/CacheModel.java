@@ -6,6 +6,7 @@ import org.w3c.dom.Element;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.UUID;
 import juno.http.Headers;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
@@ -42,7 +43,7 @@ import org.w3c.dom.Node;
 */
 public class CacheModel {
 
-    public String uuid;
+    public final String uuid;
     public long expireAt;
     
     public String requestMethod;
@@ -53,7 +54,7 @@ public class CacheModel {
     public File responseContent;
     
     public CacheModel() {
-        
+        this.uuid = UUID.randomUUID().toString();
     }
     
     public CacheModel(final Element element) {
@@ -114,16 +115,16 @@ public class CacheModel {
         return modelElement;
     }
     
-    public String request() {
+    public String getRequestAsString() {
         return requestMethod + " " + requestUrl;
     }
 
-    public void setRequest(HttpRequest request) {
+    public void setHttpRequest(HttpRequest request) {
         this.requestMethod = request.getMethod();
         this.requestUrl = request.urlAndParams();
     }
     
-    public void write(HttpResponse response, File tmpData) throws IOException {
+    public void writeResponseToFile(HttpResponse response, File tmpData) throws IOException {
         // Write Tmp File
         FileOutputStream out = null;
         try {
@@ -138,7 +139,7 @@ public class CacheModel {
         this.responseContent = tmpData;
     }
     
-    public HttpResponse getResponseBody() throws Exception {
+    public HttpResponse getHttpResponseFromFile() throws Exception {
         byte[] content = Files.readByteArray(responseContent);
         return new HttpResponse(
                 responseCode, "OK", responseHeaders, content);

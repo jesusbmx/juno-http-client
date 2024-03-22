@@ -22,20 +22,28 @@ public class CacheSource {
     private static final Map<File, CacheSource> INSTANCES = 
             new HashMap<File, CacheSource>();
     
-    private final File _src;
+    public final File file;
     private List<CacheModel> _objects;
 
-    private CacheSource(File src) {
-        this._src = src;
+    private CacheSource(File file) {
+        this.file = file;
     }
     
-    public static CacheSource get(File src) {
+    public static CacheSource getCacheSourceFromFile(File src) {
         CacheSource db = INSTANCES.get(src);
         if (db == null) {
             db = new CacheSource(src);
             INSTANCES.put(src, db);
         }
         return db;
+    }
+    
+    public File getParentFile() {
+        final File dir = file.getParentFile();
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return dir;
     }
     
     public int indexOf(String uuid, List<CacheModel> list) {
@@ -48,11 +56,15 @@ public class CacheSource {
     
     public synchronized void writeObjects(List<CacheModel> list) {
         try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.newDocument();
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            
+            final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            final Document doc = dBuilder.newDocument();
 
-            Element rootElement = doc.createElement("CacheSource");
+            final Element rootElement = doc.createElement("CacheSource");
             doc.appendChild(rootElement);
 
             for (CacheModel model : list) {
@@ -60,11 +72,11 @@ public class CacheSource {
                 rootElement.appendChild(modelElement);
             }
 
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
+            final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            final Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(_src);
+            final DOMSource source = new DOMSource(doc);
+            final StreamResult result = new StreamResult(file);
             transformer.transform(source, result);
 
         } catch (Exception e) {
@@ -74,19 +86,19 @@ public class CacheSource {
     
     public synchronized List<CacheModel> readObjects() {
         try {
-            if (!_src.exists()) {
+            if (!file.exists()) {
                 return new ArrayList<CacheModel>();
             }
             
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(_src);
+            final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            final Document doc = dBuilder.parse(file);
             doc.getDocumentElement().normalize();
 
             List<CacheModel> result = new ArrayList<CacheModel>();
-            Element rootElement = doc.getDocumentElement();
+            final Element rootElement = doc.getDocumentElement();
             for (int i = 0; i < rootElement.getChildNodes().getLength(); i++) {
-                Node node = rootElement.getChildNodes().item(i);
+                final Node node = rootElement.getChildNodes().item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     result.add(new CacheModel((Element) node));
                 }

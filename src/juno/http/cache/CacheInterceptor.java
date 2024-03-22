@@ -2,7 +2,6 @@ package juno.http.cache;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.UUID;
 import juno.http.Debug;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
@@ -10,112 +9,96 @@ import juno.http.HttpStack;
 import juno.http.OnInterceptor;
 
 public class CacheInterceptor implements OnInterceptor {
-    
-    public final String name;
-    public final File dirStorage;
-    private CacheSource _cacheSource;
+
+    public final CacheSource source;
     public final Calendar nextExpireAt;
 
-    public CacheInterceptor(File dirStorage, Calendar nextExpireAt, String name) {
-        this.dirStorage = dirStorage;
+    public CacheInterceptor(CacheSource source, Calendar nextExpireAt) {
+        this.source = source;
         this.nextExpireAt = nextExpireAt;
-        this.name = name;
     }
-    
-    public CacheInterceptor(File dirStorage, Calendar nextExpireAt) {
-        this(dirStorage, nextExpireAt, "HttpCacheInterceptor.xml");
+
+    public CacheInterceptor(File source, Calendar nextExpireAt) {
+        this(CacheSource.getCacheSourceFromFile(source), nextExpireAt);
     }
-    
-    public CacheInterceptor(File dirStorage) {
-        this(dirStorage, defaultNextExpireAt());
+
+    public CacheInterceptor(CacheSource source) {
+        this(source, defaultNextExpireAt());
     }
-    
+
+    public CacheInterceptor(File source) {
+        this(CacheSource.getCacheSourceFromFile(source));
+    }
+
     private static Calendar defaultNextExpireAt() {
         Calendar nextExpireAt = Calendar.getInstance();
-        // Sumar un día
         nextExpireAt.add(Calendar.DAY_OF_YEAR, 1);
-        
         return nextExpireAt;
     }
-    
-    public File getDirStorage() {
-        if (!dirStorage.exists()) {
-            dirStorage.mkdirs();
-        }
-        return dirStorage;
-    }
-    
-    public CacheSource getCacheSource() {
-        if (_cacheSource == null) {
-            _cacheSource = CacheSource.get(new File(getDirStorage(), name));
-        }
-        return _cacheSource;
-    }
-   
+
     @Override
     public HttpResponse intercept(HttpRequest request, HttpStack stack) throws Exception {
-        final CacheModel cache = getCacheSource().find(request);
-        if (cache == null) {
-            Debug.debug("CacheInterceptor", "executeRequest", request);
-            return executeRequest(stack, request, null);
-        }
-        
-        final long now = System.currentTimeMillis();
-        Debug.debug("CacheInterceptor", "cache", cache);
+        CacheModel cache = source.find(request);
 
-        // Expiro la cache
-        if (now > cache.expireAt) {
-            Debug.debug("CacheInterceptor", "expire", cache.request());
-            return executeRequest(stack, request, cache);
+        if (cache == null || hasCacheExpired(cache)) {
+            return handleCacheMiss(request, stack, cache);
         }
-        
-        // Obtiene la ultima respuesta desde la cache
-        try {
-            Debug.debug("CacheInterceptor", "get cache", cache.request());
-            return cache.getResponseBody(); 
-             
-        } catch(Exception e) {
-            Debug.debug("CacheInterceptor", "error getting cache", cache.request());
-            return executeRequest(stack, request, cache);
-        }
+
+        return handleCacheHit(request, cache, stack);
     }
-    
-    public HttpResponse executeRequest(HttpStack stack, HttpRequest request, CacheModel cache) throws Exception {
-        if (cache == null)  {
-            cache = new CacheModel();
-            cache.uuid = UUID.randomUUID().toString();
-        }
-        
-        // Executa la solicituda el el servidor
+
+    protected HttpResponse handleCacheMiss(HttpRequest request, HttpStack stack, CacheModel cache) throws Exception {
+        Debug.debug("CacheInterceptor", "executeRequest:", request);
         final HttpResponse response = stack.execute(request);
 
-        if (response.code == 200) {
-            cache.expireAt = getNextExpireAt().getTimeInMillis();
-            cache.setRequest(request);
-                        
-            final File tmpContent = new File(getDirStorage(), cache.uuid + ".content");
-            cache.write(response, tmpContent);
+        if (isResponseValid(response)) {
+            try {
+                cache = updateCache(cache, request, response);
+                return cache.getHttpResponseFromFile();
 
-            // Guarda los datos de la respuesta en la cache
-            getCacheSource().save(cache);
-            
-            return cache.getResponseBody();
+            } catch (Exception e) {
+                Debug.debug("CacheInterceptor", "error.writeResponseToFile:", e.getMessage());
+            }
         }
 
         return response;
     }
 
-    public Calendar getNextExpireAt() {
-        return nextExpireAt;
+    protected HttpResponse handleCacheHit(HttpRequest request, CacheModel cache, HttpStack stack) throws Exception {
+        try {
+            Debug.debug("CacheInterceptor", "getHttpResponseFromFile:", cache.getRequestAsString());
+            return cache.getHttpResponseFromFile();
+
+        } catch (Exception e) {
+            Debug.debug("CacheInterceptor", "error.getHttpResponseFromFile:", e.getMessage());
+        }
+
+        return stack.execute(request);
     }
-    
-//    static String stringToHex(String string) {
-//        StringBuilder buf = new StringBuilder(200);
-//        for (char ch: string.toCharArray()) {
-//          if (buf.length() > 0)
-//            buf.append(' ');
-//          buf.append(String.format("%04x", (int) ch));
-//        }
-//        return buf.toString();
-//    }
+
+    protected CacheModel updateCache(CacheModel cache, HttpRequest request, HttpResponse response) throws Exception {
+        if (cache == null) {
+            cache = new CacheModel();
+        }
+
+        cache.expireAt = nextExpireAt.getTimeInMillis();
+        cache.setHttpRequest(request);
+
+        final File tmpContent = new File(source.getParentFile(), cache.uuid + ".content");
+        Debug.debug("CacheInterceptor", "writeResponseToFile:", tmpContent);
+        cache.writeResponseToFile(response, tmpContent);
+
+        // Guarda los datos de la respuesta en la cache
+        source.save(cache);
+
+        return cache;
+    }
+
+    protected boolean isResponseValid(HttpResponse response) {
+        return response.code == 200;
+    }
+
+    private boolean hasCacheExpired(CacheModel cache) {
+        return System.currentTimeMillis() > cache.expireAt;
+    }
 }

@@ -33,7 +33,7 @@ public final class Debug {
     public static void debug(String tag, Object... message) {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
-            debugInfo.append("[Debug] ").append(tag).append(" ");
+            debugInfo.append("[Debug] ").append(tag).append(" -> ");
             for (int i = 0; i < message.length; i++) {
                 if (i > 0) {
                     debugInfo.append(" ");
