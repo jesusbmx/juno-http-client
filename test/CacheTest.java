@@ -26,7 +26,7 @@ public class CacheTest {
         // Sumar un día
         nextExpireAt.add(Calendar.DAY_OF_YEAR, 1);
 
-        return client.newAsyncRequest(request, String.class)
+        return client.createAsync(request, String.class)
                 .setInterceptor(new CacheInterceptor(cacheStorage, nextExpireAt));
     }
     
@@ -42,7 +42,7 @@ public class CacheTest {
       ;
       final HttpRequest request = new HttpRequest("GET", url);
       
-      return client.newAsyncRequest(request, String.class)
+      return client.createAsync(request, String.class)
               .setInterceptor(new CacheInterceptor(cacheStorage));
     }
     

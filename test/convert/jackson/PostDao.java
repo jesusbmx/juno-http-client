@@ -30,7 +30,7 @@ public class PostDao {
     HttpRequest request = new HttpRequest(
         "GET", "https://kylewbanks.com/rest/posts.json");
 
-    return cli.newAsyncRequest(request, Post[].class);
+    return cli.createAsync(request, Post[].class);
   }
   
   public Async<String> insert(Post p) {
@@ -39,7 +39,7 @@ public class PostDao {
     HttpRequest request = new HttpRequest(
             "POST", "https://postman-echo.com/post", reqBody);
     
-    return cli.newAsyncRequest(request, String.class);
+    return cli.createAsync(request, String.class);
   }
 
   //  BasicHttpStack stack = new BasicHttpStack() {  

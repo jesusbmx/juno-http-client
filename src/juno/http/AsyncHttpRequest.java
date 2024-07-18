@@ -4,7 +4,7 @@ import juno.concurrent.AbstractAsync;
 import juno.concurrent.Dispatcher;
 import juno.http.convert.ResponseBodyConvert;
 
-public class AsyncRequest<T> extends AbstractAsync<T> {
+public class AsyncHttpRequest<T> extends AbstractAsync<T> {
     public final HttpStack stack;
     public final HttpRequest request;
     public final ResponseBodyConvert<T> convert;
@@ -13,7 +13,7 @@ public class AsyncRequest<T> extends AbstractAsync<T> {
     /**
      * Inyección de Dependencias: Dispatcher, HttpClient, ResponseBodyConvert
      */
-    public AsyncRequest(
+    public AsyncHttpRequest(
         Dispatcher dispatcher, HttpStack stack, HttpRequest request, ResponseBodyConvert<T> convert
     ) {
         super(dispatcher);
@@ -49,7 +49,7 @@ public class AsyncRequest<T> extends AbstractAsync<T> {
         return interceptor;
     }
     
-    public AsyncRequest<T> setInterceptor(OnInterceptor interceptor) {
+    public AsyncHttpRequest<T> setInterceptor(OnInterceptor interceptor) {
         this.interceptor = interceptor;
         return this;
     }

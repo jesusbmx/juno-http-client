@@ -25,7 +25,7 @@ public class AsynTest {
       HttpRequest request = new HttpRequest(
           "GET", url, body)
       ;
-      return client.newAsyncRequest(request, HttpResponse.class);
+      return client.createAsync(request, HttpResponse.class);
     }
 
     public void async() {

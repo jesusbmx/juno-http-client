@@ -181,7 +181,7 @@ public Async<String> insert(
   HttpRequest request = new HttpRequest(
       "POST", "https://postman-echo.com/post", reqBody);
 
-  return client.newAsyncRequest(request, String.class);
+  return client.createAsync(request, String.class);
 }
 ```
 
@@ -240,7 +240,7 @@ public Async<JSONObject> insert(
     HttpRequest request = new HttpRequest(
         "POST", "https://postman-echo.com/post", reqBody);
         
-    return client.newAsyncRequest(request, JSONObject.class);
+    return client.createAsync(request, JSONObject.class);
 }
 ```
 
@@ -361,7 +361,7 @@ public class PostApi {
     HttpRequest request = new HttpRequest(
         "GET", "https://kylewbanks.com/rest/posts.json");
 
-    return client.newAsyncRequest(request, Post[].class);
+    return client.createAsync(request, Post[].class);
   }
 
   public Async<String> insert(Post p) {
@@ -372,7 +372,7 @@ public class PostApi {
     HttpRequest request = new HttpRequest(
             "POST", "https://postman-echo.com/post", reqBody);
     
-    return client.newAsyncRequest(request, String.class);
+    return client.createAsync(request, String.class);
   }
 }
 ```
@@ -447,7 +447,7 @@ public class PostApi {
     HttpRequest request = new HttpRequest(
         "GET", "https://kylewbanks.com/rest/posts.json");
 
-    return client.newAsyncRequest(request, Post[].class);
+    return client.createAsync(request, Post[].class);
   }
   
   public Async<String> insert(Post p) {
@@ -457,7 +457,7 @@ public class PostApi {
     HttpRequest request = new HttpRequest(
             "POST", "https://postman-echo.com/post", reqBody);
     
-    return client.newAsyncRequest(request, String.class);
+    return client.createAsync(request, String.class);
   }
 }
 ```

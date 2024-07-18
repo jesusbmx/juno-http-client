@@ -142,17 +142,17 @@ public class HttpClient implements HttpStack {
    * 
    * @return una llamada
    */
-  public <V> AsyncRequest<V> newAsyncRequest(HttpRequest request, ResponseBodyConvert<V> convert) {
-    return new AsyncRequest<V>(getDispatcher(), this, request, convert);
+  public <V> AsyncHttpRequest<V> createAsync(HttpRequest request, ResponseBodyConvert<V> convert) {
+    return new AsyncHttpRequest<V>(getDispatcher(), this, request, convert);
   }
   
-  public <V> AsyncRequest<V> newAsyncRequest(HttpRequest request, Class<V> cast) {
-    return this.newAsyncRequest(request, getFactory()
+  public <V> AsyncHttpRequest<V> createAsync(HttpRequest request, Class<V> cast) {
+    return this.createAsync(request, getFactory()
             .getResponseBodyConvert(cast));
   }
   
-  public AsyncRequest<HttpResponse> newAsyncRequest(HttpRequest request) {
-    return this.newAsyncRequest(request, getFactory()
+  public AsyncHttpRequest<HttpResponse> createAsync(HttpRequest request) {
+    return this.createAsync(request, getFactory()
             .getResponseBodyConvert(HttpResponse.class));
   }
   

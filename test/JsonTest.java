@@ -22,7 +22,7 @@ public class JsonTest {
         HttpRequest request = new HttpRequest(
                 "POST", "https://postman-echo.com/post", reqBody);
 
-        return client.newAsyncRequest(request, JSONObject.class);
+        return client.createAsync(request, JSONObject.class);
     }
 
     public void async() {
