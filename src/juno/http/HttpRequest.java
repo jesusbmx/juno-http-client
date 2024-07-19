@@ -17,52 +17,66 @@ public class HttpRequest {
     /**
      * Metodo de la request: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE.
      */
-    String method = DEFAULT_METHOD;
+    private String method = DEFAULT_METHOD;
 
     /**
      * Url de nuestra request.
      */
-    HttpUrl url;
+    private HttpUrl url;
 
     /**
      * Lista de encabezados adicionales de HTTP para esta peticion.
      */
-    Headers headers;
+    private Headers headers;
 
     /**
      * Parametros de nuestra request.
      */
-    RequestBody body;
+    private RequestBody body;
 
     /**
      * Etiqueta para identificar la request.
      */
-    Object tag = HttpRequest.class;
+    private Object tag = HttpRequest.class;
 
     /**
      * Tiempo limite de espera.
      */
-    int timeoutMs = DEFAULT_TIMEOUT;
+    private int timeoutMs = DEFAULT_TIMEOUT;
 
 
     public HttpRequest() {
+    } 
+   
+    public HttpRequest(String method, HttpUrl url, Headers headers, RequestBody body) {
+        this.method = method.toUpperCase();
+        this.url = url;
+        this.headers = headers;
+        this.body = body;
     }
-
-    public HttpRequest(String method, String url, RequestBody body) {
-        setMethod(method).setUrl(url).setBody(body);
-    }
-
-    public HttpRequest(String method, String url) {
-        setMethod(method).setUrl(url);
-    }
-
     public HttpRequest(String method, HttpUrl url, RequestBody body) {
-        setMethod(method).setUrl(url).setBody(body);
+        this(method, url, null, body);
+    }
+    public HttpRequest(String method, HttpUrl url, Headers headers) {
+        this(method, url, headers, null);
+    }
+    public HttpRequest(String method, HttpUrl url) {
+        this(method, url, null, null);
+    }
+    
+    public HttpRequest(String method, String url, Headers headers, RequestBody body) {
+        this(method, new HttpUrl(url), headers, body);
+    }
+    public HttpRequest(String method, String url, RequestBody body) {
+        this(method, new HttpUrl(url), null, body);
+    }
+    public HttpRequest(String method, String url, Headers headers) {
+        this(method, new HttpUrl(url), headers, null);
+    }
+    public HttpRequest(String method, String url) {
+        this(method, new HttpUrl(url), null, null);
     }
 
-    public HttpRequest(String method, HttpUrl url) {
-        setMethod(method).setUrl(url);
-    }
 
     public String getMethod() {
         return method;

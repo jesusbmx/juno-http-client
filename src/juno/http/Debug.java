@@ -52,7 +52,7 @@ public final class Debug {
             debugInfo.append(request.getMethod()).append(" ")
                     .append(request.urlAndParams()).append(" HTTP/1.1").append("\r\n");
             
-            final Headers headers = request.headers;
+            final Headers headers = request.getHeaders();
             if (headers != null) {
                 debugInfo.append(headers);
             }
@@ -69,7 +69,7 @@ public final class Debug {
             debugInfo.append(request.getMethod()).append(" ")
                     .append(request.urlAndParams()).append(" HTTP/1.1").append("\r\n");
             
-            final Headers headers = request.headers;
+            final Headers headers = request.getHeaders();
             if (headers != null) {
                 debugInfo.append(headers);
             }
