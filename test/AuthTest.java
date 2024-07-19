@@ -1,11 +1,11 @@
 
 
+import juno.content.DataStorage;
+import juno.content.MemoryDataStorage;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
 import juno.http.auth.AuthorizationToken;
-import juno.content.DataStorage;
-import juno.content.MemoryDataStorage;
 import juno.http.auth.Token;
 import juno.http.auth.TokenManager;
 

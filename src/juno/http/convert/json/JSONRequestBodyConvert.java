@@ -2,8 +2,8 @@ package juno.http.convert.json;
 
 import java.util.Map;
 import juno.http.RequestBody;
+import juno.http.convert.ObjectAdapter;
 import juno.http.convert.RequestBodyConvert;
-import juno.http.convert.internal.ObjectAdapter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

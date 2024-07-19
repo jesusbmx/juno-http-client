@@ -1,8 +1,5 @@
 package juno.http.cache;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,6 +9,8 @@ import juno.http.HttpRequest;
 import juno.http.HttpResponse;
 import juno.io.Files;
 import juno.io.IOUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /*

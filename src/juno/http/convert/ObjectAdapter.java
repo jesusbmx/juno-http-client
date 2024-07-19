@@ -1,5 +1,5 @@
 
-package juno.http.convert.internal;
+package juno.http.convert;
 
 import java.util.HashMap;
 import java.util.Map;
