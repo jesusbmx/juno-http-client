@@ -172,7 +172,9 @@ HttpClient client = HttpClient.getInstance().setInterceptor((request, stack) -> 
     }
     throw new Exception("Unknown error code: " + response.code);
 });
-```java
+```
+
+
 
 ## [Asynchronous and Synchronous Tasks](test/AsynTest.java)
 
