@@ -32,7 +32,7 @@ public class AuthTest implements Token.OnAuth {
         HttpRequest request = new HttpRequest(
                 "POST", "https://postman-echo.com/post");
 
-        return client.execute(request, HttpResponse.class);
+        return client.execute(request);
     }
 
     public static void main(String[] args) throws Exception {
