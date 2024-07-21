@@ -145,7 +145,7 @@ HttpResponse getIpLocation() throws Exception {
   HttpRequest request = new HttpRequest("GET", url)
     .addHeader("User-Agent", "nombre-cliente")
   ;
-  return client.execute(request, HttpResponse.class);
+  return client.execute(request);
 }
 ```
 #### HttpResponse
@@ -304,7 +304,7 @@ public HttpResponse request() throws Exception{
   HttpRequest request = new HttpRequest(
       "POST", "https://postman-echo.com/post");
 
-  return client.execute(request, HttpResponse.class);
+  return client.execute(request);
 ```
 
 ## [GSON](https://github.com/google/gson) 
