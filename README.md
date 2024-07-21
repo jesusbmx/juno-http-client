@@ -165,8 +165,7 @@ try ( HttpResponse response = getIpLocation() ) {
 #### Interceptor
 
 ```java
-HttpClient client = HttpClient.getInstance().setInterceptor(
-(request, stack) -> {
+HttpClient client = HttpClient.getInstance().setInterceptor((request, stack) -> {
     HttpResponse response = stack.execute(request);
     if (response.code >= 200 && response.code <= 299) {
         return response;
