@@ -152,7 +152,7 @@ public class HttpURLConnectionStack implements HttpStack {
     
     // Create Http Response
     final HttpResponse response = new HttpResponse(
-            responseCode, status, headers, content);
+            responseCode, headers, content);
     
     Debug.debug(request, response);
     

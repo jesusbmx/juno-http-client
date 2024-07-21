@@ -16,23 +16,21 @@ public class HttpResponse implements Closeable {
 
     protected boolean closed;
     public final int code;
-    public final String status;
     public final Headers headers;
     public final InputStream content;
 
-    public HttpResponse(int code, String status, Headers headers, InputStream content) {
+    public HttpResponse(int code, Headers headers, InputStream content) {
         this.code = code;
-        this.status = status;
         this.headers = headers;
         this.content = content;
     }
 
-//    public HttpResponse(int code, String status, Headers headers, File content) throws FileNotFoundException {
-//        this(code, status, headers, new FileInputStream(content));
+//    public HttpResponse(int code, Headers headers, File content) throws FileNotFoundException {
+//        this(code, headers, new FileInputStream(content));
 //    }
 
-    public HttpResponse(int code, String status, Headers headers, byte[] content) {
-        this(code, status, headers, new ByteArrayInputStream(content, 0, content.length));
+    public HttpResponse(int code, Headers headers, byte[] content) {
+        this(code,headers, new ByteArrayInputStream(content, 0, content.length));
     }
 
     public long getContentLength() {

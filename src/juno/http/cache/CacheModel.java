@@ -141,7 +141,7 @@ public class CacheModel {
     public HttpResponse getHttpResponseFromFile() throws Exception {
         byte[] content = Files.readByteArray(responseContent);
         return new HttpResponse(
-                responseCode, "OK", responseHeaders, content);
+                responseCode, responseHeaders, content);
     }
 
     @Override

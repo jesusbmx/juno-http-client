@@ -153,7 +153,6 @@ HttpResponse getIpLocation() throws Exception {
 ```java
 try ( HttpResponse response = getIpLocation() ) {
   int code = response.code;  
-  String status = response.status;
   Headers headers = response.headers;
   Charset charset = response.getCharsetFromContentType();
   InputStream content = response.content;

@@ -13,7 +13,6 @@ public class SimpleResponseBodyConvert implements ResponseBodyConvert<HttpRespon
 
             return new HttpResponse(
                     response.code, 
-                    response.status, 
                     response.headers, 
                     content);
 
