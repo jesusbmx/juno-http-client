@@ -162,6 +162,18 @@ try ( HttpResponse response = getIpLocation() ) {
 }
 ```
 
+#### Interceptor
+
+```java
+HttpClient client = HttpClient.getInstance().setInterceptor((request, stack) -> {
+    HttpResponse response = stack.execute(request);
+    if (response.code >= 200 && response.code <= 299) {
+        return response;
+    }
+    throw new Exception("Unknown error code: " + response.code);
+});
+```
+
 
 
 ## [Asynchronous and Synchronous Tasks](test/AsynTest.java)
@@ -219,20 +231,6 @@ try {
     e.printStackTrace();
 }
 ```
-
-
-#### Interceptor
-
-```java
-HttpClient client = HttpClient.getInstance().setInterceptor((request, stack) -> {
-    HttpResponse response = stack.execute(request);
-    if (response.code >= 200 && response.code <= 299) {
-        return response;
-    }
-    throw new Exception("Unknown error code: " + response.code);
-});
-```
-
 
 ## [JSON](https://github.com/stleary/JSON-java)
 (https://www.json.org/json-en.html)
