@@ -44,19 +44,14 @@ public class AsynTest {
         });
    }
   
-  public void sync() {
-    Async<HttpResponse> ipLocation = getIpLocation();
-    
-    try (HttpResponse response = ipLocation.await()) {
-      String result = response.readString();
-      System.out.println(result);
-    
-    } catch(Exception e) {
-      e.printStackTrace();
-    }
+  public void sync() throws Exception {
+    HttpResponse response = getIpLocation().await();
+    String result = response.readString();
+    System.out.println(result);
+    response.close();
   }
   
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     AsynTest test = new AsynTest();
     //test.async();
     test.sync();
