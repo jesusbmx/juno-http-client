@@ -3,4 +3,5 @@ jdk:
   - openjdk8
 
 install:
-  - ant -DskipTests=true
+  - ant clean
+  - ant -DskipTests=true jar
