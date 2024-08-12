@@ -5,5 +5,5 @@ jdk:
 install:
   - ant clean
   - ant -DskipTests=true jar
-  - mkdir -p build/libs
-  - cp dist/juno-http-client.jar build/libs/
+  - mkdir -p target
+  - cp dist/juno-http-client.jar target/juno-http-client.jar
