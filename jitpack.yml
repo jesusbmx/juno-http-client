@@ -5,10 +5,5 @@ jdk:
 install:
   - ant clean
   - ant -DskipTests=true jar
-
-artifacts:
-  paths:
-    - dist/juno-http-client.jar
-  name: juno-http-client
-  type: jar
-  
+  - mkdir -p build/libs
+  - cp dist/juno-http-client.jar build/libs/
