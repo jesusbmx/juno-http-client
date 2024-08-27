@@ -112,4 +112,12 @@ public final class Debug {
         }
         return false;
     }
+
+    public static List<String> getLegibleContentTypes() {
+        return LEGIBLE_CONTENT_TYPES;
+    }
+    
+    public static void addLegibleContentType(String contentType) {
+        LEGIBLE_CONTENT_TYPES.add(contentType);
+    }
 }
