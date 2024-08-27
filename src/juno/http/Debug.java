@@ -2,19 +2,21 @@ package juno.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import juno.io.IOUtils;
 
 public final class Debug {
-    private static final List<String> LEGIBLE_CONTENT_TYPES = Arrays.asList(
+
+    private static final List<String> READABLE_CONTENT_TYPES = new ArrayList<String>(Arrays.asList(
             "application/json",
             "application/xml",
             "application/x-www-form-urlencoded",
             //"multipart/form-data",
             "text/plain",
             "text/html"
-    );
+    ));
     
     private static boolean isDebug;
     
@@ -77,7 +79,7 @@ public final class Debug {
             debugInfo.append(Headers.CONTENT_TYPE).append(": ").append(contentType).append("\r\n")
                      .append(Headers.CONTENT_LENGTH).append(": ").append(contentLength).append("\r\n");
 
-            if (isLegibleContentType(contentType)) {
+            if (isReadableContentType(contentType)) {
                 final ByteArrayOutputStream outputStream = IOUtils.arrayOutputStream();
                 rb.writeTo(outputStream);
                 final String requestBodyString = outputStream.toString();
@@ -104,8 +106,8 @@ public final class Debug {
         }
     }
     
-    private static boolean isLegibleContentType(String contentType) {
-        for (String legibleContentType : LEGIBLE_CONTENT_TYPES) {
+    private static boolean isReadableContentType(String contentType) {
+        for (String legibleContentType : READABLE_CONTENT_TYPES) {
             if (contentType.startsWith(legibleContentType)) {
                 return true;
             }
@@ -113,11 +115,11 @@ public final class Debug {
         return false;
     }
 
-    public static List<String> getLegibleContentTypes() {
-        return LEGIBLE_CONTENT_TYPES;
+    public static List<String> getReadableContentTypes() {
+        return READABLE_CONTENT_TYPES;
     }
     
-    public static void addLegibleContentType(String contentType) {
-        LEGIBLE_CONTENT_TYPES.add(contentType);
+    public static void addReadableContentType(String contentType) {
+        READABLE_CONTENT_TYPES.add(contentType);
     }
 }
