@@ -16,6 +16,9 @@ public class HttpClient implements HttpStack {
   /** Authorization */
   protected Authorization mAuthorization;
   
+  /** Headers adicionales */
+  protected Headers additionalHeaders = new Headers();
+  
   /** Interceptor de peticiones. */
   protected OnInterceptor mInterceptor;
   
@@ -65,7 +68,20 @@ public class HttpClient implements HttpStack {
     this.mAuthorization = mAuthorization;
     return this;
   }
+
+  public Headers getAdditionalHeaders() {
+    return additionalHeaders;
+  }
+
+  public void setAdditionalHeaders(Headers additionalHeaders) {
+    this.additionalHeaders = additionalHeaders;
+  }
   
+  public HttpClient addHeaders(String name, String value) {
+    this.additionalHeaders.add(name, value);
+    return this;
+  }
+ 
   public OnInterceptor getInterceptor() {
     return mInterceptor;
   }
@@ -106,6 +122,9 @@ public class HttpClient implements HttpStack {
   public HttpResponse execute(HttpRequest request) throws Exception {
     if (mAuthorization != null) {
         request.addHeader("Authorization", mAuthorization.getAuthorization());
+    }
+    for (int i = 0; i < additionalHeaders.size(); i++) {
+        request.addHeader(additionalHeaders.getName(i), additionalHeaders.getValue(i));
     }
     if (mInterceptor != null) {
         return mInterceptor.intercept(request, getHttpStack());
