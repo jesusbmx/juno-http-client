@@ -77,7 +77,7 @@ public class HttpClient implements HttpStack {
     this.additionalHeaders = additionalHeaders;
   }
   
-  public HttpClient addHeaders(String name, String value) {
+  public HttpClient addHeader(String name, String value) {
     this.additionalHeaders.add(name, value);
     return this;
   }
