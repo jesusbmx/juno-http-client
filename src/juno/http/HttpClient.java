@@ -69,11 +69,11 @@ public class HttpClient implements HttpStack {
     return this;
   }
 
-  public Headers getAdditionalHeaders() {
+  public Headers getHeaders() {
     return additionalHeaders;
   }
 
-  public void setAdditionalHeaders(Headers additionalHeaders) {
+  public void setHeaders(Headers additionalHeaders) {
     this.additionalHeaders = additionalHeaders;
   }
   
