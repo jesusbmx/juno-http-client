@@ -10,12 +10,12 @@ import juno.io.IOUtils;
 public final class Debug {
 
     private static final List<String> READABLE_CONTENT_TYPES = new ArrayList<String>(Arrays.asList(
-            "application/json",
-            "application/xml",
-            "application/x-www-form-urlencoded",
-            //"multipart/form-data",
-            "text/plain",
-            "text/html"
+        "application/json",
+        "application/xml",
+        "application/x-www-form-urlencoded",
+        //"multipart/form-data",
+        "text/plain",
+        "text/html"
     ));
     
     private static boolean isDebug;
