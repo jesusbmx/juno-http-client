@@ -11,6 +11,12 @@ public class AuthInterceptor implements Authorization {
     public AuthInterceptor(TokenManager tokenManager) {
         this.tokenManager = tokenManager;
     }
+    
+    public AuthInterceptor(TokenManager tokenManager, String header, String headerPrefix) {
+        this.tokenManager = tokenManager;
+        this.header = header;
+        this.headerPrefix = headerPrefix;
+    }
 
     @Override
     public String getValue() throws Exception {

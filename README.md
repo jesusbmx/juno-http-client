@@ -283,9 +283,7 @@ DataStorage tokenStorage = new FileDataStorage(new File(".../MyApi.jwt"));
 JwtTokenManager tokenManager = new JwtTokenManager(tokenStorage, onAuth);
 
 HttpClient client = new HttpClient()
-    .setAuthorization(new AuthInterceptor(tokenManager)
-        .setHeader("Authorization")
-        .setHeaderPrefix("Bearer "))
+    .setAuthorization(new AuthInterceptor(tokenManager, "Authorization", "Bearer "))
     .setDebug(true);
 ```
 
