@@ -203,10 +203,10 @@ Asynchronously send the request and notify your application with a callback when
 Main UI is not blocked or interferes with it.
 
 ```java
-Async<String> insert = insert(
+Async<String> async = insert(
             22, "John Doe", true);
     
-insert.execute((String response) -> {
+async.execute((String response) -> {
   String str = response;
   System.out.println(str);
 
@@ -220,11 +220,11 @@ insert.execute((String response) -> {
 Synchronously send the request and return your response.
 
 ```java
-Async<String> insert = insert(
+Async<String> async = insert(
             22, "John Doe", true);
     
 try {
-    String response = insert.await();
+    String response = async.await();
     System.out.println(response);
     
 } catch(Exception e) {
