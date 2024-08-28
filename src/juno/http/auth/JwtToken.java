@@ -98,8 +98,13 @@ public class JwtToken implements Token {
     public String getToken() {
         return token;
     }
+
+    @Override
+    public String toString() {
+        return token;
+    }
     
-     /**
+    /**
      * Genera un JWT a partir de un header, un payload y una clave secreta.
      *
      * @param header El objeto JSONObject que representa el header del JWT.

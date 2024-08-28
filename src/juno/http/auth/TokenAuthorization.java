@@ -18,7 +18,7 @@ public class TokenAuthorization implements Authorization {
 
     @Override
     public String generateAuthHeader() throws Exception {
-        final Token token = tokenManager.getValidToken();
+        final Token token = tokenManager.retrieveOrRefreshToken();
         return headerPrefix + token.getToken();
     }
 

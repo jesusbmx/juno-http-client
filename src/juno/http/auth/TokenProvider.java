@@ -2,9 +2,13 @@ package juno.http.auth;
 
 public interface TokenProvider {
     
-    Token getValidToken() throws Exception;
+    Token retrieveOrRefreshToken() throws Exception;
     
-    JwtToken getAccessToken() throws Exception;
+    String getAccessToken() throws Exception;
     
-    void setAccessToken(JwtToken token) throws Exception;
+    void setAccessToken(String token) throws Exception;
+    
+    String getRefreshToken() throws Exception;
+    
+    void setRefreshToken(String token) throws Exception;
 }
