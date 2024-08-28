@@ -2,5 +2,7 @@ package juno.http;
 
 public interface Authorization {
     
-    String getAuthorization() throws Exception;
+    String getHeader();
+
+    String getValue() throws Exception;
 }

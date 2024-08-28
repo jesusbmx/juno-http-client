@@ -8,7 +8,7 @@ import org.json.JSONObject;
 /**
  * https://jwt.io/
  */
-public class JWT implements Token {
+public class JwtToken implements Token {
     
     public final String token;
     
@@ -39,7 +39,7 @@ public class JWT implements Token {
      * @param accessToken "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
      * @throws org.json.JSONException
      */
-    public JWT(String accessToken) throws JSONException {
+    public JwtToken(String accessToken) throws JSONException {
         this.token = accessToken;
         
         String[] chunks = accessToken.split("\\.");

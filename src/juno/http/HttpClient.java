@@ -121,7 +121,7 @@ public class HttpClient implements HttpStack {
   @Override
   public HttpResponse execute(HttpRequest request) throws Exception {
     if (mAuthorization != null) {
-        request.addHeader("Authorization", mAuthorization.getAuthorization());
+        request.addHeader(mAuthorization.getHeader(), mAuthorization.getValue());
     }
     for (int i = 0; i < additionalHeaders.size(); i++) {
         request.addHeader(additionalHeaders.getName(i), additionalHeaders.getValue(i));
