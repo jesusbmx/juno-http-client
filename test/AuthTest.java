@@ -9,12 +9,13 @@ import juno.http.HttpResponse;
 import juno.http.auth.TokenAuthorization;
 import juno.http.auth.JwtToken;
 import juno.http.auth.JwtTokenProvider;
+import juno.http.auth.TokenProvider;
 import org.json.JSONObject;
 
 public class AuthTest implements JwtTokenProvider.OnAuth {
 
     HttpClient client;
-    JwtTokenProvider tokenProvider;
+    TokenProvider tokenProvider;
 
     public AuthTest() {
         // You can create you own storage

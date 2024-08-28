@@ -42,11 +42,13 @@ public class JwtTokenProvider implements TokenProvider {
         return accessToken;
     }
 
+    @Override
     public JwtToken getAccessToken() throws Exception {
         final String token = storage.getItem("accessToken", null);
         return token != null ? new JwtToken(token) : null;
     }
 
+    @Override
     public void setAccessToken(JwtToken token) throws Exception {
         storage.setItem("accessToken", token.getToken());
     }
