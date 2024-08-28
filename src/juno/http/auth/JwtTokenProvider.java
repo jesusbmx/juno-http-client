@@ -32,22 +32,22 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public Token getValidToken() throws Exception {
-        JwtToken accessToken = readToken();
+        JwtToken accessToken = getAccessToken();
         
         if (accessToken == null || !accessToken.isValid()) {
             accessToken = onAuth.auth(accessToken);
-            saveToken(accessToken);
+            setAccessToken(accessToken);
         }
         
         return accessToken;
     }
 
-    private JwtToken readToken() throws Exception {
+    public JwtToken getAccessToken() throws Exception {
         final String token = storage.getItem("accessToken", null);
         return token != null ? new JwtToken(token) : null;
     }
 
-    private void saveToken(JwtToken token) throws Exception {
+    public void setAccessToken(JwtToken token) throws Exception {
         storage.setItem("accessToken", token.getToken());
     }
 }

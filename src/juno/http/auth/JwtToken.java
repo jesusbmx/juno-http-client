@@ -1,7 +1,10 @@
 package juno.http.auth;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import juno.util.Convert;
+import juno.util.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,16 +41,20 @@ public class JwtToken implements Token {
     /**
      * @param accessToken "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
      * @throws org.json.JSONException
+     * @throws java.io.UnsupportedEncodingException
      */
-    public JwtToken(String accessToken) throws JSONException {
+    public JwtToken(String accessToken) throws JSONException, UnsupportedEncodingException {
         this.token = accessToken;
         
         String[] chunks = accessToken.split("\\.");
+        if (chunks.length != 3) {
+            throw new IllegalArgumentException("Invalid JWT token format.");
+        }
         
-        String sHeader = Convert.fromBase64(chunks[0]);
+        String sHeader = new String(Base64.getUrlDecoder().decode(chunks[0]), "UTF-8");
         header = new JSONObject(sHeader);
 
-        String sPayload = Convert.fromBase64(chunks[1]);
+        String sPayload = new String(Base64.getUrlDecoder().decode(chunks[1]), "UTF-8");
         payload = new JSONObject(sPayload);
         
         signature = chunks[2];
@@ -92,9 +99,59 @@ public class JwtToken implements Token {
         return token;
     }
     
+     /**
+     * Genera un JWT a partir de un header, un payload y una clave secreta.
+     *
+     * @param header El objeto JSONObject que representa el header del JWT.
+     * @param payload El objeto JSONObject que representa el payload del JWT.
+     * @param secretKey La clave secreta utilizada para generar la firma.
+     * @return El token JWT completo como un String.
+     * @throws NoSuchAlgorithmException Si el algoritmo HMAC SHA-256 no está disponible.
+     * @throws java.io.UnsupportedEncodingException
+     */
+    public static String generateToken(JSONObject header, JSONObject payload, String secretKey) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        // Codificar header y payload en Base64URL
+        String encodedHeader = Base64.getUrlEncoder().withoutPadding().encodeToString(header.toString().getBytes("UTF-8"));
+        String encodedPayload = Base64.getUrlEncoder().withoutPadding().encodeToString(payload.toString().getBytes("UTF-8"));
+
+        // Concatenar header y payload
+        String unsignedToken = encodedHeader + "." + encodedPayload;
+
+        // Crear la firma
+        String signature = createHMACSHA256Signature(unsignedToken, secretKey);
+
+        // Concatenar todo para formar el token completo
+        return unsignedToken + "." + signature;
+    }
+
+    private static String createHMACSHA256Signature(String data, String secret) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest((data + secret).getBytes("UTF-8"));
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+    }
+    
 //    public static void main(String[] args) throws JSONException {
 //        JWT jwt = new JWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
 //        System.out.println(jwt.header);
 //        System.out.println(jwt.payload);
+//    }
+    
+//    // Método main para probar la generación del token
+//    public static void main(String[] args) throws Exception {
+//        // Crear el header y payload
+//        JSONObject header = new JSONObject();
+//        header.put("alg", "HS256");
+//        header.put("typ", "JWT");
+//
+//        JSONObject payload = new JSONObject();
+//        payload.put("sub", UUID.randomUUID());
+//        payload.put("name", "John Doe");
+//        payload.put("iat", System.currentTimeMillis() / 1000);
+//        payload.put("exp", (System.currentTimeMillis() / 1000) + 3600);
+//
+//        // Generar el token
+//        String secretKey = Long.toHexString(System.currentTimeMillis());
+//        String token = generateToken(header, payload, secretKey);
+//        System.out.println("Generated Token: " + token);
 //    }
 }
