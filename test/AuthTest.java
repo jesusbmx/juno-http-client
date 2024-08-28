@@ -21,7 +21,7 @@ public class AuthTest implements Token.OnAuth {
 
         // Add the JWT Manager to interceptor
         client = new HttpClient()
-                .setAuthorization(new AuthInterceptor(tokenManager, "Authorization", "Bearer "))
+                .setAuthorization(new AuthInterceptor("Bearer ", tokenManager))
                 .setDebug(true);
     }
 

@@ -5,33 +5,21 @@ import juno.http.Authorization;
 public class AuthInterceptor implements Authorization {
     
     private final TokenManager tokenManager;
-    private String header = "Authorization";
-    private String headerPrefix = "Bearer ";
+    private String headerPrefix;
 
-    public AuthInterceptor(TokenManager tokenManager) {
+    public AuthInterceptor(String headerPrefix, TokenManager tokenManager) {
         this.tokenManager = tokenManager;
-    }
-    
-    public AuthInterceptor(TokenManager tokenManager, String header, String headerPrefix) {
-        this.tokenManager = tokenManager;
-        this.header = header;
         this.headerPrefix = headerPrefix;
     }
+    
+    public AuthInterceptor(TokenManager tokenManager) {
+        this("Bearer ", tokenManager);
+    }
 
     @Override
-    public String getValue() throws Exception {
-        final Token token = tokenManager.getAccessToken();
+    public String getAuthorizationHeaderValue() throws Exception {
+        final Token token = tokenManager.retrieveValidAccessToken();
         return headerPrefix + token.getToken();
-    }
-
-    @Override
-    public String getHeader() {
-        return header;
-    }
-
-    public AuthInterceptor setHeader(String header) {
-        this.header = header;
-        return this;
     }
 
     public String getHeaderPrefix() {

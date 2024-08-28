@@ -2,5 +2,5 @@ package juno.http.auth;
 
 public interface TokenManager {
     
-    public Token getAccessToken() throws Exception;
+    public Token retrieveValidAccessToken() throws Exception;
 }

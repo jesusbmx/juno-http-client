@@ -19,7 +19,7 @@ public class JwtTokenManager implements TokenManager {
     }
 
     @Override
-    public Token getAccessToken() throws Exception {
+    public Token retrieveValidAccessToken() throws Exception {
         Token accessToken = readToken();
         
         if (accessToken == null || !accessToken.isValid()) {
