@@ -2,23 +2,23 @@ package juno.http.auth;
 
 import juno.http.Authorization;
 
-public class AuthInterceptor implements Authorization {
+public class TokenAuthorization implements Authorization {
     
-    private final TokenManager tokenManager;
+    private final TokenProvider tokenManager;
     private String headerPrefix;
 
-    public AuthInterceptor(String headerPrefix, TokenManager tokenManager) {
+    public TokenAuthorization(String headerPrefix, TokenProvider tokenManager) {
         this.tokenManager = tokenManager;
         this.headerPrefix = headerPrefix;
     }
     
-    public AuthInterceptor(TokenManager tokenManager) {
+    public TokenAuthorization(TokenProvider tokenManager) {
         this("Bearer ", tokenManager);
     }
 
     @Override
-    public String getAuthorizationHeaderValue() throws Exception {
-        final Token token = tokenManager.retrieveValidAccessToken();
+    public String generateAuthHeader() throws Exception {
+        final Token token = tokenManager.getValidToken();
         return headerPrefix + token.getToken();
     }
 
@@ -26,7 +26,7 @@ public class AuthInterceptor implements Authorization {
         return headerPrefix;
     }
 
-    public AuthInterceptor setHeaderPrefix(String headerPrefix) {
+    public TokenAuthorization setHeaderPrefix(String headerPrefix) {
         this.headerPrefix = headerPrefix;
         return this;
     }

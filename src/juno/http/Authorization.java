@@ -11,5 +11,5 @@ public interface Authorization {
      * 
      * @throws Exception 
      */
-    String getAuthorizationHeaderValue() throws Exception;
+    String generateAuthHeader() throws Exception;
 }

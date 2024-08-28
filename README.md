@@ -277,19 +277,19 @@ JSONObject jsonRequest() throws Exception {
 
 Store, clear, transmit and automatically refresh JWT authentication tokens.
 
-Create you own storage and add the JwtTokenManager
+Create you own storage and add the JwtTokenProvider
 ```java
 DataStorage tokenStorage = new FileDataStorage(new File(".../MyApi.jwt"));
-JwtTokenManager tokenManager = new JwtTokenManager(tokenStorage, onAuth);
+TokenProvider tokenProvider = new JwtTokenProvider(tokenStorage, onAuth);
 
 HttpClient client = new HttpClient()
-    .setAuthorization(new AuthInterceptor("Bearer ", tokenManager))
+    .setAuthorization(new TokenAuthorization("Bearer ", tokenProvider))
     .setDebug(true);
 ```
 
 Define token auth function.
 ```java
-Token.OnAuth onAuth = (Token oldToken) -> {
+JwtTokenProvider.OnAuth onAuth = (JwtToken oldToken) -> {
     FormBody body = new FormBody()
             .add("email", "myMail@domain.com")
             .add("password", "myPassword");
