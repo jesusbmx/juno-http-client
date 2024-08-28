@@ -280,7 +280,7 @@ Store, clear, transmit and automatically refresh JWT authentication tokens.
 Create you own storage and add the JwtTokenProvider
 ```java
 DataStorage tokenStorage = new FileDataStorage(new File(".../MyApi.jwt"));
-TokenProvider tokenProvider = new JwtTokenProvider(tokenStorage, onRefreshRequest);
+TokenProvider tokenProvider = new JwtTokenProvider(tokenStorage, onTokenRefresh);
 
 HttpClient client = new HttpClient()
     .setAuthorization(new TokenAuthorization("Bearer ", tokenProvider))
@@ -289,7 +289,7 @@ HttpClient client = new HttpClient()
 
 Define token auth function.
 ```java
-JwtTokenProvider.OnAuth onRefreshRequest = (TokenProvider provider) -> {
+JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
     FormBody body = new FormBody()
             .add("email", "myMail@domain.com")
             .add("password", "myPassword");

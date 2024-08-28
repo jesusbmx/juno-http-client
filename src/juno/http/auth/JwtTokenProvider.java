@@ -7,19 +7,19 @@ import juno.content.FileDataStorage;
 public class JwtTokenProvider implements TokenProvider {
     
     private final DataStorage storage;
-    private final OnRefresh onRefresh;
+    private final OnTokenRefresh onTokenRefresh;
 
-    public interface OnRefresh {
-        void onRefreshRequest(TokenProvider provider) throws Exception;
+    public interface OnTokenRefresh {
+        void onTokenRefresh(TokenProvider provider) throws Exception;
     }
     
-    public JwtTokenProvider(DataStorage storage, OnRefresh onRefresh) {
+    public JwtTokenProvider(DataStorage storage, OnTokenRefresh onTokenRefresh) {
         this.storage = storage;
-        this.onRefresh = onRefresh;
+        this.onTokenRefresh = onTokenRefresh;
     }
     
-    public JwtTokenProvider(File storage, OnRefresh onRefresh) {
-        this(new FileDataStorage(storage), onRefresh);
+    public JwtTokenProvider(File storage, OnTokenRefresh onTokenRefresh) {
+        this(new FileDataStorage(storage), onTokenRefresh);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class JwtTokenProvider implements TokenProvider {
         String accessToken = getAccessToken();
         
         if (accessToken == null) {
-            onRefresh.onRefreshRequest(this);
+            onTokenRefresh.onTokenRefresh(this);
             accessToken = getAccessToken();
             
         } else {
@@ -35,7 +35,7 @@ public class JwtTokenProvider implements TokenProvider {
             if (jwtToken.isValid()) {
                 return jwtToken;
             }
-            onRefresh.onRefreshRequest(this);
+            onTokenRefresh.onTokenRefresh(this);
             accessToken = getAccessToken();
         }
             

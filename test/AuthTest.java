@@ -12,7 +12,7 @@ import juno.http.auth.JwtTokenProvider;
 import juno.http.auth.TokenProvider;
 import org.json.JSONObject;
 
-public class AuthTest implements JwtTokenProvider.OnRefresh {
+public class AuthTest implements JwtTokenProvider.OnTokenRefresh {
 
     HttpClient client;
     TokenProvider tokenProvider;
@@ -28,8 +28,8 @@ public class AuthTest implements JwtTokenProvider.OnRefresh {
                 .setDebug(true);
     }
 
-    @Override public void onRefreshRequest(TokenProvider provider) throws Exception {
-        System.out.println("AuthTest.onRefreshRequest()");
+    @Override public void onTokenRefresh(TokenProvider provider) throws Exception {
+        System.out.println("AuthTest.onTokenRefresh()");
         
         FormBody body = new FormBody()
             .add("token", provider.getRefreshToken())
