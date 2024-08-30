@@ -5,6 +5,8 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import juno.io.IOUtils;
@@ -39,15 +41,28 @@ public class HttpURLConnectionStack implements HttpStack {
      * @throws java.io.IOException
      */
     public HttpURLConnection open(HttpRequest request) throws IOException {
-        final String url = request.urlAndParams();
-        final URL src = new URL(url);
-        final HttpURLConnection conn = open(src);
-        conn.setConnectTimeout(request.getTimeoutMs());
-        conn.setReadTimeout(request.getTimeoutMs());
-        conn.setUseCaches(false);
-        conn.setDoInput(true);
-        conn.setRequestMethod(request.getMethod());
-        return conn;
+        try {
+            final String url = request.urlAndParams();
+            final URL src = new URL(url);
+            final HttpURLConnection conn = open(src);
+            conn.setConnectTimeout(request.getTimeoutMs());
+            conn.setReadTimeout(request.getTimeoutMs());
+            conn.setUseCaches(false);
+            conn.setDoInput(true);
+            conn.setRequestMethod(request.getMethod());
+            return conn;
+            
+        } catch (MalformedURLException e) {
+            throw new IOException("Malformed URL: " + request.urlAndParams(), e);
+        } catch (ProtocolException e) {
+            throw new IOException("Invalid HTTP method: " + request.getMethod(), e);
+        } catch (IllegalArgumentException e) {
+            throw new IOException("Invalid argument in request configuration: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new IOException("Error opening HTTP connection for URL: " + request.urlAndParams(), e);
+        } catch (Exception e) {
+            throw new IOException("Unexpected error while opening HTTP connection: " + e.getMessage(), e);
+        }
     }
 
     /**
