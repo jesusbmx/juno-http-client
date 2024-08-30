@@ -40,20 +40,14 @@ public class HttpURLConnectionStack implements HttpStack {
      */
     public HttpURLConnection open(HttpRequest request) throws IOException {
         final String url = request.urlAndParams();
-        try {
-            final URL src = new URL(url);
-
-            final HttpURLConnection conn = open(src);
-            conn.setConnectTimeout(request.getTimeoutMs());
-            conn.setReadTimeout(request.getTimeoutMs());
-            conn.setUseCaches(false);
-            conn.setDoInput(true);
-            conn.setRequestMethod(request.getMethod());
-            return conn;
-            
-        } catch (IOException e) {
-            throw new IOException("Failed to open connection for URL: " + url, e);
-        }
+        final URL src = new URL(url);
+        final HttpURLConnection conn = open(src);
+        conn.setConnectTimeout(request.getTimeoutMs());
+        conn.setReadTimeout(request.getTimeoutMs());
+        conn.setUseCaches(false);
+        conn.setDoInput(true);
+        conn.setRequestMethod(request.getMethod());
+        return conn;
     }
 
     /**
@@ -130,16 +124,7 @@ public class HttpURLConnectionStack implements HttpStack {
      */
     public HttpResponse getResponse(HttpURLConnection conn, HttpRequest request)
             throws IOException {
-        final String baseUrl = request.getUrl().baseUrl; // Obtener la URL de la petición
-        int responseCode;
-        try {
-            responseCode = conn.getResponseCode();
-        } catch (UnknownHostException e) {
-            throw new IOException("Network error: Unable to resolve host for URL: " + baseUrl + ". Check your internet connection.", e);
-        } catch (IOException e) {
-            throw new IOException("Failed to retrieve response code from the server for URL: " + baseUrl + ".", e);
-        }
-        
+        final int responseCode = conn.getResponseCode();
         final String status = conn.getResponseMessage();
 
         if (responseCode == -1) {
@@ -212,6 +197,13 @@ public class HttpURLConnectionStack implements HttpStack {
             writeBody(conn, request);
             return getResponse(conn, request);
 
+        } catch (UnknownHostException e) {
+            if (conn != null) {
+                conn.disconnect();
+            }
+            String baseUrl = request.getUrl().baseUrl;
+            throw new IOException("Network error: Unable to resolve host for URL: " + baseUrl + ". Check your internet connection.", e);
+        
         } catch (IOException e) {
             if (conn != null) {
                 conn.disconnect();
