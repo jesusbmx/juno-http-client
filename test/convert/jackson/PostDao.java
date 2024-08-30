@@ -15,7 +15,7 @@ import juno.http.convert.jackson.JacksonConvertFactory;
 // import restlight.BasicHttpStack;
 public class PostDao {
   
-  HttpClient cli = HttpClient.getInstance()
+  HttpClient client = HttpClient.getInstance()
           .setDebug(true);  
     
   public PostDao() {
@@ -23,23 +23,23 @@ public class PostDao {
             .setDateFormat(new SimpleDateFormat("M/d/yy hh:mm a"))
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     
-    cli.setFactory(new JacksonConvertFactory(mapper));
+    client.setFactory(new JacksonConvertFactory(mapper));
   }
 
   public Async<Post[]> getPosts() {
     HttpRequest request = new HttpRequest(
         "GET", "https://kylewbanks.com/rest/posts.json");
 
-    return cli.createAsync(request, Post[].class);
+    return client.createAsync(request, Post[].class);
   }
   
   public Async<String> insert(Post p) {
-    RequestBody reqBody = cli.createRequestBody(p);
+    RequestBody reqBody = client.createRequestBody(p);
     
     HttpRequest request = new HttpRequest(
             "POST", "https://postman-echo.com/post", reqBody);
     
-    return cli.createAsync(request, String.class);
+    return client.createAsync(request, String.class);
   }
 
   //  BasicHttpStack stack = new BasicHttpStack() {  

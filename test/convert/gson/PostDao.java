@@ -14,7 +14,7 @@ import juno.http.convert.gson.GsonConvertFactory;
 // import restlight.BasicHttpStack;
 public class PostDao {
   
-  HttpClient cli = HttpClient.getInstance()
+  HttpClient client = HttpClient.getInstance()
           .setDebug(true);  
     
   public PostDao() {
@@ -22,23 +22,23 @@ public class PostDao {
             .setDateFormat("M/d/yy hh:mm a")
             .create();
     
-    cli.setFactory(new GsonConvertFactory(gson));
+    client.setFactory(new GsonConvertFactory(gson));
   }
 
   public Async<Post[]> getPosts() {
     HttpRequest request = new HttpRequest(
         "GET", "https://kylewbanks.com/rest/posts.json");
 
-    return cli.createAsync(request, Post[].class);
+    return client.createAsync(request, Post[].class);
   }
   
   public Async<String> insert(Post p) {
-    RequestBody reqBody = cli.createRequestBody(p);
+    RequestBody reqBody = client.createRequestBody(p);
     
     HttpRequest request = new HttpRequest(
             "POST", "https://postman-echo.com/post", reqBody);
     
-    return cli.createAsync(request, String.class);
+    return client.createAsync(request, String.class);
   }
 
   //  BasicHttpStack stack = new BasicHttpStack() {  
