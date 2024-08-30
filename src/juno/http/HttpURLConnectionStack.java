@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import juno.io.IOUtils;
 
 public class HttpURLConnectionStack implements HttpStack {
@@ -129,7 +130,16 @@ public class HttpURLConnectionStack implements HttpStack {
      */
     public HttpResponse getResponse(HttpURLConnection conn, HttpRequest request)
             throws IOException {
-        final int responseCode = conn.getResponseCode();
+        final String baseUrl = request.getUrl().baseUrl; // Obtener la URL de la petición
+        int responseCode;
+        try {
+            responseCode = conn.getResponseCode();
+        } catch (UnknownHostException e) {
+            throw new IOException("Network error: Unable to resolve host for URL: " + baseUrl + ". Check your internet connection.", e);
+        } catch (IOException e) {
+            throw new IOException("Failed to retrieve response code from the server for URL: " + baseUrl + ".", e);
+        }
+        
         final String status = conn.getResponseMessage();
 
         if (responseCode == -1) {
