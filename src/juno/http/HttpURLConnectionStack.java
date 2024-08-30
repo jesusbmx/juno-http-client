@@ -8,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import juno.io.IOUtils;
 
 public class HttpURLConnectionStack implements HttpStack {
@@ -212,13 +211,6 @@ public class HttpURLConnectionStack implements HttpStack {
             writeBody(conn, request);
             return getResponse(conn, request);
 
-        } catch (UnknownHostException e) {
-            if (conn != null) {
-                conn.disconnect();
-            }
-            String baseUrl = request.getUrl().baseUrl;
-            throw new IOException("Network error: Unable to resolve host for URL: " + baseUrl + ". Check your internet connection.", e);
-        
         } catch (IOException e) {
             if (conn != null) {
                 conn.disconnect();
