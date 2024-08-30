@@ -58,11 +58,7 @@ public class HttpURLConnectionStack implements HttpStack {
             throw new ProtocolException("Invalid HTTP method: " + request.getMethod());
         } catch (IllegalArgumentException e) {
             throw new IOException("Invalid argument in request configuration: " + e.getMessage(), e);
-        } catch (IOException e) {
-            throw new IOException("Error opening HTTP connection for URL: " + request.urlAndParams(), e);
-        } catch (Exception e) {
-            throw new IOException("Unexpected error while opening HTTP connection: " + e.getMessage(), e);
-        }
+        } 
     }
 
     /**
