@@ -53,9 +53,9 @@ public class HttpURLConnectionStack implements HttpStack {
             return conn;
             
         } catch (MalformedURLException e) {
-            throw new IOException("Malformed URL: " + request.urlAndParams(), e);
+            throw new MalformedURLException("Malformed URL: " + request.urlAndParams());
         } catch (ProtocolException e) {
-            throw new IOException("Invalid HTTP method: " + request.getMethod(), e);
+            throw new ProtocolException("Invalid HTTP method: " + request.getMethod());
         } catch (IllegalArgumentException e) {
             throw new IOException("Invalid argument in request configuration: " + e.getMessage(), e);
         } catch (IOException e) {
