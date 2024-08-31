@@ -7,7 +7,7 @@ import juno.concurrent.Async;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.RequestBody;
-import juno.http.convert.jackson.JacksonConvertFactory;
+import juno.http.convert.jackson.JacksonConverterFactory;
 // import com.squareup.okhttp.OkHttpClient;
 // import java.io.IOException;
 // import java.net.HttpURLConnection;
@@ -23,7 +23,7 @@ public class PostDao {
             .setDateFormat(new SimpleDateFormat("M/d/yy hh:mm a"))
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     
-    client.setFactory(new JacksonConvertFactory(mapper));
+    client.addConverterFactory(new JacksonConverterFactory(mapper)); 
   }
 
   public Async<Post[]> getPosts() {

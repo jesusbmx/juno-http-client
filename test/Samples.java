@@ -7,7 +7,7 @@ import juno.http.HttpResponse;
 import juno.http.HttpUrl;
 import juno.http.MultipartBody;
 import juno.http.RequestBody;
-import juno.http.convert.generic.FileResponseBodyConvert;
+import juno.http.convert.generic.FileResponseBodyConverter;
 
 public class Samples {
 
@@ -93,7 +93,7 @@ public class Samples {
                 "GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
                 .setTimeoutMs(20000);
 
-        FileResponseBodyConvert convert = new FileResponseBodyConvert()
+        FileResponseBodyConverter convert = new FileResponseBodyConverter()
                 .setDir(System.getProperty("user.home") + "\\Downloads\\") //.setName("httpclient.jar")
         ;
         return client.execute(request, convert);

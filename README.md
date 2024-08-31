@@ -118,11 +118,11 @@ File download() throws Exception {
   HttpRequest request = new HttpRequest("GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
       .setTimeoutMs(20000)
   ;
-  FileResponseBodyConvert convert = new FileResponseBodyConvert()
+  FileResponseBodyConverter converter = new FileResponseBodyConverter()
       .setDir(System.getProperty("user.home") + "\\Downloads\\") 
       //.setName("httpclient.jar")
   ;  
-  return client.execute(request, convert);
+  return client.execute(request, converter);
   //return client.execute(request, File.class);
 }
 ```
@@ -364,7 +364,7 @@ public class PostApi {
             .setDateFormat("M/d/yy hh:mm a")
             .create();
     
-    client.setFactory(new GsonConvertFactory(gson));
+    client.addConverterFactory(new GsonConverterFactory(gson));
   }
 
   public Async<Post[]> getPosts() {
@@ -450,7 +450,7 @@ public class PostApi {
             .setDateFormat(new SimpleDateFormat("M/d/yy hh:mm a"))
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     
-    client.setFactory(new JacksonConvertFactory(mapper));
+    client.addConverterFactory(new JacksonConverterFactory(mapper));
   }
 
   public Async<Post[]> getPosts() {

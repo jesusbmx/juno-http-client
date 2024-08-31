@@ -1,9 +1,12 @@
 package juno.http;
 
+import java.util.ArrayList;
+import java.util.List;
 import juno.concurrent.Dispatcher;
-import juno.http.convert.ConvertFactory;
-import juno.http.convert.ResponseBodyConvert;
-import juno.http.convert.generic.GenericConvertFactory;
+import juno.http.convert.ConverterFactory;
+import juno.http.convert.generic.GenericConverterFactory;
+import juno.http.convert.RequestBodyConverter;
+import juno.http.convert.ResponseBodyConverter;
 
 public class HttpClient implements HttpStack {
     
@@ -23,13 +26,14 @@ public class HttpClient implements HttpStack {
   protected OnInterceptor mInterceptor;
   
   /** Fabrica para los adaptadores. */
-  private ConvertFactory mConvertFactory = GenericConvertFactory.getInstance();
+  private List<ConverterFactory> mConvertersFactory = new ArrayList<ConverterFactory>();
   
   /** Procesa la peticiones en segundo plano. */
   private Dispatcher mDispatcher = Dispatcher.getInstance();
     
   public HttpClient(HttpStack stack) {
     mHttpStack = stack;
+    mConvertersFactory.add(new GenericConverterFactory());
   }
  
   public HttpClient() {
@@ -90,16 +94,16 @@ public class HttpClient implements HttpStack {
     this.mInterceptor = interceptor;
     return this;
   }
-  
-  public ConvertFactory getFactory() {
-    return mConvertFactory;
+
+  public List<ConverterFactory> getConvertersFactory() {
+    return mConvertersFactory;
   }
   
-  public HttpClient setFactory(ConvertFactory convertFactory) {
-    this.mConvertFactory = convertFactory;
+  public HttpClient addConverterFactory(ConverterFactory convertFactory) {
+    this.mConvertersFactory.add(convertFactory);
     return this;
   }
-
+  
   public Dispatcher getDispatcher() {
     return mDispatcher;
   }
@@ -132,11 +136,11 @@ public class HttpClient implements HttpStack {
     return getHttpStack().execute(request);
   }
 
-  public <V> V execute(HttpRequest request, ResponseBodyConvert<V> convert) throws Exception {
+  public <V> V execute(HttpRequest request, ResponseBodyConverter<V> convert) throws Exception {
     HttpResponse response = null;
     try {
       response = execute(request);
-      return convert.parse(response);
+      return convert.convert(response);
       
     } catch(Exception e) {
       if (response != null) {
@@ -148,7 +152,7 @@ public class HttpClient implements HttpStack {
   }
  
   public <V> V execute(HttpRequest request, Class<V> cast) throws Exception {
-    return execute(request, getFactory().getResponseBodyConvert(cast));
+    return execute(request, getResponseBodyConverter(cast));
   }
  
   /**
@@ -161,29 +165,48 @@ public class HttpClient implements HttpStack {
    * 
    * @return una llamada
    */
-  public <V> AsyncHttpRequest<V> createAsync(HttpRequest request, ResponseBodyConvert<V> convert) {
+  public <V> AsyncHttpRequest<V> createAsync(HttpRequest request, ResponseBodyConverter<V> convert) {
     return new AsyncHttpRequest<V>(getDispatcher(), this, request, convert);
   }
   
   public <V> AsyncHttpRequest<V> createAsync(HttpRequest request, Class<V> cast) {
-    return this.createAsync(request, getFactory()
-            .getResponseBodyConvert(cast));
+    return this.createAsync(request, getResponseBodyConverter(cast));
   }
   
   public AsyncHttpRequest<HttpResponse> createAsync(HttpRequest request) {
-    return this.createAsync(request, getFactory()
-            .getResponseBodyConvert(HttpResponse.class));
+    return this.createAsync(request, getResponseBodyConverter(HttpResponse.class));
   }
   
-  public <V> RequestBody createRequestBody(V src) {
-    return getFactory().createRequestBody(src);
+  public <V> RequestBody createRequestBody(V object) {
+    if (object == null) return null;
+    if (object instanceof RequestBody) return (RequestBody) object;
+
+    try {
+      final Class<V> type = (Class<V>) object.getClass();
+      return getRequestBodyConverter(type).convert(object);
+
+    } catch(Exception e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
   
-  public <V> FormBody createFormBody(V src) {
-    return getFactory().createFormBody(src);
+  public <V> ResponseBodyConverter<V> getResponseBodyConverter(Class<V> type) {
+    for (ConverterFactory converterFactory : mConvertersFactory) {
+      ResponseBodyConverter responseBodyConverter = converterFactory.responseBodyConverter(type);
+      if (responseBodyConverter != null) {
+        return responseBodyConverter;
+      }
+    }
+    throw new RuntimeException("No adapter found for class '" + type.getCanonicalName() + "'");
   }
   
-  public <V> MultipartBody createMultipartBody(V src) {
-    return getFactory().createMultipartBody(src);
+  public <V> RequestBodyConverter<V> getRequestBodyConverter(Class<V> type) {
+    for (ConverterFactory converterFactory : mConvertersFactory) {
+      RequestBodyConverter<V> requestBodyConverter = converterFactory.requestBodyConverter(type);
+      if (requestBodyConverter != null) {
+        return requestBodyConverter;
+      }
+    }
+    throw new RuntimeException("No adapter found for class '" + type.getCanonicalName() + "'");
   }
 }

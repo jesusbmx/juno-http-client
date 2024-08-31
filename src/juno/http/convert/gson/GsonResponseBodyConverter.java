@@ -8,21 +8,21 @@ import com.google.gson.stream.JsonToken;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import juno.http.HttpResponse;
-import juno.http.convert.ResponseBodyConvert;
 import juno.io.IOUtils;
+import juno.http.convert.ResponseBodyConverter;
 
-public class GsonResponseBodyConvert<T> implements ResponseBodyConvert<T> {
+public class GsonResponseBodyConverter<T> implements ResponseBodyConverter<T> {
 
     public final Gson gson;
     public final TypeAdapter<T> adapter;
 
-    public GsonResponseBodyConvert(Gson gson, TypeAdapter<T> adapter) {
+    public GsonResponseBodyConverter(Gson gson, TypeAdapter<T> adapter) {
         this.gson = gson;
         this.adapter = adapter;
     }
     
     @Override
-    public T parse(HttpResponse response) throws Exception {
+    public T convert(HttpResponse response) throws Exception {
       Reader reader = null;
       try {
         reader = new InputStreamReader(

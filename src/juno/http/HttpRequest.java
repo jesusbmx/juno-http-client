@@ -1,6 +1,6 @@
 package juno.http;
 
-import juno.http.convert.ResponseBodyConvert;
+import juno.http.convert.ResponseBodyConverter;
 
 public class HttpRequest {
 
@@ -168,11 +168,11 @@ public class HttpRequest {
         return execute(HttpClient.getInstance());
     }
 
-    public <V> V execute(HttpClient client, ResponseBodyConvert<V> convert) throws Exception {
+    public <V> V execute(HttpClient client, ResponseBodyConverter<V> convert) throws Exception {
         return client.execute(this, convert);
     }
     
-    public <V> V execute(ResponseBodyConvert<V> convert) throws Exception {
+    public <V> V execute(ResponseBodyConverter<V> convert) throws Exception {
         return execute(HttpClient.getInstance(), convert);
     }
 

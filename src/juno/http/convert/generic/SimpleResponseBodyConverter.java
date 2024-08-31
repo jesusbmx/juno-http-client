@@ -1,13 +1,15 @@
 package juno.http.convert.generic;
 
 import juno.http.HttpResponse;
-import juno.http.convert.ResponseBodyConvert;
 import juno.io.IOUtils;
+import juno.http.convert.ResponseBodyConverter;
 
-public class SimpleResponseBodyConvert implements ResponseBodyConvert<HttpResponse> {
+public class SimpleResponseBodyConverter implements ResponseBodyConverter<HttpResponse> {
+    
+    public static final SimpleResponseBodyConverter INSTANCE = new SimpleResponseBodyConverter();
 
     @Override
-    public HttpResponse parse(HttpResponse response) throws Exception {
+    public HttpResponse convert(HttpResponse response) throws Exception {
         try {
             byte[] content = IOUtils.readByteArray(response.content);
 

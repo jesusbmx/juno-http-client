@@ -55,6 +55,6 @@ public class JsonTest {
     public static void main(String[] args) throws Exception {
         JsonTest test = new JsonTest();
         //test.async();
-        test.jsonRequest();
+        System.out.println(test.jsonRequest().toString(1));
     }
 }

@@ -6,7 +6,7 @@ import juno.concurrent.Async;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.RequestBody;
-import juno.http.convert.gson.GsonConvertFactory;
+import juno.http.convert.gson.GsonConverterFactory;
 // import com.squareup.okhttp.OkHttpClient;
 // import java.io.IOException;
 // import java.net.HttpURLConnection;
@@ -22,7 +22,7 @@ public class PostDao {
             .setDateFormat("M/d/yy hh:mm a")
             .create();
     
-    client.setFactory(new GsonConvertFactory(gson));
+    client.addConverterFactory(new GsonConverterFactory(gson));
   }
 
   public Async<Post[]> getPosts() {

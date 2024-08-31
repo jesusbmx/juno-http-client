@@ -2,19 +2,19 @@ package juno.http;
 
 import juno.concurrent.AbstractAsync;
 import juno.concurrent.Dispatcher;
-import juno.http.convert.ResponseBodyConvert;
+import juno.http.convert.ResponseBodyConverter;
 
 public class AsyncHttpRequest<T> extends AbstractAsync<T> {
     public final HttpStack stack;
     public final HttpRequest request;
-    public final ResponseBodyConvert<T> convert;
+    public final ResponseBodyConverter<T> convert;
     protected OnInterceptor interceptor;
 
     /**
      * Inyección de Dependencias: Dispatcher, HttpClient, ResponseBodyConvert
      */
     public AsyncHttpRequest(
-        Dispatcher dispatcher, HttpStack stack, HttpRequest request, ResponseBodyConvert<T> convert
+        Dispatcher dispatcher, HttpStack stack, HttpRequest request, ResponseBodyConverter<T> convert
     ) {
         super(dispatcher);
         this.stack = stack;
@@ -34,7 +34,7 @@ public class AsyncHttpRequest<T> extends AbstractAsync<T> {
         HttpResponse response = null;
         try {
           response = execute(request);
-          return convert.parse(response);
+          return convert.convert(response);
 
         } catch(Exception e) {
           if (response != null) {

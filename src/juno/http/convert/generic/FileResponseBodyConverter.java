@@ -6,25 +6,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import juno.http.Headers;
 import juno.http.HttpResponse;
-import juno.http.convert.ResponseBodyConvert;
 import juno.io.Files;
 import juno.io.IOUtils;
+import juno.http.convert.ResponseBodyConverter;
 
-public class FileResponseBodyConvert implements ResponseBodyConvert<File> {
+public class FileResponseBodyConverter implements ResponseBodyConverter<File> {
 
   private File dir;
   private String name;
 
-  public FileResponseBodyConvert setDir(File dir) {
+  public FileResponseBodyConverter setDir(File dir) {
     this.dir = dir;
     return this;
   }
   
-  public FileResponseBodyConvert setDir(Object dir) {
+  public FileResponseBodyConverter setDir(Object dir) {
     return this.setDir(new File(dir.toString()));
   }
 
-  public FileResponseBodyConvert setName(Object name) {
+  public FileResponseBodyConverter setName(Object name) {
     this.name = name.toString();
     return this;
   }
@@ -51,7 +51,7 @@ public class FileResponseBodyConvert implements ResponseBodyConvert<File> {
   }
   
   @Override
-  public File parse(HttpResponse response) throws Exception {
+  public File convert(HttpResponse response) throws Exception {
     BufferedOutputStream bos = null;
     try {
       File f = newFile(response.headers);
