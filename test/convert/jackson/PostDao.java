@@ -35,6 +35,8 @@ public class PostDao {
   
   public Async<String> insert(Post p) {
     RequestBody reqBody = client.createRequestBody(p);
+    //RequestBody reqBody = new FormBody(Maps.fromObjectFields(p));
+    //RequestBody reqBody = new MultipartBody(Maps.fromObjectFields(p));
     
     HttpRequest request = new HttpRequest(
             "POST", "https://postman-echo.com/post", reqBody);
