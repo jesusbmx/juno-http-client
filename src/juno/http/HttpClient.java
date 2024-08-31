@@ -26,14 +26,14 @@ public class HttpClient implements HttpStack {
   protected OnInterceptor mInterceptor;
   
   /** Fabrica para los adaptadores. */
-  private List<ConverterFactory> mConvertersFactory = new ArrayList<ConverterFactory>();
+  private List<ConverterFactory> mConverterFactories = new ArrayList<ConverterFactory>();
   
   /** Procesa la peticiones en segundo plano. */
   private Dispatcher mDispatcher = Dispatcher.getInstance();
     
   public HttpClient(HttpStack stack) {
     mHttpStack = stack;
-    mConvertersFactory.add(new GenericConverterFactory());
+    mConverterFactories.add(new GenericConverterFactory());
   }
  
   public HttpClient() {
@@ -95,12 +95,17 @@ public class HttpClient implements HttpStack {
     return this;
   }
 
-  public List<ConverterFactory> getConvertersFactory() {
-    return mConvertersFactory;
+  public List<ConverterFactory> getConverterFactories() {
+    return mConverterFactories;
   }
-  
+
+  public HttpClient setConverterFactories(List<ConverterFactory> mConverterFactories) {
+    this.mConverterFactories = mConverterFactories;
+    return this;
+  }
+
   public HttpClient addConverterFactory(ConverterFactory convertFactory) {
-    this.mConvertersFactory.add(convertFactory);
+    this.mConverterFactories.add(convertFactory);
     return this;
   }
   
@@ -179,8 +184,6 @@ public class HttpClient implements HttpStack {
   
   public <V> RequestBody createRequestBody(V object) {
     if (object == null) return null;
-    if (object instanceof RequestBody) return (RequestBody) object;
-
     try {
       final Class<V> type = (Class<V>) object.getClass();
       return getRequestBodyConverter(type).convert(object);
@@ -191,7 +194,7 @@ public class HttpClient implements HttpStack {
   }
   
   public <V> ResponseBodyConverter<V> getResponseBodyConverter(Class<V> type) {
-    for (ConverterFactory converterFactory : mConvertersFactory) {
+    for (ConverterFactory converterFactory : mConverterFactories) {
       ResponseBodyConverter responseBodyConverter = converterFactory.responseBodyConverter(type);
       if (responseBodyConverter != null) {
         return responseBodyConverter;
@@ -201,7 +204,7 @@ public class HttpClient implements HttpStack {
   }
   
   public <V> RequestBodyConverter<V> getRequestBodyConverter(Class<V> type) {
-    for (ConverterFactory converterFactory : mConvertersFactory) {
+    for (ConverterFactory converterFactory : mConverterFactories) {
       RequestBodyConverter<V> requestBodyConverter = converterFactory.requestBodyConverter(type);
       if (requestBodyConverter != null) {
         return requestBodyConverter;
