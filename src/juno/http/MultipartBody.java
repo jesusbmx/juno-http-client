@@ -10,13 +10,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import juno.io.IOUtils;
 
@@ -53,36 +49,6 @@ public class MultipartBody extends RequestBody {
   public MultipartBody(Map<String, Object> map) {
     this();
     addMap(map);
-  } 
-  
-  public MultipartBody(Object bean) {
-    this();
-    
-    Class<?> type = bean.getClass();
-    boolean includeSuperClass = type.getClassLoader() != null;
-    Method[] methods = includeSuperClass ? type.getMethods() : type.getDeclaredMethods();
-    for (final Method method : methods) {
-        final int modifiers = method.getModifiers();
-        if (Modifier.isPublic(modifiers)
-                && !Modifier.isStatic(modifiers)
-                && method.getParameterTypes().length == 0
-                && !method.isBridge()
-                && method.getReturnType() != Void.TYPE
-                && isValidMethodName(method.getName())) {
-            final String key = getKeyNameFromMethod(method);
-            if (key != null && !key.isEmpty()) {
-                try {
-                    final Object result = method.invoke(bean);
-                    if (result != null) {
-                        addObject(key, result);
-                    }
-                } catch (IllegalAccessException ignore) {
-                } catch (IllegalArgumentException ignore) {
-                } catch (InvocationTargetException ignore) {
-                }
-            }
-        }
-    }
   } 
   
   public String boundary() {
@@ -245,33 +211,5 @@ public class MultipartBody extends RequestBody {
               Headers.CONTENT_TRANSFER_ENCODING, "binary");
       return new Part(body, headers);
     }
-  }
-  
-  private static boolean isValidMethodName(String name) {
-    return !"getClass".equals(name) && !"getDeclaringClass".equals(name);
-  }
-
-  private static String getKeyNameFromMethod(Method method) {
-    String key;
-    final String name = method.getName();
-    if (name.startsWith("get") && name.length() > 3) {
-        key = name.substring(3);
-    } else if (name.startsWith("is") && name.length() > 2) {
-        key = name.substring(2);
-    } else {
-        return null;
-    }
-    // if the first letter in the key is not uppercase, then skip.
-    // This is to maintain backwards compatibility before PR406
-    // (https://github.com/stleary/JSON-java/pull/406/)
-    if (key.length() == 0 || Character.isLowerCase(key.charAt(0))) {
-        return null;
-    }
-    if (key.length() == 1) {
-        key = key.toLowerCase(Locale.ROOT);
-    } else if (!Character.isUpperCase(key.charAt(1))) {
-        key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
-    }
-    return key;
   }
 }
