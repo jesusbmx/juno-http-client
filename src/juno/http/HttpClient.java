@@ -200,7 +200,7 @@ public class HttpClient implements HttpStack {
         return responseBodyConverter;
       }
     }
-    throw new IllegalArgumentException("No converter found for class '" + type.getCanonicalName() + "'");
+    throw new IllegalArgumentException("Could not HttpResponse converter for class '" + type.getCanonicalName() + "'");
   }
   
   public <V> RequestBodyConverter<V> getRequestBodyConverter(Class<V> type) {
@@ -210,6 +210,6 @@ public class HttpClient implements HttpStack {
         return requestBodyConverter;
       }
     }
-    throw new IllegalArgumentException("No converter found for class '" + type.getCanonicalName() + "'");
+    throw new IllegalArgumentException("Could not RequestBody converter for class '" + type.getCanonicalName() + "'");
   }
 }
