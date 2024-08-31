@@ -376,8 +376,8 @@ public class PostApi {
 
   public Async<String> insert(Post p) {
     RequestBody reqBody = client.createRequestBody(p); // application/json
-    // RequestBody reqBody = new FormBody(p); // application-www-www-form-urlencoded
-    // RequestBody reqBody = new MultipartBody(p); // multipart/form-data
+    // RequestBody reqBody = new FormBody(Maps.fromObjectFields(p)); // application-www-www-form-urlencoded
+    // RequestBody reqBody = new MultipartBody(Maps.fromObjectFields(p)); // multipart/form-data
     
     HttpRequest request = new HttpRequest(
             "POST", "https://postman-echo.com/post", reqBody);
