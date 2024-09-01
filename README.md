@@ -275,7 +275,7 @@ JSONObject jsonRequest() throws Exception {
 
 [JWT](https://jwt.io/)
 
-You can automatically store, cleanse, transmit, and refresh authentication tokens..
+You can automatically store, cleanse, transmit, and refresh authentication tokens.
 
 ### Storage and Configuration
 
@@ -350,17 +350,16 @@ In this example, if there is no token available, the user will log in for the fi
 ```java
 JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
     FormBody body = new FormBody()
-            .add("email", "myMail@domain.com")
-            .add("password", "myPassword");
-
+        .add("email", "myMail@domain.com")
+        .add("password", "myPassword")
+    ;
     HttpRequest request = new HttpRequest(
-            "POST", ".../auth/login", body);
+        "POST", ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
     JSONObject response = request.execute(JSONObject.class);
 
     provider.setAccessToken(response.optString("accessToken"));
-    //provider.setRefreshToken(response.optString("refreshToken"));
 };
 ```
 
