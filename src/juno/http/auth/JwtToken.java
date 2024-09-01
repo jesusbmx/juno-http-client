@@ -39,25 +39,29 @@ public class JwtToken implements Token {
     public final String signature;
     
     /**
-     * @param accessToken "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+     * @param token "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
      * @throws org.json.JSONException
      * @throws java.io.UnsupportedEncodingException
      */
-    public JwtToken(String accessToken) throws JSONException, UnsupportedEncodingException {
-        this.token = accessToken;
-        
-        String[] chunks = accessToken.split("\\.");
+    public JwtToken(String token) throws JSONException, UnsupportedEncodingException {
+        this.token = token;
+        String[] chunks = splitToken(token);
+        this.header = decodeBase64Json(chunks[0]);
+        this.payload = decodeBase64Json(chunks[1]);
+        this.signature = chunks[2];
+    }
+
+    private String[] splitToken(String token) {
+        String[] chunks = token.split("\\.");
         if (chunks.length != 3) {
             throw new IllegalArgumentException("Invalid JWT token format.");
         }
-        
-        String sHeader = new String(Base64.getUrlDecoder().decode(chunks[0]), "UTF-8");
-        header = new JSONObject(sHeader);
+        return chunks;
+    }
 
-        String sPayload = new String(Base64.getUrlDecoder().decode(chunks[1]), "UTF-8");
-        payload = new JSONObject(sPayload);
-        
-        signature = chunks[2];
+    private JSONObject decodeBase64Json(String encoded) throws UnsupportedEncodingException, JSONException {
+        String json = new String(Base64.getUrlDecoder().decode(encoded), "UTF-8");
+        return new JSONObject(json);
     }
 
     public Date getDate(String name) {

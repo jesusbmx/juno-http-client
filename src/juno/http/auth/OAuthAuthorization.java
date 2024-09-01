@@ -3,7 +3,7 @@ package juno.http.auth;
 import juno.http.Authorization;
 
 /**
- * "OAuth %parameters%"
+ * Implements OAuth Authorization scheme: "OAuth %token%"
  */
 public class OAuthAuthorization implements Authorization {
 
