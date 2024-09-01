@@ -6,7 +6,7 @@ Download [juno-http-client.jar](https://github.com/jesusbmx/java-http-client/raw
 Download [juno.jar](https://github.com/jesusbmx/juno/raw/master/dist/juno.jar)
 
 ## [Samples](test/Samples.java)
-
+Start by creating an instance of the `HttpClient`:
 ```java
 HttpClient client = HttpClient.getInstance()
     .setDebug(true);
@@ -273,9 +273,7 @@ JSONObject jsonRequest() throws Exception {
 
 ## Authorization
 
-[JWT](https://jwt.io/)
-
-You can automatically store, cleanse, transmit, and refresh authentication tokens.
+[JWT](https://jwt.io/) enables automatic storage, cleansing, transmission, and refresh of authentication tokens.
 
 ### Storage and Configuration
 
