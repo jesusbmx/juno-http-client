@@ -83,12 +83,7 @@ public class JwtTokenProvider implements TokenProvider {
     public void setAccessToken(String token) throws Exception {
         storage.setItem("accessToken", token);
     }
-    
-    @Override
-    public void setAccessToken(Token token) throws Exception {
-        setAccessToken(token.getToken());
-    }
-    
+
     @Override
     public String getRefreshToken() throws Exception {
         return storage.getItem("refreshToken", null);
@@ -102,11 +97,6 @@ public class JwtTokenProvider implements TokenProvider {
     @Override
     public void setRefreshToken(String token) throws Exception {
         storage.setItem("refreshToken", token);
-    }
-    
-    @Override
-    public void setRefreshToken(Token token) throws Exception {
-        setRefreshToken(token.getToken());
     }
     
     /**
