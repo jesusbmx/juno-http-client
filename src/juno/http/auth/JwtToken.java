@@ -51,7 +51,7 @@ public class JwtToken implements Token {
         this.signature = chunks[2];
     }
 
-    private String[] splitToken(String token) {
+    private static String[] splitToken(String token) {
         String[] chunks = token.split("\\.");
         if (chunks.length != 3) {
             throw new IllegalArgumentException("Invalid JWT token format.");
@@ -59,9 +59,14 @@ public class JwtToken implements Token {
         return chunks;
     }
 
-    private JSONObject decodeBase64Json(String encoded) throws UnsupportedEncodingException, JSONException {
+    private static JSONObject decodeBase64Json(String encoded) throws UnsupportedEncodingException, JSONException {
         String json = new String(Base64.getUrlDecoder().decode(encoded), "UTF-8");
         return new JSONObject(json);
+    }
+    
+    private static String encodeJsonToBase64(JSONObject json) throws UnsupportedEncodingException {
+        byte[] bytes = json.toString().getBytes("UTF-8");
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     public Date getDate(String name) {
@@ -120,8 +125,8 @@ public class JwtToken implements Token {
      */
     public static String generateToken(JSONObject header, JSONObject payload, String secretKey) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         // Codificar header y payload en Base64URL
-        String encodedHeader = Base64.getUrlEncoder().withoutPadding().encodeToString(header.toString().getBytes("UTF-8"));
-        String encodedPayload = Base64.getUrlEncoder().withoutPadding().encodeToString(payload.toString().getBytes("UTF-8"));
+        String encodedHeader = encodeJsonToBase64(header);
+        String encodedPayload = encodeJsonToBase64(payload);
 
         // Concatenar header y payload
         String unsignedToken = encodedHeader + "." + encodedPayload;
