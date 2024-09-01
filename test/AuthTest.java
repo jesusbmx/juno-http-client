@@ -29,7 +29,7 @@ public class AuthTest implements JwtTokenProvider.OnTokenRefresh {
     }
 
     @Override public void onTokenRefresh(TokenProvider provider) throws Exception {
-        System.out.println("AuthTest.onTokenRefresh()");
+        System.out.println("[LOG] AuthTest onTokenRefresh()");
         
         FormBody body = new FormBody()
             .add("token", provider.getRefreshToken())
@@ -51,7 +51,7 @@ public class AuthTest implements JwtTokenProvider.OnTokenRefresh {
     }
 
     private HttpResponse requestWithToken() throws Exception {
-        System.out.println("AuthTest.request()");
+        System.out.println("[LOG] AuthTest requestWithToken()");
         HttpRequest request = new HttpRequest(
                 "POST", "https://postman-echo.com/post");
 
@@ -59,7 +59,7 @@ public class AuthTest implements JwtTokenProvider.OnTokenRefresh {
     }
     
     void login(String email, String password) throws Exception {
-        System.out.println("AuthTest.login()");
+        System.out.println("[LOG] AuthTest login()");
         
         FormBody body = new FormBody()
             .add("email", email)

@@ -1,18 +1,27 @@
 package juno.http.auth;
 
 public interface TokenProvider {
+
+    public String getAccessToken() throws Exception;
     
-    Token retrieveOrRefreshToken() throws Exception;
+    public Token getAccessToken(String token) throws Exception;
+
+    public void setAccessToken(String token) throws Exception;
     
-    String getAccessToken() throws Exception;
+    public void setAccessToken(Token token) throws Exception;
     
-    void setAccessToken(String token) throws Exception;
+    public String getRefreshToken() throws Exception;
     
-    String getRefreshToken() throws Exception;
+    public Token getRefreshToken(String token) throws Exception;
+
+    public void setRefreshToken(String token) throws Exception;
     
-    void setRefreshToken(String token) throws Exception;
+    public void setRefreshToken(Token token) throws Exception;
     
-    void clearAuthTokens() throws Exception;
+    public void clearAuthTokens() throws Exception;
     
+    public Token retrieveOrRefreshToken() throws Exception;
+      
     public boolean isLoggedIn();
+    
 }
