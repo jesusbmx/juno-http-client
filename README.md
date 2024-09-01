@@ -284,6 +284,7 @@ First, you must create your own token storage and add the `JwtTokenProvider` to 
 DataStorage tokenStorage = new FileDataStorage(new File(".../MyApi.jwt"));
 TokenProvider tokenProvider = new JwtTokenProvider(tokenStorage, onTokenRefresh);
 
+// Configure the HTTP client with Bearer token authorization and enable debugging
 HttpClient client = new HttpClient()
     .setAuthorization(new TokenAuthorization("Bearer ", tokenProvider))
     .setDebug(true);
@@ -294,15 +295,18 @@ HttpClient client = new HttpClient()
 If the token expires or there is no saved token, a token refresh function will be executed. Below is an example of how to implement this logic.
 ```java
 JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
+    // Create the request body with the refresh token
     FormBody body = new FormBody()
         .add("token", provider.getRefreshToken())
     ;
+    // Create a POST request to refresh the token
     HttpRequest request = new HttpRequest(
         "POST", ".../auth/refresh_token", body);
 
     // Execute the request with another client to avoid entering a loop
     JSONObject response = request.execute(JSONObject.class);
 
+    // Update the access and refresh tokens
     provider.setAccessToken(response.optString("accessToken"));
     provider.setRefreshToken(response.optString("refreshToken"));
 };
@@ -312,16 +316,19 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
 To sign in and obtain the initial tokens, you can implement a login function like this:
 ```java
 void login(String email, String password) throws Exception {
+    // Create the request body with login credentials
     FormBody body = new FormBody()
         .add("email", email)
         .add("password", password)
     ;
+    // Create a POST request to the login endpoint
     HttpRequest request = new HttpRequest(
         "POST", ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
     JSONObject response = request.execute(JSONObject.class);
 
+    // Store the received access and refresh tokens
     tokenProvider.setAccessToken(response.getString("accessToken"));
     tokenProvider.setRefreshToken(response.getString("refreshToken"));
 }
@@ -337,9 +344,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3O
 
 ```java
 public HttpResponse requestWithToken() throws Exception{
+  // Create the POST request
   HttpRequest request = new HttpRequest(
       "POST", "https://postman-echo.com/post");
 
+  // Execute the request using the client configured with JWT authorization
   return client.execute(request);
 ```
 
@@ -349,16 +358,19 @@ In this example, if there is no token available, the user will log in for the fi
 
 ```java
 JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
+    // Create the request body with login credentials
     FormBody body = new FormBody()
         .add("email", "myMail@domain.com")
         .add("password", "myPassword")
     ;
+    // Create a POST request to the login endpoint
     HttpRequest request = new HttpRequest(
         "POST", ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
     JSONObject response = request.execute(JSONObject.class);
 
+    // Store the new access token
     provider.setAccessToken(response.optString("accessToken"));
 };
 ```
