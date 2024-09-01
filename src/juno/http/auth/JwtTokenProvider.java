@@ -1,6 +1,8 @@
 package juno.http.auth;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import juno.content.DataStorage;
 import juno.content.FileDataStorage;
 
@@ -74,6 +76,16 @@ public class JwtTokenProvider implements TokenProvider {
     @Override
     public void setRefreshToken(String token) throws Exception {
         storage.setItem("refreshToken", token);
+    }
+    
+    /**
+     * Remove the auth tokens from storage
+     * @throws java.lang.Exception
+     */
+    @Override
+    public void clearAuthTokens() throws Exception {
+        List<String> keys = Arrays.asList("accessToken", "refreshToken");
+        storage.multiRemove(keys);
     }
     
 }

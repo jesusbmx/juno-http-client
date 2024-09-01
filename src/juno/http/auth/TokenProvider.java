@@ -11,4 +11,6 @@ public interface TokenProvider {
     String getRefreshToken() throws Exception;
     
     void setRefreshToken(String token) throws Exception;
+    
+    void clearAuthTokens() throws Exception ;
 }
