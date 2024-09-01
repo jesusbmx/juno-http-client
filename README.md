@@ -295,18 +295,36 @@ If the token expires or there is no saved token, a token refresh function will b
 ```java
 JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
     FormBody body = new FormBody()
-            .add("email", "myMail@domain.com")
-            .add("password", "myPassword");
-
+        .add("token", provider.getRefreshToken())
+    ;
     HttpRequest request = new HttpRequest(
-            "POST", ".../auth/login", body);
+        "POST", ".../auth/refresh_token", body);
 
     // Execute the request with another client to avoid entering a loop
     JSONObject response = request.execute(JSONObject.class);
 
     provider.setAccessToken(response.optString("accessToken"));
-    //provider.setRefreshToken(response.optString("refreshToken"));
+    provider.setRefreshToken(response.optString("refreshToken"));
 };
+```
+
+### Sign In
+To sign in and obtain the initial tokens, you can implement a login function like this:
+```java
+void login(String email, String password) throws Exception {
+    FormBody body = new FormBody()
+        .add("email", email)
+        .add("password", password)
+    ;
+    HttpRequest request = new HttpRequest(
+        "POST", ".../auth/login", body);
+
+    // Execute the request with another client to avoid entering a loop
+    JSONObject response = request.execute(JSONObject.class);
+
+    tokenProvider.setAccessToken(response.getString("accessToken"));
+    tokenProvider.setRefreshToken(response.getString("refreshToken"));
+}
 ```
 
 ### Executing Requests with the JWT Token
@@ -324,6 +342,28 @@ public HttpResponse requestWithToken() throws Exception{
 
   return client.execute(request);
 ```
+
+### Simple Sign In and Token Refresh
+
+In this example, if there is no token available, the user will log in for the first time. When the token expires, the login process will be repeated to refresh it:
+
+```java
+JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
+    FormBody body = new FormBody()
+            .add("email", "myMail@domain.com")
+            .add("password", "myPassword");
+
+    HttpRequest request = new HttpRequest(
+            "POST", ".../auth/login", body);
+
+    // Execute the request with another client to avoid entering a loop
+    JSONObject response = request.execute(JSONObject.class);
+
+    provider.setAccessToken(response.optString("accessToken"));
+    //provider.setRefreshToken(response.optString("refreshToken"));
+};
+```
+
 
 ## [GSON](https://github.com/google/gson) 
 
