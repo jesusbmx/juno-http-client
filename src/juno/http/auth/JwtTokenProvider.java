@@ -6,9 +6,13 @@ import juno.content.FileDataStorage;
 
 public class JwtTokenProvider implements TokenProvider {
     
+    // Almacenamiento para los tokens (acceso y refresco)
     private final DataStorage storage;
+    
+    // Callback que se ejecuta cuando se debe refrescar el token
     private final OnTokenRefresh onTokenRefresh;
 
+    // Interfaz que define un método para manejar el refresco del token
     public interface OnTokenRefresh {
         void onTokenRefresh(TokenProvider provider) throws Exception;
     }
@@ -24,25 +28,31 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public Token retrieveOrRefreshToken() throws Exception {
+        // Intenta recuperar el token de acceso almacenado
         String accessToken = getAccessToken();
         
+        // Si el token de acceso no existe, se ejecuta el callback para refrescarlo
         if (accessToken == null) {
             onTokenRefresh.onTokenRefresh(this);
             accessToken = getAccessToken();
             
         } else {
+            // Si existe un token, valida si es válido
             final JwtToken jwtToken = new JwtToken(accessToken);
             if (jwtToken.isValid()) {
                 return jwtToken;
             }
+            // Si el token no es válido, refresca el token llamando al callback
             onTokenRefresh.onTokenRefresh(this);
             accessToken = getAccessToken();
         }
             
+        // Si después de intentar refrescar el token aún no se tiene un token de acceso, lanza una excepción
         if (accessToken == null) {
             throw new Exception("The token provider does not contain any access tokens");
         }
         
+        // Retorna el nuevo token de acceso como un JwtToken
         return new JwtToken(accessToken);
     }
 

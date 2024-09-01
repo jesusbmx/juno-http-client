@@ -16,6 +16,10 @@ public class TokenAuthorization implements Authorization {
         this("Bearer ", tokenManager);
     }
 
+    public TokenProvider getTokenManager() {
+        return tokenManager;
+    }
+    
     @Override
     public String generateAuthHeader() throws Exception {
         final Token token = tokenManager.retrieveOrRefreshToken();

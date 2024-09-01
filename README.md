@@ -275,9 +275,11 @@ JSONObject jsonRequest() throws Exception {
 
 [JWT](https://jwt.io/)
 
-Store, clear, transmit and automatically refresh JWT authentication tokens.
+You can automatically store, cleanse, transmit, and refresh authentication tokens..
 
-Create you own storage and add the JwtTokenProvider
+### Storage and Configuration
+
+First, you must create your own token storage and add the `JwtTokenProvider` to manage the tokens.
 ```java
 DataStorage tokenStorage = new FileDataStorage(new File(".../MyApi.jwt"));
 TokenProvider tokenProvider = new JwtTokenProvider(tokenStorage, onTokenRefresh);
@@ -287,7 +289,9 @@ HttpClient client = new HttpClient()
     .setDebug(true);
 ```
 
-Define token auth function.
+### Token Refresh Management
+
+If the token expires or there is no saved token, a token refresh function will be executed. Below is an example of how to implement this logic.
 ```java
 JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
     FormBody body = new FormBody()
@@ -297,7 +301,7 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
     HttpRequest request = new HttpRequest(
             "POST", ".../auth/login", body);
 
-    // Result
+    // Execute the request with another client to avoid entering a loop
     JSONObject response = request.execute(JSONObject.class);
 
     provider.setAccessToken(response.optString("accessToken"));
@@ -305,13 +309,16 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
 };
 ```
 
+### Executing Requests with the JWT Token
+Once the HTTP client is configured with the JWT token provider, you can execute authenticated requests. Below is an example of how to make a POST request using the JWT token.
+
 ```
 POST https://postman-echo.com/post HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 ```
 
 ```java
-public HttpResponse request() throws Exception{
+public HttpResponse requestWithToken() throws Exception{
   HttpRequest request = new HttpRequest(
       "POST", "https://postman-echo.com/post");
 
@@ -494,7 +501,7 @@ async.execute((Post[] response) -> {
 License
 =======
 
-    Copyright 2022 HttpClient, Inc.
+    Copyright 2022 Juno Http Client, Inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
