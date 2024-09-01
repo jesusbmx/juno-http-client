@@ -2,6 +2,9 @@ package juno.http.auth;
 
 import juno.http.Authorization;
 
+/**
+ * "Bearer %token%"
+ */
 public class TokenAuthorization implements Authorization {
     
     private final TokenProvider tokenManager;

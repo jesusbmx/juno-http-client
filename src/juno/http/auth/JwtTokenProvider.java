@@ -88,4 +88,21 @@ public class JwtTokenProvider implements TokenProvider {
         storage.multiRemove(keys);
     }
     
+    @Override
+    public boolean isLoggedIn() {
+        try {
+            // Intenta recuperar el token de acceso almacenado
+            final String accessToken = getAccessToken();
+            if (accessToken == null) {
+                return false;
+            }
+            // Si existe un token, valida si es válido
+            JwtToken jwtToken = new JwtToken(accessToken);
+            return jwtToken.isValid();
+            
+        } catch (Exception e) {
+            return false; // Token inválido o formato incorrecto
+        }
+    }
+    
 }

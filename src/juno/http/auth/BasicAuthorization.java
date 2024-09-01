@@ -4,8 +4,7 @@ import juno.http.Authorization;
 import juno.util.Base64;
 
 /**
- *
- * @author Jesus
+ * "Basic %base64_encoded_credentials%"
  */
 public class BasicAuthorization implements Authorization {
 

@@ -12,5 +12,7 @@ public interface TokenProvider {
     
     void setRefreshToken(String token) throws Exception;
     
-    void clearAuthTokens() throws Exception ;
+    void clearAuthTokens() throws Exception;
+    
+    public boolean isLoggedIn();
 }
