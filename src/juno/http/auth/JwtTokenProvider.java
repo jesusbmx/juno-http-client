@@ -56,13 +56,12 @@ public class JwtTokenProvider implements TokenProvider {
     public boolean isLoggedIn() {
         try {
             // Intenta recuperar el token de acceso almacenado
-            final String accessToken = getAccessToken();
+            final JwtToken accessToken = getAccessToken(getAccessToken());
             if (accessToken == null) {
                 return false;
             }
             // Si existe un token, valida si es válido
-            JwtToken jwtToken = new JwtToken(accessToken);
-            return jwtToken.isValid();
+            return accessToken.isValid();
             
         } catch (Exception e) {
             return false; // Token inválido o formato incorrecto
