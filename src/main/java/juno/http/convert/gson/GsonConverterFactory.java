@@ -19,7 +19,7 @@ public class GsonConverterFactory implements ConverterFactory {
     @Override
     public <V> RequestBodyConverter<V> requestBodyConverter(final Class<V> type) {
         TypeAdapter<V> adapter = gson.getAdapter(type);
-        return new GsonRequestBodyConverter<V>(adapter, MEDIA_TYPE);
+        return new GsonRequestBodyConverter<V>(gson, adapter, MEDIA_TYPE);
     }
     
     @Override

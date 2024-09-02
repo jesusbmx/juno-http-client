@@ -1,15 +1,18 @@
 package juno.http.convert.gson;
 
+import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import juno.http.RequestBody;
 import juno.http.convert.RequestBodyConverter;
 
 public class GsonRequestBodyConverter<T> implements RequestBodyConverter<T> {
 
+    public final Gson gson;
     public final TypeAdapter<T> adapter;
     public final String contentType;
 
-    public GsonRequestBodyConverter(TypeAdapter<T> adapter, String contentType) {
+    public GsonRequestBodyConverter(Gson gson, TypeAdapter<T> adapter, String contentType) {
+        this.gson = gson;
         this.adapter = adapter;
         this.contentType = contentType;
     }
