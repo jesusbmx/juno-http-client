@@ -7,15 +7,16 @@ To include Juno in your project using Gradle, add the following dependency:
 ```
 dependencies {
   implementation 'com.github.jesusbmx:juno:1.0.0'
-  implementation 'com.github.jesusbmx:java-http-client:1.0.0'
+  implementation 'com.github.jesusbmx:java-http-client:0.0.1'
 }
 ```
 
 Alternatively, you can download the JAR file directly from [JitPack](https://jitpack.io/#jesusbmx/java-http-client):
 
-Download [juno-http-client.jar](https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar)
-
 Download [juno.jar](https://jitpack.io/com/github/jesusbmx/juno/1.0.0/juno-1.0.0.jar)
+
+Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/java-http-client/0.0.1/java-http-client-0.0.1.jar)
+
 
 ## [Samples](test/Samples.java)
 Start by creating an instance of the `HttpClient`:
