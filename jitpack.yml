@@ -1,9 +1,0 @@
-# jitpack.yml
-jdk:
-  - openjdk8
-
-install:
-  - ant clean
-  - ant -DskipTests=true jar
-  - mkdir -p target
-  - cp dist/juno-http-client.jar target/juno-http-client.jar
