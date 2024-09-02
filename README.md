@@ -15,7 +15,7 @@ Alternatively, you can download the JAR file directly from [JitPack](https://jit
 
 Download [juno.jar](https://jitpack.io/com/github/jesusbmx/juno/1.0.0/juno-1.0.0.jar)
 
-Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/0.0.1/juno-http-client-0.0.1.jar)
+Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.0.0/juno-http-client-1.0.0.jar)
 
 
 ## [Samples](src/test/java/Samples.java)
