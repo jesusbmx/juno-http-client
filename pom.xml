@@ -23,6 +23,12 @@
 	    <groupId>com.github.jesusbmx</groupId>
 	    <artifactId>juno</artifactId>
 	    <version>1.0.0</version>
+            <!-- 
+                El scope está establecido en provided, lo que significa que 
+                la dependencia solo se utilizará en tiempo de compilación y 
+                no se incluirá en el archivo final de la aplicación. 
+            -->
+            <scope>provided</scope>
 	</dependency>
         
         <!-- JSON -->

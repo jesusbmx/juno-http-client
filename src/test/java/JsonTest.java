@@ -45,6 +45,7 @@ public class JsonTest {
 
         RequestBody reqBody = RequestBody.create(
                 "application/json", data.toString());
+//        RequestBody reqBody = client.createRequestBody(data);
 
         HttpRequest request = new HttpRequest(
                 "POST", "https://postman-echo.com/post", reqBody);

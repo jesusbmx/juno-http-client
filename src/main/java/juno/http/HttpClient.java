@@ -7,6 +7,7 @@ import juno.http.convert.ConverterFactory;
 import juno.http.convert.generic.GenericConverterFactory;
 import juno.http.convert.RequestBodyConverter;
 import juno.http.convert.ResponseBodyConverter;
+import juno.http.convert.json.JSONConverterFactory;
 
 public class HttpClient implements HttpStack {
     
@@ -34,6 +35,9 @@ public class HttpClient implements HttpStack {
   public HttpClient(HttpStack stack) {
     mHttpStack = stack;
     mConverterFactories.add(new GenericConverterFactory());
+    if (JSONConverterFactory.isJSONSupportAvailable()) {
+        mConverterFactories.add(new JSONConverterFactory());
+    }
   }
  
   public HttpClient() {

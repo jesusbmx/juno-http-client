@@ -4,6 +4,8 @@ C:\GitHub\juno-http-client\src\main\java\juno\http\Headers.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\convert\gson\GsonConverterFactory.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\auth\OAuthAuthorization.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\HttpStack.java
+C:\GitHub\juno-http-client\src\main\java\juno\http\convert\generic\StringRequestBodyConverter.java
+C:\GitHub\juno-http-client\src\main\java\juno\http\convert\json\JSONConverterFactory.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\HttpURLConnectionStack.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\auth\BasicAuthorization.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\convert\jackson\JacksonResponseBodyConvert.java
