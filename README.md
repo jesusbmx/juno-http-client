@@ -7,7 +7,7 @@ To include Juno in your project using Gradle, add the following dependency:
 ```
 dependencies {
   implementation 'com.github.jesusbmx:juno:1.0.0'
-  implementation 'com.github.jesusbmx:java-http-client:0.0.1'
+  implementation 'com.github.jesusbmx:java-http-client:1.0.0'
 }
 ```
 
@@ -18,7 +18,7 @@ Download [juno.jar](https://jitpack.io/com/github/jesusbmx/juno/1.0.0/juno-1.0.0
 Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/java-http-client/0.0.1/java-http-client-0.0.1.jar)
 
 
-## [Samples](test/Samples.java)
+## [Samples](src/test/java/Samples.java)
 Start by creating an instance of the `HttpClient`:
 ```java
 HttpClient client = HttpClient.getInstance()
@@ -123,12 +123,12 @@ String upload(File file) throws Exception {
 
 #### Download
 ```
-GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar HTTP/1.1
+GET https://jitpack.io/com/github/jesusbmx/java-http-client/0.0.1/java-http-client-0.0.1.jar HTTP/1.1
 ```
 
 ```java
 File download() throws Exception {
-  HttpRequest request = new HttpRequest("GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
+  HttpRequest request = new HttpRequest("GET", "https://jitpack.io/com/github/jesusbmx/java-http-client/0.0.1/java-http-client-0.0.1.jar")
       .setTimeoutMs(20000)
   ;
   FileResponseBodyConverter converter = new FileResponseBodyConverter()
@@ -189,7 +189,7 @@ HttpClient client = HttpClient.getInstance().setInterceptor((request, stack) -> 
 
 
 
-## [Asynchronous and Synchronous Tasks](test/AsynTest.java)
+## [Asynchronous and Synchronous Tasks](src/test/java/AsynTest.java)
 
 We prepare the request
 
