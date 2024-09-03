@@ -1,4 +1,4 @@
-package juno.http;
+package juno.http.auth;
 
 public interface Authorization {
 

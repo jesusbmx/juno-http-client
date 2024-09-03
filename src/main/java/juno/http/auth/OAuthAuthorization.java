@@ -1,7 +1,5 @@
 package juno.http.auth;
 
-import juno.http.Authorization;
-
 /**
  * Implements OAuth Authorization scheme: "OAuth %token%"
  */

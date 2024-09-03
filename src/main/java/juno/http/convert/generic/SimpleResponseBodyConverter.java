@@ -1,8 +1,8 @@
 package juno.http.convert.generic;
 
 import juno.http.HttpResponse;
-import juno.io.IOUtils;
 import juno.http.convert.ResponseBodyConverter;
+import juno.io.IOUtils;
 
 public class SimpleResponseBodyConverter implements ResponseBodyConverter<HttpResponse> {
     

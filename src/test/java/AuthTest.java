@@ -6,9 +6,9 @@ import juno.http.FormBody;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
-import juno.http.auth.TokenAuthorization;
 import juno.http.auth.JwtToken;
 import juno.http.auth.JwtTokenProvider;
+import juno.http.auth.TokenAuthorization;
 import juno.http.auth.TokenProvider;
 import org.json.JSONObject;
 

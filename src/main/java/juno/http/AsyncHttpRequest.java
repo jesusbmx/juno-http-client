@@ -7,19 +7,19 @@ import juno.http.convert.ResponseBodyConverter;
 public class AsyncHttpRequest<T> extends AbstractAsync<T> {
     public final HttpStack stack;
     public final HttpRequest request;
-    public final ResponseBodyConverter<T> convert;
+    public final ResponseBodyConverter<T> converter;
     protected OnInterceptor interceptor;
 
     /**
      * Inyección de Dependencias: Dispatcher, HttpClient, ResponseBodyConvert
      */
     public AsyncHttpRequest(
-        Dispatcher dispatcher, HttpStack stack, HttpRequest request, ResponseBodyConverter<T> convert
+        Dispatcher dispatcher, HttpStack stack, HttpRequest request, ResponseBodyConverter<T> converter
     ) {
         super(dispatcher);
         this.stack = stack;
         this.request = request;
-        this.convert = convert;
+        this.converter = converter;
     }
     
     private HttpResponse execute(HttpRequest request) throws Exception {
@@ -34,7 +34,7 @@ public class AsyncHttpRequest<T> extends AbstractAsync<T> {
         HttpResponse response = null;
         try {
           response = execute(request);
-          return convert.convert(response);
+          return converter.convert(response);
 
         } catch(Exception e) {
           if (response != null) {

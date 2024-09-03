@@ -1,6 +1,5 @@
 package juno.http.auth;
 
-import juno.http.Authorization;
 import juno.util.Base64;
 
 /**

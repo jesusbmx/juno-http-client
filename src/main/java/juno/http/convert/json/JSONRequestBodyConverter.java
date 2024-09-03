@@ -1,9 +1,9 @@
 package juno.http.convert.json;
 
 import juno.http.RequestBody;
+import juno.http.convert.RequestBodyConverter;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import juno.http.convert.RequestBodyConverter;
 
 public class JSONRequestBodyConverter {
     private static final String MEDIA_TYPE = "application/json; charset=UTF-8";

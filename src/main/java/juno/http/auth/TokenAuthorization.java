@@ -1,7 +1,5 @@
 package juno.http.auth;
 
-import juno.http.Authorization;
-
 /**
  * Implements Bearer Authorization scheme: "Bearer %token%"
  */

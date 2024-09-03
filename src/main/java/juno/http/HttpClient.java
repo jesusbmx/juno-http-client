@@ -3,10 +3,11 @@ package juno.http;
 import java.util.ArrayList;
 import java.util.List;
 import juno.concurrent.Dispatcher;
+import juno.http.auth.Authorization;
 import juno.http.convert.ConverterFactory;
-import juno.http.convert.generic.GenericConverterFactory;
 import juno.http.convert.RequestBodyConverter;
 import juno.http.convert.ResponseBodyConverter;
+import juno.http.convert.generic.GenericConverterFactory;
 import juno.http.convert.json.JSONConverterFactory;
 
 public class HttpClient implements HttpStack {
@@ -145,11 +146,11 @@ public class HttpClient implements HttpStack {
     return getHttpStack().execute(request);
   }
 
-  public <V> V execute(HttpRequest request, ResponseBodyConverter<V> convert) throws Exception {
+  public <V> V execute(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
     HttpResponse response = null;
     try {
       response = execute(request);
-      return convert.convert(response);
+      return converter.convert(response);
       
     } catch(Exception e) {
       if (response != null) {
@@ -170,12 +171,12 @@ public class HttpClient implements HttpStack {
    * 
    * @param <V>
    * @param request petición a realizar
-   * @param convert adaptador para parsear la respuesta
+   * @param converter adaptador para parsear la respuesta
    * 
    * @return una llamada
    */
-  public <V> AsyncHttpRequest<V> createAsync(HttpRequest request, ResponseBodyConverter<V> convert) {
-    return new AsyncHttpRequest<V>(getDispatcher(), this, request, convert);
+  public <V> AsyncHttpRequest<V> createAsync(HttpRequest request, ResponseBodyConverter<V> converter) {
+    return new AsyncHttpRequest<V>(getDispatcher(), this, request, converter);
   }
   
   public <V> AsyncHttpRequest<V> createAsync(HttpRequest request, Class<V> cast) {
@@ -193,7 +194,7 @@ public class HttpClient implements HttpStack {
       return getRequestBodyConverter(type).convert(object);
 
     } catch(Exception e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new IllegalArgumentException(e.getMessage(), e);
     }
   }
   

@@ -1,10 +1,10 @@
 package juno.http.convert.json;
 
 import juno.http.HttpResponse;
+import juno.http.convert.ResponseBodyConverter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import juno.http.convert.ResponseBodyConverter;
 
 public class JSONResponseBodyConverter {
 
