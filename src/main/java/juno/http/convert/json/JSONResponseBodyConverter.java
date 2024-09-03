@@ -8,54 +8,46 @@ import org.json.JSONObject;
 
 public class JSONResponseBodyConverter {
 
+    private static String readAndValidateJson(HttpResponse response) throws Exception {
+        String json = null;
+        try {
+            json = response.readString();
+            if (json == null || json.isEmpty()) {
+                throw new JSONException("Response body is null or empty");
+            }
+            return json;
+        } finally {
+            response.close();
+        }
+    }
+
     public static class Obj implements ResponseBodyConverter<JSONObject> {
-        
+
         public static final Obj INSTANCE = new Obj();
 
         @Override
         public JSONObject convert(HttpResponse response) throws Exception {
+            String json = readAndValidateJson(response);
             try {
-                String json = response.readString();
-
-                if (json == null) {
-                    throw new JSONException("json == null");
-                }
-
-                if (json.isEmpty()) {
-                    throw new JSONException("json is empty");
-                }
-
                 return new JSONObject(json);
-
-            } finally {
-                response.close();
+            } catch (JSONException e) {
+                throw new Exception("Failed to parse JSONObject from response: " + json, e);
             }
         }
     }
 
     public static class Array implements ResponseBodyConverter<JSONArray> {
-        
-         public static final Array INSTANCE = new Array();
+
+        public static final Array INSTANCE = new Array();
 
         @Override
         public JSONArray convert(HttpResponse response) throws Exception {
+            String json = readAndValidateJson(response);
             try {
-                String json = response.readString();
-
-                if (json == null) {
-                    throw new JSONException("json == null");
-                }
-
-                if (json.isEmpty()) {
-                    throw new JSONException("json is empty");
-                }
-
                 return new JSONArray(json);
-
-            } finally {
-                response.close();
+            } catch (JSONException e) {
+                throw new Exception("Failed to parse JSONArray from response: " + json, e);
             }
         }
     }
-
 }
