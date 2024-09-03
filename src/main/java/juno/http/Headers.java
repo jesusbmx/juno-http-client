@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import juno.tuple.Pair;
+import juno.util.Pair;
 import juno.util.Convert;
 import juno.util.Strings;
 

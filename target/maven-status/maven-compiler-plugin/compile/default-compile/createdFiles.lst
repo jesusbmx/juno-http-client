@@ -10,7 +10,6 @@ juno\http\AsyncHttpRequest.class
 juno\http\convert\json\JSONRequestBodyConverter$Obj.class
 juno\http\convert\RequestBodyConverter.class
 juno\http\cache\CacheModel.class
-juno\http\Authorization.class
 juno\http\auth\JwtTokenProvider$OnTokenRefresh.class
 juno\http\cache\CacheSource.class
 juno\http\convert\json\JSONRequestBodyConverter$Array.class

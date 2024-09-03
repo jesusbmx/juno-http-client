@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.jesusbmx</groupId>
     <artifactId>juno-http-client</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
     
     <!--
@@ -22,7 +22,7 @@
         <dependency>
 	    <groupId>com.github.jesusbmx</groupId>
 	    <artifactId>juno</artifactId>
-	    <version>1.0.0</version>
+	    <version>1.0.1</version>
             <!-- 
                 El scope está establecido en provided, lo que significa que 
                 la dependencia solo se utilizará en tiempo de compilación y 

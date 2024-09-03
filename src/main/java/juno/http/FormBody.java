@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import juno.io.IOUtils;
-import juno.tuple.Pair;
+import juno.util.Pair;
 
 public class FormBody extends RequestBody {
 

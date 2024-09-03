@@ -17,13 +17,13 @@ C:\GitHub\juno-http-client\src\main\java\juno\http\HttpClient.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\cache\CacheInterceptor.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\convert\generic\BytesResponseBodyConverter.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\Debug.java
+C:\GitHub\juno-http-client\src\main\java\juno\http\auth\Authorization.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\auth\TokenProvider.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\convert\gson\GsonResponseBodyConverter.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\convert\generic\StringResponseBodyConverter.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\convert\RequestBodyConverter.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\auth\JwtTokenProvider.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\OnInterceptor.java
-C:\GitHub\juno-http-client\src\main\java\juno\http\Authorization.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\AsyncHttpRequest.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\convert\generic\FileResponseBodyConverter.java
 C:\GitHub\juno-http-client\src\main\java\juno\http\convert\generic\GenericConverterFactory.java
