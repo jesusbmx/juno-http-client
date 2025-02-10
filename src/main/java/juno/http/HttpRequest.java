@@ -10,19 +10,14 @@ public class HttpRequest {
     public static final int DEFAULT_TIMEOUT = 2500 * 2 * 2;
 
     /**
-     * Metodo por default.
-     */
-    public static final String DEFAULT_METHOD = "GET";
-
-    /**
      * Metodo de la request: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE.
      */
-    private String method = DEFAULT_METHOD;
+    private final String method;
 
     /**
      * Url de nuestra request.
      */
-    private HttpUrl url;
+    private final HttpUrl url;
 
     /**
      * Lista de encabezados adicionales de HTTP para esta peticion.
@@ -44,60 +39,99 @@ public class HttpRequest {
      */
     private int timeoutMs = DEFAULT_TIMEOUT;
 
-
-    public HttpRequest() {
-    } 
    
-    public HttpRequest(String method, HttpUrl url, Headers headers, RequestBody body) {
+    public HttpRequest(String method, HttpUrl url, RequestBody body) {
         this.method = method.toUpperCase();
         this.url = url;
-        this.headers = headers;
         this.body = body;
     }
-    public HttpRequest(String method, HttpUrl url, RequestBody body) {
-        this(method, url, null, body);
-    }
-    public HttpRequest(String method, HttpUrl url, Headers headers) {
-        this(method, url, headers, null);
-    }
+    
     public HttpRequest(String method, HttpUrl url) {
-        this(method, url, null, null);
+        this(method, url, null);
     }
     
-    public HttpRequest(String method, String url, Headers headers, RequestBody body) {
-        this(method, new HttpUrl(url), headers, body);
-    }
     public HttpRequest(String method, String url, RequestBody body) {
-        this(method, new HttpUrl(url), null, body);
+        this(method, new HttpUrl(url), body);
     }
-    public HttpRequest(String method, String url, Headers headers) {
-        this(method, new HttpUrl(url), headers, null);
-    }
+    
     public HttpRequest(String method, String url) {
-        this(method, new HttpUrl(url), null, null);
+        this(method, new HttpUrl(url), null);
+    }
+    
+    // Métodos de fábrica para solicitudes HTTP
+    
+    public static HttpRequest get(HttpUrl url) {
+        return new HttpRequest("GET", url);
     }
 
+    public static HttpRequest get(String url) {
+        return new HttpRequest("GET", url);
+    }
+
+    public static HttpRequest post(HttpUrl url, RequestBody body) {
+        return new HttpRequest("POST", url, body);
+    }
+
+    public static HttpRequest post(String url, RequestBody body) {
+        return new HttpRequest("POST",  url, body);
+    }
+
+    public static HttpRequest put(HttpUrl url, RequestBody body) {
+        return new HttpRequest("PUT", url, body);
+    }
+
+    public static HttpRequest put(String url, RequestBody body) {
+        return new HttpRequest("PUT", url, body);
+    }
+
+    public static HttpRequest delete(HttpUrl url) {
+        return new HttpRequest("DELETE", url);
+    }
+
+    public static HttpRequest delete(String url) {
+        return new HttpRequest("DELETE", url);
+    }
+
+    public static HttpRequest patch(HttpUrl url, RequestBody body) {
+        return new HttpRequest("PATCH", url, body);
+    }
+
+    public static HttpRequest patch(String url, RequestBody body) {
+        return new HttpRequest("PATCH", url, body);
+    }
+
+    public static HttpRequest head(HttpUrl url) {
+        return new HttpRequest("HEAD", url);
+    }
+
+    public static HttpRequest head(String url) {
+        return new HttpRequest("HEAD", url);
+    }
+
+    public static HttpRequest options(HttpUrl url) {
+        return new HttpRequest("OPTIONS", url);
+    }
+
+    public static HttpRequest options(String url) {
+        return new HttpRequest("OPTIONS", url);
+    }
+
+    public static HttpRequest trace(HttpUrl url) {
+        return new HttpRequest("TRACE", url);
+    }
+
+    public static HttpRequest trace(String url) {
+        return new HttpRequest("TRACE", url);
+    }
+    
+    // Getters y Setters
 
     public String getMethod() {
         return method;
     }
 
-    public HttpRequest setMethod(String method) {
-        this.method = method.toUpperCase();
-        return this;
-    }
-
     public HttpUrl getUrl() {
         return url;
-    }
-
-    public HttpRequest setUrl(HttpUrl url) {
-        this.url = url;
-        return this;
-    }
-
-    public HttpRequest setUrl(String url) {
-        return setUrl(new HttpUrl(url));
     }
 
     public Headers getHeaders() {

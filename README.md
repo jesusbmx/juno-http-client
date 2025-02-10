@@ -7,7 +7,7 @@ To include Juno in your project using Gradle, add the following dependency:
 ```
 dependencies {
   implementation 'com.github.jesusbmx:juno:1.0.3'
-  implementation 'com.github.jesusbmx:juno-http-client:1.0.3'
+  implementation 'com.github.jesusbmx:juno-http-client:1.0.4'
 }
 ```
 
@@ -15,7 +15,7 @@ Alternatively, you can download the JAR file directly from [JitPack](https://jit
 
 Download [juno.jar](https://jitpack.io/com/github/jesusbmx/juno/1.0.3/juno-1.0.3.jar)
 
-Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.0.3/juno-http-client-1.0.3.jar)
+Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.0.3/juno-http-client-1.0.4.jar)
 
 
 ## [Samples](src/test/java/Samples.java)
@@ -32,8 +32,8 @@ GET https://postman-echo.com/get HTTP/1.1
 
 ```java
 String get() throws Exception {
-  HttpRequest request = new HttpRequest(
-       "GET", "https://postman-echo.com/get")
+  HttpRequest request = HttpRequest.get(
+       "https://postman-echo.com/get")
   ;
   return client.execute(request, String.class);
 }
@@ -56,8 +56,8 @@ String post(int id, String name, boolean active) throws Exception {
           .add("name", name)
           .add("active", active)
   ;
-  HttpRequest request = new HttpRequest(
-      "POST", "https://postman-echo.com/post", reqBody)
+  HttpRequest request = HttpRequest.post(
+      "https://postman-echo.com/post", reqBody)
   ;
   return client.execute(request, String.class);
 }
@@ -80,8 +80,8 @@ String request() throws Exception {
     RequestBody reqBody = RequestBody.create(
         "application/json", json)
     ;
-    HttpRequest request = new HttpRequest(
-        "POST", "https://postman-echo.com/post", reqBody)
+    HttpRequest request = HttpRequest.post(
+        "https://postman-echo.com/post", reqBody)
     ;
     return client.execute(request, String.class);
 }
@@ -114,8 +114,8 @@ String upload(File file) throws Exception {
     .addParam("name", "John Doe")
     .addFile("file", file)
   ;
-  HttpRequest request = new HttpRequest(
-    "POST", "https://postman-echo.com/post", reqBody)
+  HttpRequest request = HttpRequest.post(
+    "https://postman-echo.com/post", reqBody)
   ;
   return client.execute(request, String.class);
 }
@@ -128,7 +128,7 @@ GET https://jitpack.io/com/github/jesusbmx/java-http-client/0.0.1/java-http-clie
 
 ```java
 File download() throws Exception {
-  HttpRequest request = new HttpRequest("GET", "https://jitpack.io/com/github/jesusbmx/java-http-client/0.0.1/java-http-client-0.0.1.jar")
+  HttpRequest request = HttpRequest.get("https://jitpack.io/com/github/jesusbmx/java-http-client/0.0.1/java-http-client-0.0.1.jar")
       .setTimeoutMs(20000)
   ;
   FileResponseBodyConverter converter = new FileResponseBodyConverter()
@@ -155,7 +155,7 @@ HttpResponse getIpLocation() throws Exception {
     .addQueryParameter("fields", "status,message,query,country,city")
     .addQueryParameter("lang", "en")
   ;
-  HttpRequest request = new HttpRequest("GET", url)
+  HttpRequest request = HttpRequest.get(url)
     .addHeader("User-Agent", "nombre-cliente")
   ;
   return client.execute(request);
@@ -203,8 +203,8 @@ public Async<String> insert(
       .add("name", name)
       .add("active", active);
   
-  HttpRequest request = new HttpRequest(
-      "POST", "https://postman-echo.com/post", reqBody);
+  HttpRequest request = HttpRequest.post(
+      "https://postman-echo.com/post", reqBody);
 
   return client.createAsync(request, String.class);
 }
@@ -260,8 +260,8 @@ public Async<JSONObject> insert(
         .add("age", age)
         .add("active", active);
 
-    HttpRequest request = new HttpRequest(
-        "POST", "https://postman-echo.com/post", reqBody);
+    HttpRequest request = HttpRequest.post(
+        "https://postman-echo.com/post", reqBody);
         
     return client.createAsync(request, JSONObject.class);
 }
@@ -277,8 +277,8 @@ JSONObject jsonRequest() throws Exception {
   RequestBody reqBody = RequestBody.create(
         "application/json", data.toString());
 
-  HttpRequest request = new HttpRequest(
-        "POST", "https://postman-echo.com/post", reqBody);
+  HttpRequest request = HttpRequest.post(
+        "https://postman-echo.com/post", reqBody);
 
   return client.execute(request, JSONObject.class);
 }
@@ -311,8 +311,8 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
         .add("token", provider.getRefreshToken())
     ;
     // Create a POST request to refresh the token
-    HttpRequest request = new HttpRequest(
-        "POST", ".../auth/refresh_token", body);
+    HttpRequest request = HttpRequest.post(
+        ".../auth/refresh_token", body);
 
     // Execute the request with another client to avoid entering a loop
     JSONObject response = request.execute(JSONObject.class);
@@ -333,8 +333,8 @@ void login(String email, String password) throws Exception {
         .add("password", password)
     ;
     // Create a POST request to the login endpoint
-    HttpRequest request = new HttpRequest(
-        "POST", ".../auth/login", body);
+    HttpRequest request = HttpRequest.post(
+        ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
     JSONObject response = request.execute(JSONObject.class);
@@ -356,8 +356,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3O
 ```java
 public HttpResponse requestWithToken() throws Exception{
   // Create the POST request
-  HttpRequest request = new HttpRequest(
-      "POST", "https://postman-echo.com/post");
+  HttpRequest request = HttpRequest.post(
+      "https://postman-echo.com/post");
 
   // Execute the request using the client configured with JWT authorization
   return client.execute(request);
@@ -375,8 +375,8 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
         .add("password", "myPassword")
     ;
     // Create a POST request to the login endpoint
-    HttpRequest request = new HttpRequest(
-        "POST", ".../auth/login", body);
+    HttpRequest request = HttpRequest.post(
+        ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
     JSONObject response = request.execute(JSONObject.class);
@@ -437,8 +437,8 @@ public class PostApi {
   }
 
   public Async<Post[]> getPosts() {
-    HttpRequest request = new HttpRequest(
-        "GET", "https://kylewbanks.com/rest/posts.json");
+    HttpRequest request = HttpRequest.get(
+        "https://kylewbanks.com/rest/posts.json");
 
     return client.createAsync(request, Post[].class);
   }
@@ -448,8 +448,8 @@ public class PostApi {
     // RequestBody reqBody = new FormBody(Maps.getPublicFields(p)); // application-www-www-form-urlencoded
     // RequestBody reqBody = new MultipartBody(Maps.getPublicFields(p)); // multipart/form-data
     
-    HttpRequest request = new HttpRequest(
-            "POST", "https://postman-echo.com/post", reqBody);
+    HttpRequest request = HttpRequest.post(
+            "https://postman-echo.com/post", reqBody);
     
     return client.createAsync(request, String.class);
   }
@@ -523,8 +523,8 @@ public class PostApi {
   }
 
   public Async<Post[]> getPosts() {
-    HttpRequest request = new HttpRequest(
-        "GET", "https://kylewbanks.com/rest/posts.json");
+    HttpRequest request = HttpRequest.get(
+        "https://kylewbanks.com/rest/posts.json");
 
     return client.createAsync(request, Post[].class);
   }
@@ -533,8 +533,8 @@ public class PostApi {
     // application/json
     RequestBody reqBody = client.createRequestBody(p);
     
-    HttpRequest request = new HttpRequest(
-            "POST", "https://postman-echo.com/post", reqBody);
+    HttpRequest request = HttpRequest.post(
+            "https://postman-echo.com/post", reqBody);
     
     return client.createAsync(request, String.class);
   }

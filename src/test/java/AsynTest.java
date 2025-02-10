@@ -1,7 +1,6 @@
 
 import juno.concurrent.Async;
 import juno.concurrent.Callback;
-import juno.http.FormBody;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
@@ -17,13 +16,10 @@ public class AsynTest {
       HttpUrl url = new HttpUrl("http://ip-api.com/")
                 .addPath("json")
                 .addPath("24.48.0.1")
+                .addQueryParameter("fields", "status,message,query,country,city")
+                .addQueryParameter("lang", "en")
       ;
-      FormBody body = new FormBody()
-          .add("fields", "status,message,query,country,city")
-          .add("lang", "en")
-      ;
-      HttpRequest request = new HttpRequest(
-          "GET", url, body)
+      HttpRequest request = HttpRequest.get(url)
       ;
       return client.createAsync(request);
     }

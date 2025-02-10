@@ -38,8 +38,8 @@ public class AuthTest implements JwtTokenProvider.OnTokenRefresh {
             .add("accessToken", generateRandomToken(0))
             .add("refreshToken", generateRandomToken(2000))
         ;
-        HttpRequest request = new HttpRequest(
-                "POST", "https://postman-echo.com/post", body);
+        HttpRequest request = HttpRequest.post(
+                "https://postman-echo.com/post", body);
 
         // Result
         JSONObject response = request.execute(JSONObject.class);
@@ -52,8 +52,8 @@ public class AuthTest implements JwtTokenProvider.OnTokenRefresh {
 
     private HttpResponse requestWithToken() throws Exception {
         System.out.println("[LOG] AuthTest requestWithToken()");
-        HttpRequest request = new HttpRequest(
-                "POST", "https://postman-echo.com/post");
+        HttpRequest request = HttpRequest.post(
+                "ttps://postman-echo.com/post", null);
 
         return client.execute(request);
     }
@@ -69,8 +69,8 @@ public class AuthTest implements JwtTokenProvider.OnTokenRefresh {
             .add("accessToken", generateRandomToken(0))
             .add("refreshToken", generateRandomToken(2000))
         ;
-        HttpRequest request = new HttpRequest(
-                "POST", "https://postman-echo.com/post", body);
+        HttpRequest request = HttpRequest.post(
+                "https://postman-echo.com/post", body);
 
         // Result
         JSONObject response = request.execute(JSONObject.class);

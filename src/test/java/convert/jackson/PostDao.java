@@ -27,8 +27,8 @@ public class PostDao {
   }
 
   public Async<Post[]> getPosts() {
-    HttpRequest request = new HttpRequest(
-        "GET", "https://kylewbanks.com/rest/posts.json");
+    HttpRequest request = HttpRequest.get(
+        "https://kylewbanks.com/rest/posts.json");
 
     return client.createAsync(request, Post[].class);
   }
@@ -38,8 +38,8 @@ public class PostDao {
     //RequestBody reqBody = new FormBody(Maps.fromObjectFields(p));
     //RequestBody reqBody = new MultipartBody(Maps.fromObjectFields(p));
     
-    HttpRequest request = new HttpRequest(
-            "POST", "https://postman-echo.com/post", reqBody);
+    HttpRequest request = HttpRequest.post(
+            "https://postman-echo.com/post", reqBody);
     
     return client.createAsync(request, String.class);
   }

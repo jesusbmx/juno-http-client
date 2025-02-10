@@ -19,8 +19,8 @@ public class CacheTest {
     GET https://postman-echo.com/get HTTP/1.1
     */
     Async<String> get() throws Exception {
-        final HttpRequest request = new HttpRequest(
-                "GET", "https://postman-echo.com/get");
+        final HttpRequest request = HttpRequest.get(
+                "https://postman-echo.com/get");
 
         final Calendar nextExpireAt = Calendar.getInstance();
         // Sumar un día
@@ -40,7 +40,7 @@ public class CacheTest {
         .addQueryParameter("fields", "status,message,query,country,city")
         .addQueryParameter("lang", "en")
       ;
-      final HttpRequest request = new HttpRequest("GET", url);
+      final HttpRequest request = HttpRequest.get(url);
       
       return client.createAsync(request, String.class)
               .setInterceptor(new CacheInterceptor(cacheStorage));

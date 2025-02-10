@@ -31,7 +31,7 @@ public class InterceptorTest {
         .addQueryParameter("fields", "status,message,query,country,city")
         .addQueryParameter("lang", "en")
       ;
-      HttpRequest request = new HttpRequest("GET", url);
+      HttpRequest request = HttpRequest.get(url);
       
       return client.createAsync(request, String.class);
     }

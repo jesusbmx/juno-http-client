@@ -19,8 +19,8 @@ public class JsonTest {
                 .add("age", age)
                 .add("active", active);
 
-        HttpRequest request = new HttpRequest(
-                "POST", "https://postman-echo.com/post", reqBody);
+        HttpRequest request = HttpRequest.post(
+                "https://postman-echo.com/post", reqBody);
 
         return client.createAsync(request, JSONObject.class);
     }
@@ -47,8 +47,8 @@ public class JsonTest {
                 "application/json", data.toString());
 //        RequestBody reqBody = client.createRequestBody(data);
 
-        HttpRequest request = new HttpRequest(
-                "POST", "https://postman-echo.com/post", reqBody);
+        HttpRequest request = HttpRequest.post(
+                "https://postman-echo.com/post", reqBody);
 
         return client.execute(request, JSONObject.class);
     }

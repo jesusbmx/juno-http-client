@@ -73,6 +73,10 @@ public class HttpResponse implements Closeable {
             IOUtils.closeQuietly(content);
         }
     }
+    
+    public boolean isSuccessful() {
+        return code >= 200 && code < 300;
+    }
 
     @Override
     public String toString() {

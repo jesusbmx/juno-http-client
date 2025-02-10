@@ -18,8 +18,8 @@ public class Samples {
     GET https://postman-echo.com/get HTTP/1.1
     */
     String get() throws Exception {
-        HttpRequest request = new HttpRequest(
-                "GET", "https://postman-echo.com/get");
+        HttpRequest request = HttpRequest.get(
+                "https://postman-echo.com/get");
 
         return client.execute(request, String.class);
     }
@@ -38,8 +38,8 @@ public class Samples {
                 .add("name", name)
                 .add("active", active)
         ;
-        HttpRequest request = new HttpRequest(
-                "POST", "https://postman-echo.com/post", reqBody);
+        HttpRequest request = HttpRequest.post(
+                "https://postman-echo.com/post", reqBody);
 
         return client.execute(request, String.class);
     }
@@ -59,8 +59,8 @@ public class Samples {
         RequestBody reqBody = RequestBody.create(
                 "application/json", json);
         
-        HttpRequest request = new HttpRequest(
-                "POST", "https://postman-echo.com/post", reqBody);
+        HttpRequest request = HttpRequest.post(
+                "https://postman-echo.com/post", reqBody);
 
         return client.execute(request, String.class);
     }
@@ -79,8 +79,8 @@ public class Samples {
                 .addParam("name", "John Doe")
                 .addFile("file", file)
         ;
-        HttpRequest request = new HttpRequest(
-                "POST", "https://postman-echo.com/post", reqBody);
+        HttpRequest request = HttpRequest.post(
+                "https://postman-echo.com/post", reqBody);
 
         return client.execute(request, String.class);
     }
@@ -89,8 +89,8 @@ public class Samples {
     GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar HTTP/1.1
     */
     File download() throws Exception {
-        HttpRequest request = new HttpRequest(
-                "GET", "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
+        HttpRequest request = HttpRequest.get(
+                "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
                 .setTimeoutMs(20000);
 
         FileResponseBodyConverter convert = new FileResponseBodyConverter()
@@ -112,7 +112,7 @@ public class Samples {
         .addQueryParameter("fields", "status,message,query,country,city")
         .addQueryParameter("lang", "en")
       ;
-      HttpRequest request = new HttpRequest("GET", url)
+      HttpRequest request = HttpRequest.get(url)
         .addHeader("User-Agent", "nombre-cliente")
       ;
       return client.execute(request);
