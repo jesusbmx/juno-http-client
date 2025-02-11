@@ -78,8 +78,8 @@ public class MultipartBody extends RequestBody {
   @Override public void writeTo(OutputStream out) throws IOException {
     doWrite(out, true);
   }
-  
-  private void doWrite(OutputStream out, boolean write) throws IOException {
+    
+  public void doWrite(OutputStream out, boolean write) throws IOException {
     byte[] boundaryToCharArray = boundary.getBytes();
 
     for (Part part : parts) {      

@@ -107,7 +107,7 @@ public class HttpURLConnectionStack implements HttpStack {
             BufferedOutputStream bos = null;
             try {
                 bos = new BufferedOutputStream(conn.getOutputStream());
-                Debug.debug(request, requestBody, contentType, contentLength);
+                Debug.debugRequest(request, requestBody, contentType, contentLength);
                 requestBody.writeTo(bos);
 
             } finally {
@@ -115,7 +115,7 @@ public class HttpURLConnectionStack implements HttpStack {
             }
 
         } else {
-            Debug.debug(request);
+            Debug.debugRequest(request);
         }
     }
 
@@ -165,7 +165,7 @@ public class HttpURLConnectionStack implements HttpStack {
         final HttpResponse response = new HttpResponse(
                 responseCode, headers, content);
 
-        Debug.debug(request, response);
+        Debug.debugResponse(request, response);
 
         return response;
     }

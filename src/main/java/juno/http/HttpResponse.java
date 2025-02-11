@@ -97,7 +97,7 @@ public class HttpResponse implements Closeable {
         sb.append("\n");
 
         // Response body
-        sb.append("--- content ---");
+        sb.append("{{content}}");
 
         return sb.toString();
     }

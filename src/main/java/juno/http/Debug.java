@@ -2,10 +2,15 @@ package juno.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import static juno.http.MultipartBody.COLON_SPACE;
+import static juno.http.MultipartBody.CR_LF;
+import static juno.http.MultipartBody.TWO_DASHES;
 import juno.io.IOUtils;
+import juno.util.Strings;
 
 public final class Debug {
 
@@ -13,7 +18,7 @@ public final class Debug {
         "application/json",
         "application/xml",
         "application/x-www-form-urlencoded",
-        //"multipart/form-data",
+        "multipart/form-data",
         "text/plain",
         "text/html"
     ));
@@ -36,22 +41,17 @@ public final class Debug {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
             debugInfo.append("[Debug] ").append(tag).append(" -> ");
-            for (int i = 0; i < message.length; i++) {
-                if (i > 0) {
-                    debugInfo.append(" ");
-                }
-                debugInfo.append(message[i]);
-            }
+            debugInfo.append(Strings.join(message, " "));            
             debugInfo.append("\n");
             System.out.print(debugInfo);
         }
     }
     
-    public static void debug(HttpRequest request) throws IOException {
+    public static void debugRequest(HttpRequest request) throws IOException {
         if (isDebug) {
-            final StringBuilder debugInfo = new StringBuilder();
-            debugInfo.append("```http-request-").append(request.hashCode()).append("\n");
-            debugInfo.append(request.getMethod()).append(" ")
+            final StringBuilder debugInfo = new StringBuilder()
+                    .append("```http-request-").append(request.hashCode()).append("\n")
+                    .append(request.getMethod()).append(" ")
                     .append(request.urlAndParams()).append(" HTTP/1.1").append("\r\n");
             
             final Headers headers = request.getHeaders();
@@ -64,11 +64,11 @@ public final class Debug {
         }
     }
     
-    public static void debug(HttpRequest request, RequestBody rb, String contentType, long contentLength) throws IOException {
+    public static void debugRequest(HttpRequest request, RequestBody rb, String contentType, long contentLength) throws IOException {
         if (isDebug) {
-            final StringBuilder debugInfo = new StringBuilder();
-            debugInfo.append("```http-request-").append(request.hashCode()).append("\n");
-            debugInfo.append(request.getMethod()).append(" ")
+            final StringBuilder debugInfo = new StringBuilder()
+                    .append("```http-request-").append(request.hashCode()).append("\n")
+                    .append(request.getMethod()).append(" ")
                     .append(request.urlAndParams()).append(" HTTP/1.1").append("\r\n");
             
             final Headers headers = request.getHeaders();
@@ -80,15 +80,16 @@ public final class Debug {
                      .append(Headers.CONTENT_LENGTH).append(": ").append(contentLength).append("\r\n");
 
             if (isReadableContentType(contentType)) {
-                final ByteArrayOutputStream outputStream = IOUtils.arrayOutputStream();
-                rb.writeTo(outputStream);
-                final String requestBodyString = outputStream.toString();
-                outputStream.close();
-                
-                debugInfo.append("\r\n").append(requestBodyString).append("\r\n");
-
+                try (ByteArrayOutputStream outputStream = IOUtils.arrayOutputStream()) {
+                    if (rb instanceof MultipartBody) {
+                        write(System.out, (MultipartBody) rb);
+                    } else {
+                        rb.writeTo(outputStream);
+                    }
+                    debugInfo.append("\r\n").append(outputStream.toString()).append("\r\n");
+                }
             } else {
-                debugInfo.append("\r\n").append("-- binary --\r\n");
+                debugInfo.append("\r\n{{binary}}\r\n");
             }
 
             debugInfo.append("```\n");
@@ -96,7 +97,47 @@ public final class Debug {
         }
     }
     
-    public static void debug(HttpRequest request, HttpResponse responseBody) {
+    private static void write(OutputStream out, MultipartBody multipartBody) throws IOException {
+        byte[] boundaryToCharArray = multipartBody.boundary.getBytes();
+        List<MultipartBody.Part> parts = multipartBody.parts();
+        
+        for (MultipartBody.Part part : parts) {      
+          out.write(TWO_DASHES);
+          out.write(boundaryToCharArray);
+          out.write(CR_LF);
+
+          // Write Format Multipart Header:
+          for (int i = 0, size = part.headers.size(); i < size; i++) {
+            out.write(part.headers.getName(i).getBytes());
+            out.write(COLON_SPACE);
+            out.write(part.headers.getValue(i).getBytes());
+            out.write(CR_LF);
+          }
+          
+          final String contentType = part.body.contentType();
+          out.write(Headers.CONTENT_TYPE.getBytes());
+          out.write(COLON_SPACE);
+          out.write(contentType.getBytes());
+          out.write(CR_LF);
+
+          // Write Body:
+          out.write(CR_LF);
+          if (isReadableContentType(contentType)) 
+              part.body.writeTo(out);
+          else
+              out.write("{{binary}}".getBytes());
+          
+          out.write(CR_LF);
+        }
+
+        // End of multipart/form-data.
+        out.write(TWO_DASHES);
+        out.write(boundaryToCharArray);
+        out.write(TWO_DASHES);
+        out.write(CR_LF);
+    }
+    
+    public static void debugResponse(HttpRequest request, HttpResponse responseBody) {
         if (isDebug) {
             final StringBuilder debugInfo = new StringBuilder();
             debugInfo.append("```http-response-").append(request.hashCode()).append("\n");
