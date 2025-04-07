@@ -117,39 +117,47 @@ public class MultipartBody extends RequestBody {
     return this;
   }
   
-  public MultipartBody addBody(String name, RequestBody body) {
+  public MultipartBody addPart(RequestBody body) {
+    return addPart(new Part(body, new Headers()));
+  }
+  
+  public MultipartBody addPart(Headers headers, RequestBody body) {
+    return addPart(new Part(body, headers));
+  }
+  
+  public MultipartBody addFormDataPart(String name, RequestBody body) {
     return addPart(Part.createFormData(name, body));
   }
   
-  public MultipartBody addBody(RequestBody body) {
-    return addPart(new Part(body, new Headers()));
+  public MultipartBody addFormDataPart(String name, String filename, RequestBody body) {
+    return addPart(Part.createFormData(name, filename, body));
   }
   
   public MultipartBody addParam(String name, Object value, Charset charset) {
     final String newValue = (value == null) ? "" : value.toString();
     final RequestBody body = RequestBody.create(
             "text/plain; charset=" + charset.name(), newValue);
-    return addPart(Part.createFormData(name, body));
+    return addFormDataPart(name, body);
   }
   
   public MultipartBody addParam(String name, Object value) {
     return addParam(name, value, DEFAULT_ENCODING);
   }
 
-  public MultipartBody addFile(String name, File file) {
-    return addFile(name, file, file.getName());
-  }
-  
   public MultipartBody addFile(String name, File file, String filename) {
     final RequestBody body = RequestBody.create(
             "application/octet-stream", file);
-    return addPart(Part.createFormData(name, filename, body));
+    return addFormDataPart(name, filename, body);
   }
   
   public MultipartBody addFile(String name, byte[] value, String filename) {
     final RequestBody body = RequestBody.create(
             "application/octet-stream", value);
-    return addPart(Part.createFormData(name, filename, body));
+    return addFormDataPart(name, filename, body);
+  }
+  
+  public MultipartBody addFile(String name, File file) {
+    return addFile(name, file, file.getName());
   }
   
   public MultipartBody addObject(String name, Object value) {
@@ -160,7 +168,7 @@ public class MultipartBody extends RequestBody {
     else if (value instanceof Part) 
       addPart((Part) value);
     else if (value instanceof RequestBody) 
-      addBody(name, (RequestBody) value);
+      addFormDataPart(name, (RequestBody) value);
     else
       addParam(name, value);
     
