@@ -10,7 +10,7 @@ import juno.http.convert.ResponseBodyConverter;
 import juno.http.convert.generic.GenericConverterFactory;
 import juno.http.convert.json.JSONConverterFactory;
 
-public class HttpClient implements HttpTransport, HttpRequestExecutor {
+public class HttpClient implements HttpTransport, HttpExecutor {
     
   /** Singleton de la clase. */
   private static HttpClient instance;

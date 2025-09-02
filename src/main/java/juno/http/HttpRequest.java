@@ -206,7 +206,7 @@ public class HttpRequest {
         return HttpRequest.this.send(HttpClient.getInstance());
     }
 
-    public <V> V send(HttpRequestExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
+    public <V> V send(HttpExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
         return executor.send(this, convert);
     }
     
@@ -214,7 +214,7 @@ public class HttpRequest {
         return HttpRequest.this.send(HttpClient.getInstance(), convert);
     }
 
-    public <V> V send(HttpRequestExecutor executor, Class<V> convert) throws Exception {
+    public <V> V send(HttpExecutor executor, Class<V> convert) throws Exception {
         return executor.send(this, convert);
     }
     

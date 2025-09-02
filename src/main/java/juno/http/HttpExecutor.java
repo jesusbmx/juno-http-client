@@ -2,7 +2,7 @@ package juno.http;
 
 import juno.http.convert.ResponseBodyConverter;
 
-public interface HttpRequestExecutor {
+public interface HttpExecutor {
     
     public <V> V send(HttpRequest httpRequest, ResponseBodyConverter<V> converter) throws Exception;
      
