@@ -5,8 +5,8 @@ import java.util.Calendar;
 import juno.http.Debug;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
-import juno.http.HttpStack;
 import juno.http.OnInterceptor;
+import juno.http.HttpTransport;
 
 public class CacheInterceptor implements OnInterceptor {
 
@@ -37,7 +37,7 @@ public class CacheInterceptor implements OnInterceptor {
     }
 
     @Override
-    public HttpResponse intercept(HttpRequest request, HttpStack stack) throws Exception {
+    public HttpResponse intercept(HttpRequest request, HttpTransport stack) throws Exception {
         CacheModel cache = source.find(request);
 
         if (cache == null || hasCacheExpired(cache)) {
@@ -47,9 +47,9 @@ public class CacheInterceptor implements OnInterceptor {
         return handleCacheHit(request, cache, stack);
     }
 
-    protected HttpResponse handleCacheMiss(HttpRequest request, HttpStack stack, CacheModel cache) throws Exception {
+    protected HttpResponse handleCacheMiss(HttpRequest request, HttpTransport stack, CacheModel cache) throws Exception {
         Debug.debug("CacheInterceptor", "executeRequest:", request);
-        final HttpResponse response = stack.execute(request);
+        final HttpResponse response = stack.send(request);
 
         if (isResponseValid(response)) {
             try {
@@ -64,7 +64,7 @@ public class CacheInterceptor implements OnInterceptor {
         return response;
     }
 
-    protected HttpResponse handleCacheHit(HttpRequest request, CacheModel cache, HttpStack stack) throws Exception {
+    protected HttpResponse handleCacheHit(HttpRequest request, CacheModel cache, HttpTransport stack) throws Exception {
         try {
             Debug.debug("CacheInterceptor", "getHttpResponseFromFile:", cache.getRequestAsString());
             return cache.getHttpResponseFromFile();
@@ -73,7 +73,7 @@ public class CacheInterceptor implements OnInterceptor {
             Debug.debug("CacheInterceptor", "error.getHttpResponseFromFile:", e.getMessage());
         }
 
-        return stack.execute(request);
+        return stack.send(request);
     }
 
     protected CacheModel updateCache(CacheModel cache, HttpRequest request, HttpResponse response) throws Exception {

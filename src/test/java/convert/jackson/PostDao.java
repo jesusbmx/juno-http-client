@@ -3,7 +3,7 @@ package convert.jackson;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.text.SimpleDateFormat;
-import juno.concurrent.Async;
+import juno.concurrent.Task;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.RequestBody;
@@ -26,14 +26,14 @@ public class PostDao {
     client.addConverterFactory(new JacksonConverterFactory(mapper)); 
   }
 
-  public Async<Post[]> getPosts() {
+  public Task<Post[]> getPosts() {
     HttpRequest request = HttpRequest.get(
         "https://kylewbanks.com/rest/posts.json");
 
-    return client.createAsync(request, Post[].class);
+    return client.newTask(request, Post[].class);
   }
   
-  public Async<String> insert(Post p) {
+  public Task<String> insert(Post p) {
     RequestBody reqBody = client.createRequestBody(p);
     //RequestBody reqBody = new FormBody(Maps.fromObjectFields(p));
     //RequestBody reqBody = new MultipartBody(Maps.fromObjectFields(p));
@@ -41,7 +41,7 @@ public class PostDao {
     HttpRequest request = HttpRequest.post(
             "https://postman-echo.com/post", reqBody);
     
-    return client.createAsync(request, String.class);
+    return client.newTask(request, String.class);
   }
 
   //  BasicHttpStack stack = new BasicHttpStack() {  

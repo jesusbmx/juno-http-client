@@ -11,7 +11,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import juno.io.IOUtils;
 
-public class HttpURLConnectionStack implements HttpStack {
+public class URLConnectionTransport implements HttpTransport {
 
     /**
      * Abre una conexión HTTP a intenert apartir de una petición.
@@ -94,7 +94,7 @@ public class HttpURLConnectionStack implements HttpStack {
 
         if (request.requiresRequestBody() && requestBody != null) {
             final String contentType = requestBody.contentType();
-
+            
             // Setup connection:
             conn.setDoOutput(true);
             conn.addRequestProperty(Headers.CONTENT_TYPE, contentType);
@@ -200,7 +200,7 @@ public class HttpURLConnectionStack implements HttpStack {
      * @throws java.io.IOException
      */
     @Override
-    public HttpResponse execute(HttpRequest request) throws Exception {
+    public HttpResponse send(HttpRequest request) throws Exception {
         HttpURLConnection conn = null;
         try {
             conn = open(request);

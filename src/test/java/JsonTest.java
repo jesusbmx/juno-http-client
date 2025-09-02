@@ -1,5 +1,5 @@
 
-import juno.concurrent.Async;
+import juno.concurrent.Task;
 import juno.http.FormBody;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
@@ -10,7 +10,7 @@ public class JsonTest {
 
     HttpClient client = HttpClient.getInstance();
 
-    public Async<JSONObject> insert(
+    public Task<JSONObject> insert(
             String name, int age, boolean active) {
 
         // application-www-www-form-urlencoded
@@ -22,15 +22,15 @@ public class JsonTest {
         HttpRequest request = HttpRequest.post(
                 "https://postman-echo.com/post", reqBody);
 
-        return client.createAsync(request, JSONObject.class);
+        return client.newTask(request, JSONObject.class);
     }
 
     public void async() {
-        Async<JSONObject> insert = insert(
+        Task<JSONObject> insert = insert(
             "John Doe", 22, true);
 
         try {
-            JSONObject response = insert.await();
+            JSONObject response = insert.sync();
             System.out.println(response.toString(1));
 
         } catch (Exception e) {
@@ -50,7 +50,7 @@ public class JsonTest {
         HttpRequest request = HttpRequest.post(
                 "https://postman-echo.com/post", reqBody);
 
-        return client.execute(request, JSONObject.class);
+        return client.send(request, JSONObject.class);
     }
 
     public static void main(String[] args) throws Exception {

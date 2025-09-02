@@ -51,10 +51,6 @@ public class Headers {
     values.clear();
   }
   
-  public void remove(int i) {
-    values.remove(i);
-  }
-  
   public int getIndexByName(String key) {
     for (int i = 0; i < values.size(); i++) {
       if (key.equalsIgnoreCase(getName(i))) {
@@ -101,7 +97,7 @@ public class Headers {
     return Convert.toLong(getValue(name), defValue);
   }
   
-  public int getLong(String name, int defValue) {
+  public int getInt(String name, int defValue) {
     return Convert.toInt(getValue(name), defValue);
   }
   
@@ -207,6 +203,25 @@ public class Headers {
       this.add(entry.getKey(), entry.getValue());
     }
     return this;
+  }
+  
+  public void remove(int i) {
+    values.remove(i);
+  }
+  
+  public void remove(String key) {
+    List<Integer> listRemove = new ArrayList<>();
+    for (int i = 0; i < values.size(); i++) {
+      if (key.equalsIgnoreCase(getName(i))) {
+        listRemove.add(i);
+      }
+    }
+    values.removeAll(listRemove);
+  }
+  
+  public void set(String key, String value) {
+    remove(key);
+    add(key, value);
   }
   
   public static Headers of(Map<String, List<String>> map) {

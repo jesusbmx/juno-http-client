@@ -1,7 +1,7 @@
 package convert.gson;
 
 import java.util.Date;
-import juno.concurrent.Async;
+import juno.concurrent.Task;
 import juno.concurrent.Callback;
 
 public class GsonTest {
@@ -9,9 +9,9 @@ public class GsonTest {
   PostDao dao = new PostDao();  
     
   public void list() {
-    Async<Post[]> call = dao.getPosts(); 
+    Task<Post[]> task = dao.getPosts(); 
     
-    call.execute(new Callback<Post[]>() {
+    task.async(new Callback<Post[]>() {
       @Override
       public void onResponse(Post[] response) throws Exception {
         //List<Post> list = Arrays.asList(result);
@@ -35,9 +35,9 @@ public class GsonTest {
     post.url = "http://127.0.0.1";
     post.body = "My body";
     
-    Async<String> call = dao.insert(post); 
+    Task<String> task = dao.insert(post); 
     
-    call.execute(new Callback<String>() {
+    task.async(new Callback<String>() {
       @Override
       public void onResponse(String response) throws Exception {
           System.out.println(response);

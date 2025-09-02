@@ -1,11 +1,11 @@
 
-import juno.concurrent.Async;
+import juno.concurrent.Task;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
-import juno.http.HttpStack;
 import juno.http.HttpUrl;
 import juno.http.OnInterceptor;
+import juno.http.HttpTransport;
 
 
 public class InterceptorTest {
@@ -13,8 +13,8 @@ public class InterceptorTest {
     HttpClient client = HttpClient.getInstance()
             .setInterceptor(new OnInterceptor() {
                 @Override
-                public HttpResponse intercept(HttpRequest request, HttpStack stack) throws Exception {
-                    HttpResponse response = stack.execute(request);
+                public HttpResponse intercept(HttpRequest request, HttpTransport stack) throws Exception {
+                    HttpResponse response = stack.send(request);
                     if (response.code >= 200 && response.code <= 299) {
                         return response;
                     }
@@ -24,7 +24,7 @@ public class InterceptorTest {
             .setDebug(true)
     ;
 
-    Async<String> getIpLocation() { 
+    Task<String> getIpLocation() { 
       HttpUrl url = new HttpUrl("http://ip-api.com/")
         .addPath("json")
         .addPath("24.48.0.1")
@@ -33,13 +33,13 @@ public class InterceptorTest {
       ;
       HttpRequest request = HttpRequest.get(url);
       
-      return client.createAsync(request, String.class);
+      return client.newTask(request, String.class);
     }
     
     public static void main(String[] args) throws Exception {
         InterceptorTest test = new InterceptorTest();
  
-        final String response = test.getIpLocation().await();
+        final String response = test.getIpLocation().sync();
         System.out.println(response);
     }
 }

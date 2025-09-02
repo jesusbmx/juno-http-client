@@ -1,6 +1,6 @@
 package juno.http;
 
-public interface HttpStack {
+public interface HttpTransport {
 
   /**
    * Ejecuta una petición.
@@ -11,5 +11,5 @@ public interface HttpStack {
    *
    * @throws java.io.IOException
    */
-  public HttpResponse execute(HttpRequest request) throws Exception;
+  public HttpResponse send(HttpRequest request) throws Exception;
 }

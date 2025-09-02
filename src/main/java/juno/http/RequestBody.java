@@ -11,7 +11,7 @@ import juno.io.IOUtils;
 public abstract class RequestBody {
   public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
 
-  public abstract String contentType() throws IOException;
+  public abstract String contentType();
 
   public abstract long contentLength() throws IOException;
 
@@ -19,7 +19,7 @@ public abstract class RequestBody {
   
   public static RequestBody create(final String contentType, final String content) {
     return new RequestBody() {
-      @Override public String contentType() throws IOException {
+      @Override public String contentType() {
         return contentType;
       }
       @Override public long contentLength() throws IOException {
@@ -43,7 +43,7 @@ public abstract class RequestBody {
   
   public static RequestBody create(final String contentType, final byte[] content) {
     return new RequestBody() {
-      @Override public String contentType() throws IOException {
+      @Override public String contentType() {
         return contentType;
       }
       @Override public long contentLength() throws IOException {
@@ -57,7 +57,7 @@ public abstract class RequestBody {
   
   public static RequestBody create(final String contentType, final File content) {
     return new RequestBody() {
-      @Override public String contentType() throws IOException {
+      @Override public String contentType() {
         return contentType;
       }
       @Override public long contentLength() throws IOException {

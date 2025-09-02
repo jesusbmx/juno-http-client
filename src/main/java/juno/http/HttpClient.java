@@ -2,7 +2,7 @@ package juno.http;
 
 import java.util.ArrayList;
 import java.util.List;
-import juno.concurrent.Dispatcher;
+import juno.concurrent.TaskDispatcher;
 import juno.http.auth.Authorization;
 import juno.http.convert.ConverterFactory;
 import juno.http.convert.RequestBodyConverter;
@@ -10,13 +10,13 @@ import juno.http.convert.ResponseBodyConverter;
 import juno.http.convert.generic.GenericConverterFactory;
 import juno.http.convert.json.JSONConverterFactory;
 
-public class HttpClient implements HttpStack {
+public class HttpClient implements HttpTransport, HttpRequestExecutor {
     
   /** Singleton de la clase. */
   private static HttpClient instance;
     
   /** Procesara las peticiones a internet. */
-  protected final HttpStack mHttpStack;
+  protected final HttpTransport mTransport;
  
   /** Authorization */
   protected Authorization mAuthorization;
@@ -31,10 +31,10 @@ public class HttpClient implements HttpStack {
   private List<ConverterFactory> mConverterFactories = new ArrayList<ConverterFactory>();
   
   /** Procesa la peticiones en segundo plano. */
-  private Dispatcher mDispatcher = Dispatcher.getInstance();
+  private TaskDispatcher mDispatcher = TaskDispatcher.getInstance();
     
-  public HttpClient(HttpStack stack) {
-    mHttpStack = stack;
+  public HttpClient(HttpTransport transport) {
+    mTransport = transport;
     mConverterFactories.add(new GenericConverterFactory());
     if (JSONConverterFactory.isJSONSupportAvailable()) {
         mConverterFactories.add(new JSONConverterFactory());
@@ -42,7 +42,7 @@ public class HttpClient implements HttpStack {
   }
  
   public HttpClient() {
-    this(new HttpURLConnectionStack());
+    this(new URLConnectionTransport());
   }
   
   public synchronized static HttpClient getInstance() {
@@ -65,8 +65,8 @@ public class HttpClient implements HttpStack {
     return this;
   }
 
-  public HttpStack getHttpStack() {
-    return mHttpStack;
+  public HttpTransport getHttpTransport() {
+    return mTransport;
   }
 
   public Authorization getAuthorization() {
@@ -114,11 +114,11 @@ public class HttpClient implements HttpStack {
     return this;
   }
   
-  public Dispatcher getDispatcher() {
+  public TaskDispatcher getDispatcher() {
     return mDispatcher;
   }
 
-  public void setDispatcher(Dispatcher dispatcher) {
+  public void setDispatcher(TaskDispatcher dispatcher) {
     this.mDispatcher = dispatcher;
   }
   
@@ -133,7 +133,7 @@ public class HttpClient implements HttpStack {
    * servidor
    */
   @Override
-  public HttpResponse execute(HttpRequest request) throws Exception {
+  public HttpResponse send(HttpRequest request) throws Exception {
     if (mAuthorization != null) {
         request.addHeader("Authorization", mAuthorization.generateAuthHeader());
     }
@@ -141,15 +141,16 @@ public class HttpClient implements HttpStack {
         request.addHeader(additionalHeaders.getName(i), additionalHeaders.getValue(i));
     }
     if (mInterceptor != null) {
-        return mInterceptor.intercept(request, getHttpStack());
+        return mInterceptor.intercept(request, getHttpTransport());
     }
-    return getHttpStack().execute(request);
+    return getHttpTransport().send(request);
   }
 
-  public <V> V execute(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
+  @Override
+  public <V> V send(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
     HttpResponse response = null;
     try {
-      response = execute(request);
+      response = send(request);
       return converter.convert(response);
       
     } catch(Exception e) {
@@ -161,8 +162,9 @@ public class HttpClient implements HttpStack {
     }
   }
  
-  public <V> V execute(HttpRequest request, Class<V> cast) throws Exception {
-    return execute(request, getResponseBodyConverter(cast));
+  @Override
+  public <V> V send(HttpRequest request, Class<V> cast) throws Exception {
+    return send(request, getResponseBodyConverter(cast));
   }
  
   /**
@@ -175,16 +177,16 @@ public class HttpClient implements HttpStack {
    * 
    * @return una llamada
    */
-  public <V> AsyncHttpRequest<V> createAsync(HttpRequest request, ResponseBodyConverter<V> converter) {
-    return new AsyncHttpRequest<V>(getDispatcher(), this, request, converter);
+  public <V> HttpTask<V> newTask(HttpRequest request, ResponseBodyConverter<V> converter) {
+    return new HttpTask<V>(getDispatcher(), this, request, converter);
   }
   
-  public <V> AsyncHttpRequest<V> createAsync(HttpRequest request, Class<V> cast) {
-    return this.createAsync(request, getResponseBodyConverter(cast));
+  public <V> HttpTask<V> newTask(HttpRequest request, Class<V> cast) {
+    return this.newTask(request, getResponseBodyConverter(cast));
   }
   
-  public AsyncHttpRequest<HttpResponse> createAsync(HttpRequest request) {
-    return this.createAsync(request, getResponseBodyConverter(HttpResponse.class));
+  public HttpTask<HttpResponse> newTask(HttpRequest request) {
+    return this.newTask(request, getResponseBodyConverter(HttpResponse.class));
   }
   
   public <V> RequestBody createRequestBody(V object) {
@@ -217,4 +219,5 @@ public class HttpClient implements HttpStack {
     }
     throw new IllegalArgumentException("Could not RequestBody converter for class '" + type.getCanonicalName() + "'");
   }
+
 }

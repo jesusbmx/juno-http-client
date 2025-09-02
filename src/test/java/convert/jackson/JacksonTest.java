@@ -1,7 +1,7 @@
 package convert.jackson;
 
 import java.util.Date;
-import juno.concurrent.Async;
+import juno.concurrent.Task;
 import juno.concurrent.Callback;
 
 public class JacksonTest {
@@ -9,9 +9,9 @@ public class JacksonTest {
   PostDao dao = new PostDao();  
     
   public void list() {
-    Async<Post[]> call = dao.getPosts(); 
+    Task<Post[]> task = dao.getPosts(); 
     
-    call.execute(new Callback<Post[]>() {
+    task.async(new Callback<Post[]>() {
       @Override
       public void onResponse(Post[] response) throws Exception {
         //List<Post> list = Arrays.asList(result);
@@ -35,8 +35,8 @@ public class JacksonTest {
     post.url = "http://127.0.0.1";
     post.body = "My body";
     
-    Async<String> async = dao.insert(post); 
-    async.execute(new Callback<String>() {
+    Task<String> task = dao.insert(post); 
+    task.async(new Callback<String>() {
       @Override
       public void onResponse(String response) throws Exception {
           System.out.println(response);

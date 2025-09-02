@@ -1,7 +1,7 @@
 
 import java.io.File;
 import java.util.Calendar;
-import juno.concurrent.Async;
+import juno.concurrent.Task;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpUrl;
@@ -18,7 +18,7 @@ public class CacheTest {
     /*
     GET https://postman-echo.com/get HTTP/1.1
     */
-    Async<String> get() throws Exception {
+    Task<String> get() throws Exception {
         final HttpRequest request = HttpRequest.get(
                 "https://postman-echo.com/get");
 
@@ -26,14 +26,14 @@ public class CacheTest {
         // Sumar un día
         nextExpireAt.add(Calendar.DAY_OF_YEAR, 1);
 
-        return client.createAsync(request, String.class)
+        return client.newTask(request, String.class)
                 .setInterceptor(new CacheInterceptor(cacheStorage, nextExpireAt));
     }
     
     /*
     GET http://ip-api.com/json/24.48.0.1?fields=status%2Cmessage%2Cquery%2Ccountry%2Ccity&lang=en HTTP/1.1
     */
-    Async<String> get2() throws Exception {
+    Task<String> get2() throws Exception {
       final HttpUrl url = new HttpUrl("http://ip-api.com/")
         .addPath("json")
         .addPath("24.48.0.1")
@@ -42,13 +42,13 @@ public class CacheTest {
       ;
       final HttpRequest request = HttpRequest.get(url);
       
-      return client.createAsync(request, String.class)
+      return client.newTask(request, String.class)
               .setInterceptor(new CacheInterceptor(cacheStorage));
     }
     
     public static void main(String[] args) throws Exception {
         CacheTest cacheTest = new CacheTest();
-        System.out.println(cacheTest.get().await());
-        System.out.println(cacheTest.get2().await());
+        System.out.println(cacheTest.get().sync());
+        System.out.println(cacheTest.get2().sync());
     }
 }

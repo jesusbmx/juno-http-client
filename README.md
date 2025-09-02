@@ -6,16 +6,16 @@
 To include Juno in your project using Gradle, add the following dependency:
 ```
 dependencies {
-  implementation 'com.github.jesusbmx:juno:1.0.3'
-  implementation 'com.github.jesusbmx:juno-http-client:1.0.6'
+  implementation 'com.github.jesusbmx:juno:1.0.5'
+  implementation 'com.github.jesusbmx:juno-http-client:1.0.7'
 }
 ```
 
 Alternatively, you can download the JAR file directly from [JitPack](https://jitpack.io/#jesusbmx/juno-http-client):
 
-Download [juno.jar](https://jitpack.io/com/github/jesusbmx/juno/1.0.3/juno-1.0.3.jar)
+Download [juno.jar](https://jitpack.io/com/github/jesusbmx/juno/1.0.5/juno-1.0.5.jar)
 
-Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.0.6/juno-http-client-1.0.6.jar)
+Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.0.7/juno-http-client-1.0.7.jar)
 
 
 ## [Samples](src/test/java/Samples.java)
@@ -35,7 +35,7 @@ String get() throws Exception {
   HttpRequest request = HttpRequest.get(
        "https://postman-echo.com/get")
   ;
-  return client.execute(request, String.class);
+  return client.send(request, String.class);
 }
 ```
 
@@ -59,7 +59,7 @@ String post(int id, String name, boolean active) throws Exception {
   HttpRequest request = HttpRequest.post(
       "https://postman-echo.com/post", reqBody)
   ;
-  return client.execute(request, String.class);
+  return client.send(request, String.class);
 }
 ```
 
@@ -83,7 +83,7 @@ String request() throws Exception {
     HttpRequest request = HttpRequest.post(
         "https://postman-echo.com/post", reqBody)
     ;
-    return client.execute(request, String.class);
+    return client.send(request, String.class);
 }
 ```
 
@@ -117,7 +117,7 @@ String upload(File file) throws Exception {
   HttpRequest request = HttpRequest.post(
     "https://postman-echo.com/post", reqBody)
   ;
-  return client.execute(request, String.class);
+  return client.send(request, String.class);
 }
 ```
 
@@ -135,8 +135,8 @@ File download() throws Exception {
       .setDir(System.getProperty("user.home") + "\\Downloads\\") 
       //.setName("httpclient.jar")
   ;  
-  return client.execute(request, converter);
-  //return client.execute(request, File.class);
+  return client.send(request, converter);
+  //return client.send(request, File.class);
 }
 ```
 
@@ -158,7 +158,7 @@ HttpResponse getIpLocation() throws Exception {
   HttpRequest request = HttpRequest.get(url)
     .addHeader("User-Agent", "nombre-cliente")
   ;
-  return client.execute(request);
+  return client.send(request);
 }
 ```
 #### HttpResponse
@@ -178,8 +178,8 @@ try ( HttpResponse response = getIpLocation() ) {
 #### Interceptor
 
 ```java
-HttpClient client = HttpClient.getInstance().setInterceptor((request, stack) -> {
-    HttpResponse response = stack.execute(request);
+HttpClient client = HttpClient.getInstance().setInterceptor((request, transport) -> {
+    HttpResponse response = transport.send(request);
     if (response.isSuccessful()) {
         return response;
     }
@@ -194,7 +194,7 @@ HttpClient client = HttpClient.getInstance().setInterceptor((request, stack) -> 
 We prepare the request
 
 ```java
-public Async<String> insert(
+public Task<String> insert(
     int id, String name, boolean active) {
     
   // application-www-www-form-urlencoded
@@ -206,7 +206,7 @@ public Async<String> insert(
   HttpRequest request = HttpRequest.post(
       "https://postman-echo.com/post", reqBody);
 
-  return client.createAsync(request, String.class);
+  return client.newTask(request, String.class);
 }
 ```
 
@@ -216,9 +216,9 @@ Asynchronously send the request and notify your application with a callback when
 Main UI is not blocked or interferes with it.
 
 ```java
-Async<String> async = insert(22, "John Doe", true);
+Task<String> task = insert(22, "John Doe", true);
     
-async.execute((String response) -> {
+task.async((String response) -> {
   String str = response;
   System.out.println(str);
 
@@ -232,10 +232,10 @@ async.execute((String response) -> {
 Synchronously send the request and return your response.
 
 ```java
-Async<String> async = insert(22, "John Doe", true);
+Task<String> task = insert(22, "John Doe", true);
     
 try {
-    String response = async.await();
+    String response = task.sync();
     System.out.println(response);
     
 } catch(Exception e) {
@@ -251,7 +251,7 @@ For other java platforms like java swing if needed.
 
 #### JSON response
 ```java
-public Async<JSONObject> insert(
+public Task<JSONObject> insert(
     String name, int age, boolean active) {
       
     // application-www-www-form-urlencoded
@@ -263,7 +263,7 @@ public Async<JSONObject> insert(
     HttpRequest request = HttpRequest.post(
         "https://postman-echo.com/post", reqBody);
         
-    return client.createAsync(request, JSONObject.class);
+    return client.newTask(request, JSONObject.class);
 }
 ```
 
@@ -280,7 +280,7 @@ JSONObject jsonRequest() throws Exception {
   HttpRequest request = HttpRequest.post(
         "https://postman-echo.com/post", reqBody);
 
-  return client.execute(request, JSONObject.class);
+  return client.send(request, JSONObject.class);
 }
 ```
 
@@ -315,7 +315,7 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
         ".../auth/refresh_token", body);
 
     // Execute the request with another client to avoid entering a loop
-    JSONObject response = request.execute(JSONObject.class);
+    JSONObject response = request.send(JSONObject.class);
 
     // Update the access and refresh tokens
     provider.setAccessToken(response.optString("accessToken"));
@@ -337,7 +337,7 @@ void login(String email, String password) throws Exception {
         ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
-    JSONObject response = request.execute(JSONObject.class);
+    JSONObject response = request.send(JSONObject.class);
 
     // Store the received access and refresh tokens
     tokenProvider.setAccessToken(response.getString("accessToken"));
@@ -360,7 +360,7 @@ public HttpResponse requestWithToken() throws Exception{
       "https://postman-echo.com/post");
 
   // Execute the request using the client configured with JWT authorization
-  return client.execute(request);
+  return client.send(request);
 ```
 
 ### Simple Sign In and Token Refresh
@@ -379,7 +379,7 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
         ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
-    JSONObject response = request.execute(JSONObject.class);
+    JSONObject response = request.send(JSONObject.class);
 
     // Store the new access token
     provider.setAccessToken(response.optString("accessToken"));
@@ -436,14 +436,14 @@ public class PostApi {
     client.addConverterFactory(new GsonConverterFactory(gson));
   }
 
-  public Async<Post[]> getPosts() {
+  public Task<Post[]> getPosts() {
     HttpRequest request = HttpRequest.get(
         "https://kylewbanks.com/rest/posts.json");
 
-    return client.createAsync(request, Post[].class);
+    return client.newTask(request, Post[].class);
   }
 
-  public Async<String> insert(Post p) {
+  public Task<String> insert(Post p) {
     RequestBody reqBody = client.createRequestBody(p); // application/json
     // RequestBody reqBody = new FormBody(Maps.getPublicFields(p)); // application-www-www-form-urlencoded
     // RequestBody reqBody = new MultipartBody(Maps.getPublicFields(p)); // multipart/form-data
@@ -451,7 +451,7 @@ public class PostApi {
     HttpRequest request = HttpRequest.post(
             "https://postman-echo.com/post", reqBody);
     
-    return client.createAsync(request, String.class);
+    return client.newTask(request, String.class);
   }
 }
 ```
@@ -462,9 +462,9 @@ Asynchronously send the request and notify your application with a callback when
 ...
 PostApi api = new PostApi();
     
-Async<Post[]> async = api.getPosts(); 
+Task<Post[]> task = api.getPosts(); 
 
-async.execute((Post[] response) -> {
+task.async((Post[] response) -> {
   List<Post> list = Arrays.asList(response);
   for (Post post : list) {
     System.out.println(post.title);
@@ -522,21 +522,21 @@ public class PostApi {
     client.addConverterFactory(new JacksonConverterFactory(mapper));
   }
 
-  public Async<Post[]> getPosts() {
+  public Task<Post[]> getPosts() {
     HttpRequest request = HttpRequest.get(
         "https://kylewbanks.com/rest/posts.json");
 
-    return client.createAsync(request, Post[].class);
+    return client.newTask(request, Post[].class);
   }
   
-  public Async<String> insert(Post p) {
+  public Task<String> insert(Post p) {
     // application/json
     RequestBody reqBody = client.createRequestBody(p);
     
     HttpRequest request = HttpRequest.post(
             "https://postman-echo.com/post", reqBody);
     
-    return client.createAsync(request, String.class);
+    return client.newTask(request, String.class);
   }
 }
 ```
@@ -547,9 +547,9 @@ Asynchronously send the request and notify your application with a callback when
 ...
 PostApi api = new PostApi();
     
-Async<Post[]> async = api.getPosts(); 
+task<Post[]> task = api.getPosts(); 
 
-async.execute((Post[] response) -> {
+task.async((Post[] response) -> {
   List<Post> list = Arrays.asList(response);
   for (Post post : list) {
     System.out.println(post.title);

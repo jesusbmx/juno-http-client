@@ -39,7 +39,6 @@ public class HttpRequest {
      */
     private int timeoutMs = DEFAULT_TIMEOUT;
 
-   
     public HttpRequest(String method, HttpUrl url, RequestBody body) {
         this.method = method.toUpperCase();
         this.url = url;
@@ -156,6 +155,11 @@ public class HttpRequest {
     }
 
     public HttpRequest setBody(RequestBody body) {
+//        if (body != null) {
+//            this.headers.set(Headers.CONTENT_TYPE, body.contentType());
+//        } else {
+//            this.headers.remove(Headers.CONTENT_TYPE);
+//        }
         this.body = body;
         return this;
     }
@@ -194,28 +198,28 @@ public class HttpRequest {
         return url.toString();
     }
     
-    public HttpResponse execute(HttpStack stack) throws Exception {
-        return stack.execute(this);
+    public HttpResponse send(HttpTransport stack) throws Exception {
+        return stack.send(this);
     }
     
-    public HttpResponse execute() throws Exception {
-        return execute(HttpClient.getInstance());
+    public HttpResponse send() throws Exception {
+        return HttpRequest.this.send(HttpClient.getInstance());
     }
 
-    public <V> V execute(HttpClient client, ResponseBodyConverter<V> convert) throws Exception {
-        return client.execute(this, convert);
+    public <V> V send(HttpRequestExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
+        return executor.send(this, convert);
     }
     
-    public <V> V execute(ResponseBodyConverter<V> convert) throws Exception {
-        return execute(HttpClient.getInstance(), convert);
+    public <V> V send(ResponseBodyConverter<V> convert) throws Exception {
+        return HttpRequest.this.send(HttpClient.getInstance(), convert);
     }
 
-    public <V> V execute(HttpClient client, Class<V> convert) throws Exception {
-        return client.execute(this, convert);
+    public <V> V send(HttpRequestExecutor executor, Class<V> convert) throws Exception {
+        return executor.send(this, convert);
     }
     
-    public <V> V execute(Class<V> convert) throws Exception {
-        return execute(HttpClient.getInstance(), convert);
+    public <V> V send(Class<V> convert) throws Exception {
+        return HttpRequest.this.send(HttpClient.getInstance(), convert);
     }
 
     @Override
@@ -227,8 +231,9 @@ public class HttpRequest {
 //    FormBody body = new FormBody()
 //            .add("fields",  "status,message,query,country,city");
 //
-//    HttpRequest request = new HttpRequest(
-//            "GET", "http://ip-api.com", body);
+//    HttpRequest request = HttpRequest
+//            .get("http://ip-api.com")
+//            .setBody(body);
 //    
 //    System.out.println(request.urlAndParams());
 //  }

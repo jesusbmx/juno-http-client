@@ -1,5 +1,5 @@
 
-import juno.concurrent.Async;
+import juno.concurrent.Task;
 import juno.concurrent.Callback;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
@@ -12,7 +12,7 @@ public class AsynTest {
               .setDebug(true)
     ;
 
-    public Async<HttpResponse> getIpLocation() {
+    public Task<HttpResponse> getIpLocation() {
       HttpUrl url = new HttpUrl("http://ip-api.com/")
                 .addPath("json")
                 .addPath("24.48.0.1")
@@ -21,13 +21,13 @@ public class AsynTest {
       ;
       HttpRequest request = HttpRequest.get(url)
       ;
-      return client.createAsync(request);
+      return client.newTask(request);
     }
 
     public void async() {
-        Async<HttpResponse> async = getIpLocation();
+        Task<HttpResponse> task = getIpLocation();
 
-        async.execute(new Callback<HttpResponse>() {
+        task.async(new Callback<HttpResponse>() {
             @Override
             public void onResponse(HttpResponse response) throws Exception {
                 String result = response.readString();
@@ -41,7 +41,7 @@ public class AsynTest {
    }
   
   public void sync() throws Exception {
-    HttpResponse response = getIpLocation().await();
+    HttpResponse response = getIpLocation().sync();
     String result = response.readString();
     System.out.println(result);
     response.close();

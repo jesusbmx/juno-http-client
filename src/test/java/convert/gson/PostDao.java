@@ -2,7 +2,7 @@ package convert.gson;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import juno.concurrent.Async;
+import juno.concurrent.Task;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.RequestBody;
@@ -25,20 +25,20 @@ public class PostDao {
     client.addConverterFactory(new GsonConverterFactory(gson));
   }
 
-  public Async<Post[]> getPosts() {
+  public Task<Post[]> getPosts() {
     HttpRequest request = HttpRequest.get(
             "https://kylewbanks.com/rest/posts.json");
 
-    return client.createAsync(request, Post[].class);
+    return client.newTask(request, Post[].class);
   }
   
-  public Async<String> insert(Post p) {
+  public Task<String> insert(Post p) {
     RequestBody reqBody = client.createRequestBody(p);
     
     HttpRequest request = HttpRequest.post(
             "https://postman-echo.com/post", reqBody);
     
-    return client.createAsync(request, String.class);
+    return client.newTask(request, String.class);
   }
 
   //  BasicHttpStack stack = new BasicHttpStack() {  
