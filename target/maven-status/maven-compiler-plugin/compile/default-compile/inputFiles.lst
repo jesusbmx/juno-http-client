@@ -2,7 +2,6 @@ C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\auth\Authorization.j
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\auth\Token.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\generic\SimpleResponseBodyConverter.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\ResponseBodyConverter.java
-C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\HttpURLConnectionStack.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\auth\TokenProvider.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\cache\CacheModel.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\cache\CacheInterceptor.java
@@ -10,8 +9,9 @@ C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\generic\Byte
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\json\JSONConverterFactory.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\Debug.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\RequestBody.java
+C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\HttpTask.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\gson\GsonConverterFactory.java
-C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\HttpStack.java
+C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\HttpTransport.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\RequestBodyConverter.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\generic\StringRequestBodyConverter.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\generic\StringResponseBodyConverter.java
@@ -29,11 +29,14 @@ C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\jackson\Jack
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\Headers.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\ConverterFactory.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\json\JSONResponseBodyConverter.java
-C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\AsyncHttpRequest.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\auth\JwtToken.java
+C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\json\JsonConversionException.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\convert\json\JSONRequestBodyConverter.java
+C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\HttpExecutor.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\auth\OAuthAuthorization.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\HttpResponse.java
+C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\HttpResult.java
+C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\URLConnectionTransport.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\HttpUrl.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\auth\JwtTokenProvider.java
 C:\GitHub\jesusbmx\juno-http-client\src\main\java\juno\http\MultipartBody.java

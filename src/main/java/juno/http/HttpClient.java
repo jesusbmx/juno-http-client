@@ -166,6 +166,16 @@ public class HttpClient implements HttpTransport, HttpExecutor {
   public <V> V send(HttpRequest request, Class<V> cast) throws Exception {
     return send(request, getResponseBodyConverter(cast));
   }
+
+  @Override
+  public <V> HttpResult<V> sendResult(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
+    return send(request, new HttpResult.Converter<>(converter));
+  }
+
+  @Override
+  public <V> HttpResult<V> sendResult(HttpRequest request, Class<V> cast) throws Exception {
+    return sendResult(request, getResponseBodyConverter(cast));
+  }
  
   /**
    * Crea una invocación de un método que envía una solicitud a un servidor web 
@@ -184,9 +194,17 @@ public class HttpClient implements HttpTransport, HttpExecutor {
   public <V> HttpTask<V> newTask(HttpRequest request, Class<V> cast) {
     return this.newTask(request, getResponseBodyConverter(cast));
   }
-  
+
   public HttpTask<HttpResponse> newTask(HttpRequest request) {
     return this.newTask(request, getResponseBodyConverter(HttpResponse.class));
+  }
+
+  public <V> HttpTask<HttpResult<V>> newResultTask(HttpRequest request, ResponseBodyConverter<V> converter) {
+    return new HttpTask<>(getDispatcher(), this, request, new HttpResult.Converter<>(converter));
+  }
+
+  public <V> HttpTask<HttpResult<V>> newResultTask(HttpRequest request, Class<V> cast) {
+    return newResultTask(request, getResponseBodyConverter(cast));
   }
   
   public <V> RequestBody createRequestBody(V object) {

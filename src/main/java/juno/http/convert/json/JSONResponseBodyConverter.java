@@ -8,16 +8,44 @@ import org.json.JSONObject;
 
 public class JSONResponseBodyConverter {
 
-    private static String readAndValidateJson(HttpResponse response) throws Exception {
-        String json = null;
+    private static String readAndValidateJson(
+            HttpResponse response
+    ) throws JsonConversionException {
+
         try {
-            json = response.readString();
-            if (json == null || json.isEmpty()) {
-                throw new JSONException("Response body is null or empty");
-            }
+            String json = response.readString();
+
+            if (json == null)
+                throw new JsonConversionException(
+                        "Response body is null",
+                        response,
+                        null,
+                        null
+                );
+
+            json = json.trim();
+
+            if (json.isEmpty())
+                throw new JsonConversionException(
+                        "Response body is empty",
+                        response,
+                        json,
+                        null
+                );
+
             return json;
-        } finally {
-            response.close();
+
+        } catch (Exception e) {
+
+            if (e instanceof JsonConversionException)
+                throw (JsonConversionException)e;
+
+            throw new JsonConversionException(
+                    "Failed to read response body",
+                    response,
+                    null,
+                    e
+            );
         }
     }
 
@@ -26,12 +54,23 @@ public class JSONResponseBodyConverter {
         public static final Obj INSTANCE = new Obj();
 
         @Override
-        public JSONObject convert(HttpResponse response) throws Exception {
+        public JSONObject convert(
+                HttpResponse response
+        ) throws Exception {
+
             String json = readAndValidateJson(response);
+
             try {
                 return new JSONObject(json);
+
             } catch (JSONException e) {
-                throw new Exception("Failed to parse JSONObject from response: " + json, e);
+
+                throw new JsonConversionException(
+                        "Failed parsing JSONObject",
+                        response,
+                        json,
+                        e
+                );
             }
         }
     }
@@ -41,12 +80,23 @@ public class JSONResponseBodyConverter {
         public static final Array INSTANCE = new Array();
 
         @Override
-        public JSONArray convert(HttpResponse response) throws Exception {
+        public JSONArray convert(
+                HttpResponse response
+        ) throws Exception {
+
             String json = readAndValidateJson(response);
+
             try {
                 return new JSONArray(json);
+
             } catch (JSONException e) {
-                throw new Exception("Failed to parse JSONArray from response: " + json, e);
+
+                throw new JsonConversionException(
+                        "Failed parsing JSONArray",
+                        response,
+                        json,
+                        e
+                );
             }
         }
     }

@@ -222,6 +222,22 @@ public class HttpRequest {
         return HttpRequest.this.send(HttpClient.getInstance(), convert);
     }
 
+    public <V> HttpResult<V> sendResult(HttpExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
+        return executor.sendResult(this, convert);
+    }
+
+    public <V> HttpResult<V> sendResult(ResponseBodyConverter<V> convert) throws Exception {
+        return HttpRequest.this.sendResult(HttpClient.getInstance(), convert);
+    }
+
+    public <V> HttpResult<V> sendResult(HttpExecutor executor, Class<V> convert) throws Exception {
+        return executor.sendResult(this, convert);
+    }
+
+    public <V> HttpResult<V> sendResult(Class<V> convert) throws Exception {
+        return HttpRequest.this.sendResult(HttpClient.getInstance(), convert);
+    }
+
     @Override
     public String toString() {
         return "HttpRequest{" + "method=" + method + ", url=" + url + ", headers=" + headers + ", body=" + body + ", tag=" + tag + ", timeoutMs=" + timeoutMs + '}';
