@@ -34,7 +34,12 @@ public class HttpResult<T> {
         public HttpResult<T> convert(HttpResponse response) throws Exception {
             int code = response.code;
             Headers headers = response.headers;
-            T body = inner.convert(response);
+            T body = null;
+            if (response.isSuccessful()) {
+                body = inner.convert(response);
+            } else {
+                response.close();
+            }
             return new HttpResult<>(code, headers, body);
         }
     }

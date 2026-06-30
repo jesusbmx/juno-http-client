@@ -188,7 +188,8 @@ public class HttpClient implements HttpTransport, HttpExecutor {
    * @return una llamada
    */
   public <V> HttpTask<V> newTask(HttpRequest request, ResponseBodyConverter<V> converter) {
-    return new HttpTask<V>(getDispatcher(), this, request, converter);
+    return new HttpTask<V>(getDispatcher(), this, request, converter)
+        .setThrowOnHttpError(true);
   }
   
   public <V> HttpTask<V> newTask(HttpRequest request, Class<V> cast) {

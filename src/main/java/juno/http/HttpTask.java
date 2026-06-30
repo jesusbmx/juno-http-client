@@ -9,6 +9,7 @@ public class HttpTask<T> extends AbstractTask<T> {
     public final HttpRequest request;
     public final ResponseBodyConverter<T> converter;
     protected OnInterceptor interceptor;
+    protected boolean throwOnHttpError = false;
 
     /**
      * Inyección de Dependencias: Dispatcher, HttpClient, ResponseBodyConvert
@@ -34,13 +35,15 @@ public class HttpTask<T> extends AbstractTask<T> {
         HttpResponse response = null;
         try {
           response = execute(request);
+          if (throwOnHttpError && !response.isSuccessful()) {
+            throw HttpException.from(response);
+          }
           return converter.convert(response);
 
         } catch(Exception e) {
           if (response != null) {
             response.close();
           }
-
           throw e;
         }
     }
@@ -51,6 +54,11 @@ public class HttpTask<T> extends AbstractTask<T> {
     
     public HttpTask<T> setInterceptor(OnInterceptor interceptor) {
         this.interceptor = interceptor;
+        return this;
+    }
+
+    public HttpTask<T> setThrowOnHttpError(boolean throwOnHttpError) {
+        this.throwOnHttpError = throwOnHttpError;
         return this;
     }
 }
