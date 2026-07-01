@@ -198,44 +198,44 @@ public class HttpRequest {
         return url.toString();
     }
     
-    public HttpResponse send(HttpTransport stack) throws Exception {
-        return stack.send(this);
+    public HttpResponse execute(HttpTransport stack) throws Exception {
+        return stack.execute(this);
     }
-    
-    public HttpResponse send() throws Exception {
-        return HttpRequest.this.send(HttpClient.getInstance());
+
+    public HttpResponse execute() throws Exception {
+        return HttpRequest.this.execute(HttpClient.getInstance());
     }
 
     public <V> V send(HttpExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
         return executor.send(this, convert);
     }
-    
+
     public <V> V send(ResponseBodyConverter<V> convert) throws Exception {
         return HttpRequest.this.send(HttpClient.getInstance(), convert);
     }
 
-    public <V> V send(HttpExecutor executor, Class<V> convert) throws Exception {
-        return executor.send(this, convert);
+    public <V> V send(HttpClient client, Class<V> convert) throws Exception {
+        return client.send(this, convert);
     }
-    
+
     public <V> V send(Class<V> convert) throws Exception {
         return HttpRequest.this.send(HttpClient.getInstance(), convert);
     }
 
-    public <V> HttpResult<V> sendResult(HttpExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
-        return executor.sendResult(this, convert);
+    public <V> HttpResult<V> fetch(HttpExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
+        return executor.fetch(this, convert);
     }
 
-    public <V> HttpResult<V> sendResult(ResponseBodyConverter<V> convert) throws Exception {
-        return HttpRequest.this.sendResult(HttpClient.getInstance(), convert);
+    public <V> HttpResult<V> fetch(ResponseBodyConverter<V> convert) throws Exception {
+        return HttpRequest.this.fetch(HttpClient.getInstance(), convert);
     }
 
-    public <V> HttpResult<V> sendResult(HttpExecutor executor, Class<V> convert) throws Exception {
-        return executor.sendResult(this, convert);
+    public <V> HttpResult<V> fetch(HttpClient client, Class<V> convert) throws Exception {
+        return client.fetch(this, convert);
     }
 
-    public <V> HttpResult<V> sendResult(Class<V> convert) throws Exception {
-        return HttpRequest.this.sendResult(HttpClient.getInstance(), convert);
+    public <V> HttpResult<V> fetch(Class<V> convert) throws Exception {
+        return HttpRequest.this.fetch(HttpClient.getInstance(), convert);
     }
 
     @Override

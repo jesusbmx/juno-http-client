@@ -3,10 +3,14 @@ package juno.http;
 public class HttpException extends Exception {
 
     public final int code;
+    public final Headers headers;
+    public final String body;
 
-    public HttpException(int code, String body) {
+    public HttpException(int code, Headers headers, String body) {
         super("HTTP " + code + (body == null || body.isEmpty() ? "" : ": " + body));
         this.code = code;
+        this.headers = headers;
+        this.body = body;
     }
 
     public static HttpException from(HttpResponse response) {
@@ -16,7 +20,7 @@ public class HttpException extends Exception {
             body = response.readString();
         } catch (Exception ignored) {
         }
-        return new HttpException(code, body);
+        return new HttpException(code, response.headers, body);
     }
 
     public boolean isClientError() {

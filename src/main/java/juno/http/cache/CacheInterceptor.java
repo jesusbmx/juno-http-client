@@ -49,7 +49,7 @@ public class CacheInterceptor implements OnInterceptor {
 
     protected HttpResponse handleCacheMiss(HttpRequest request, HttpTransport stack, CacheModel cache) throws Exception {
         Debug.debug("CacheInterceptor", "executeRequest:", request);
-        final HttpResponse response = stack.send(request);
+        final HttpResponse response = stack.execute(request);
 
         if (isResponseValid(response)) {
             try {
@@ -73,7 +73,7 @@ public class CacheInterceptor implements OnInterceptor {
             Debug.debug("CacheInterceptor", "error.getHttpResponseFromFile:", e.getMessage());
         }
 
-        return stack.send(request);
+        return stack.execute(request);
     }
 
     protected CacheModel updateCache(CacheModel cache, HttpRequest request, HttpResponse response) throws Exception {

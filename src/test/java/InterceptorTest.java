@@ -14,7 +14,7 @@ public class InterceptorTest {
             .setInterceptor(new OnInterceptor() {
                 @Override
                 public HttpResponse intercept(HttpRequest request, HttpTransport stack) throws Exception {
-                    HttpResponse response = stack.send(request);
+                    HttpResponse response = stack.execute(request);
                     if (response.code >= 200 && response.code <= 299) {
                         return response;
                     }

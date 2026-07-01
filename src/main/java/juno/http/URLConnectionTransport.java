@@ -200,7 +200,7 @@ public class URLConnectionTransport implements HttpTransport {
      * @throws java.io.IOException
      */
     @Override
-    public HttpResponse send(HttpRequest request) throws Exception {
+    public HttpResponse execute(HttpRequest request) throws Exception {
         HttpURLConnection conn = null;
         try {
             conn = open(request);

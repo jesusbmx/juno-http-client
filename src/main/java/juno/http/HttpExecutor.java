@@ -4,11 +4,13 @@ import juno.http.convert.ResponseBodyConverter;
 
 public interface HttpExecutor {
 
-    public <V> V send(HttpRequest httpRequest, ResponseBodyConverter<V> converter) throws Exception;
+    public <T> HttpResult<T> fetch(
+        HttpRequest request,
+        ResponseBodyConverter<T> converter
+    ) throws Exception;
 
-    public <V> V send(HttpRequest request, Class<V> cast) throws Exception;
-
-    public <V> HttpResult<V> sendResult(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception;
-
-    public <V> HttpResult<V> sendResult(HttpRequest request, Class<V> cast) throws Exception;
+    public <T> T send(
+        HttpRequest request,
+        ResponseBodyConverter<T> converter
+    ) throws Exception;
 }

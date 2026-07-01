@@ -115,7 +115,7 @@ public class Samples {
       HttpRequest request = HttpRequest.get(url)
         .addHeader("User-Agent", "nombre-cliente")
       ;
-      return client.send(request);
+      return client.execute(request);
     }
 
     public static void main(String[] args) throws Exception {

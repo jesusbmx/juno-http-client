@@ -55,9 +55,9 @@ public class AuthTest implements JwtTokenProvider.OnTokenRefresh {
         HttpRequest request = HttpRequest.post(
                 "ttps://postman-echo.com/post", null);
 
-        return client.send(request);
+        return client.execute(request);
     }
-    
+
     void login(String email, String password) throws Exception {
         System.out.println("[LOG] AuthTest login()");
         
