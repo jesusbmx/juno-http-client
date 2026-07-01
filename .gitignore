@@ -1,3 +1,17 @@
 /nbproject/private/
 /build/
 /dist/
+/target/
+*.class
+
+# IDEs
+/.idea/
+*.iml
+/.settings/
+.classpath
+.project
+/.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
