@@ -203,7 +203,7 @@ public class HttpRequest {
     }
 
     public HttpResponse send() throws Exception {
-        return HttpRequest.this.send(HttpClient.getInstance());
+        return send(HttpClient.getInstance());
     }
 
     public <V> HttpResult<V> execute(HttpExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
@@ -211,7 +211,7 @@ public class HttpRequest {
     }
 
     public <V> HttpResult<V> execute(ResponseBodyConverter<V> convert) throws Exception {
-        return HttpRequest.this.execute(HttpClient.getInstance(), convert);
+        return execute(HttpClient.getInstance(), convert);
     }
 
     public <V> HttpResult<V> execute(HttpClient client, Class<V> convert) throws Exception {
@@ -219,22 +219,11 @@ public class HttpRequest {
     }
 
     public <V> HttpResult<V> execute(Class<V> convert) throws Exception {
-        return HttpRequest.this.execute(HttpClient.getInstance(), convert);
+        return execute(HttpClient.getInstance(), convert);
     }
 
     @Override
     public String toString() {
         return "HttpRequest{" + "method=" + method + ", url=" + url + ", headers=" + headers + ", body=" + body + ", tag=" + tag + ", timeoutMs=" + timeoutMs + '}';
     }
-    
-//  public static void main(String[] args) {
-//    FormBody body = new FormBody()
-//            .add("fields",  "status,message,query,country,city");
-//
-//    HttpRequest request = HttpRequest
-//            .get("http://ip-api.com")
-//            .setBody(body);
-//    
-//    System.out.println(request.urlAndParams());
-//  }
 }

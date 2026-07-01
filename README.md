@@ -73,7 +73,7 @@ Content-Length: 44
 ```
 
 ```java
-String request() throws Exception {
+HttpResult<String> request() throws Exception {
     String json = "{\"id\": \"7\", \"name\": \"bar\", \"active\": \"true\"}";
     
     // application/json
@@ -83,7 +83,7 @@ String request() throws Exception {
     HttpRequest request = HttpRequest.post(
         "https://postman-echo.com/post", reqBody)
     ;
-    return client.send(request, String.class);
+    return client.execute(request, String.class);
 }
 ```
 
@@ -108,7 +108,7 @@ Content-Type: application/octet-stream
 ```
 
 ```java
-String upload(File file) throws Exception { 
+HttpResult<String> upload(File file) throws Exception { 
   // multipart/form-data
   MultipartBody reqBody = new MultipartBody()
     .addParam("name", "John Doe")
@@ -117,7 +117,7 @@ String upload(File file) throws Exception {
   HttpRequest request = HttpRequest.post(
     "https://postman-echo.com/post", reqBody)
   ;
-  return client.send(request, String.class);
+  return client.execute(request, String.class);
 }
 ```
 
@@ -127,7 +127,7 @@ GET https://jitpack.io/com/github/jesusbmx/java-http-client/0.0.1/java-http-clie
 ```
 
 ```java
-File download() throws Exception {
+HttpResult<File> download() throws Exception {
   HttpRequest request = HttpRequest.get("https://jitpack.io/com/github/jesusbmx/java-http-client/0.0.1/java-http-client-0.0.1.jar")
       .setTimeoutMs(20000)
   ;
@@ -135,8 +135,8 @@ File download() throws Exception {
       .setDir(System.getProperty("user.home") + "\\Downloads\\") 
       //.setName("httpclient.jar")
   ;  
-  return client.send(request, converter);
-  //return client.send(request, File.class);
+  return client.execute(request, converter);
+  //return client.execute(request, File.class);
 }
 ```
 
@@ -268,7 +268,7 @@ public HttpTask<JSONObject> insert(
 
 #### JSON request body
 ```java
-JSONObject jsonRequest() throws Exception {
+HttpResult<JSONObject> jsonRequest() throws Exception {
   JSONObject data = new JSONObject();
   data.put("user_id", 7);
   data.put("name", "jesus");
@@ -279,7 +279,7 @@ JSONObject jsonRequest() throws Exception {
   HttpRequest request = HttpRequest.post(
         "https://postman-echo.com/post", reqBody);
 
-  return client.send(request, JSONObject.class);
+  return client.execute(request, JSONObject.class);
 }
 ```
 

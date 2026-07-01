@@ -27,10 +27,6 @@ public class HttpResponse implements Closeable {
         this.content = content;
     }
 
-//    public HttpResponse(int code, Headers headers, File content) throws FileNotFoundException {
-//        this(code, headers, new FileInputStream(content));
-//    }
-
     public HttpResponse(int code, Headers headers, byte[] content) {
         this(code,headers, new ByteArrayInputStream(content, 0, content.length));
     }

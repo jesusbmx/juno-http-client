@@ -26,7 +26,7 @@ public class HttpTask<V> extends AbstractTask<HttpResult<V>> {
         this.converter = converter;
     }
 
-    private HttpResponse execute(HttpRequest request) throws Exception {
+    private HttpResponse getResponse() throws Exception {
         if (interceptor == null) {
             return stack.send(request);
         }
@@ -35,7 +35,7 @@ public class HttpTask<V> extends AbstractTask<HttpResult<V>> {
 
     @Override
     public HttpResult<V> call() throws Exception {
-        HttpResponse response = execute(request);
+        HttpResponse response = getResponse();
         try {
           return new HttpResult.Converter<>(converter).convert(response);
 
