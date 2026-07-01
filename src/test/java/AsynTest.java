@@ -21,7 +21,7 @@ public class AsynTest {
       ;
       HttpRequest request = HttpRequest.get(url)
       ;
-      return client.newCall(request);
+      return client.newTask(request);
     }
 
     public void async() {

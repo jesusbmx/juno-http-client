@@ -39,7 +39,7 @@ public class Test {
             System.err.println("Fetch ERR: " + result.error);
         }
         
-        client.newCall(request, JSONObject.class).async(new OnResponse<JSONObject>() {
+        client.newTask(request, JSONObject.class).async(new OnResponse<JSONObject>() {
             @Override
             public void onResponse(JSONObject body) throws Exception {
                 System.out.println("Axios Async OK: " + body.toString(1));
@@ -51,7 +51,7 @@ public class Test {
             }
         });
         
-        client.newFetch(request, JSONObject.class).async(new OnResponse<HttpResult<JSONObject>>() {
+        client.newFetchTask(request, JSONObject.class).async(new OnResponse<HttpResult<JSONObject>>() {
             @Override
             public void onResponse(HttpResult<JSONObject> result) throws Exception {
                 if (result.isSuccessful()) {
