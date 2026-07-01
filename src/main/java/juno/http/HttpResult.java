@@ -22,18 +22,25 @@ public class HttpResult<T> {
     /**
      * Comportamiento "axios": lanza {@link HttpException} si la respuesta no
      * fue 2xx, sin intentar convertir el body de error; si fue exitosa
-     * devuelve un {@link HttpResult} (code/headers/data).
+     * devuelve un {@link HttpResult} (code/headers/data). Con {@code throwOnHttpError}
+     * en {@code false}, convierte el body sin importar el status (como antes).
      */
     public static class Converter<T> implements ResponseBodyConverter<HttpResult<T>> {
         private final ResponseBodyConverter<T> inner;
+        private final boolean throwOnHttpError;
 
         public Converter(ResponseBodyConverter<T> inner) {
+            this(inner, true);
+        }
+
+        public Converter(ResponseBodyConverter<T> inner, boolean throwOnHttpError) {
             this.inner = inner;
+            this.throwOnHttpError = throwOnHttpError;
         }
 
         @Override
         public HttpResult<T> convert(HttpResponse response) throws Exception {
-            if (!response.ok) {
+            if (throwOnHttpError && !response.ok) {
                 throw HttpException.from(response);
             }
 

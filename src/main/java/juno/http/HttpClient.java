@@ -33,7 +33,16 @@ public class HttpClient implements HttpTransport, HttpExecutor {
   
   /** Procesa la peticiones en segundo plano. */
   private TaskDispatcher mDispatcher = TaskDispatcher.getInstance();
-    
+
+  /**
+   * Comportamiento "axios" por defecto: {@link #execute}/{@link #newTask} lanzan
+   * {@link HttpException} si la respuesta no fue 2xx. Desactívalo si tu backend
+   * usa códigos no-2xx para respuestas de negocio (no solo errores) y necesitas
+   * leer el body igual — como antes, se convierte sin importar el status.
+   */
+  protected boolean throwOnHttpError = true;
+
+
   public HttpClient(HttpTransport transport) {
     mTransport = transport;
     mConverterFactories.add(new GenericConverterFactory());
@@ -122,7 +131,16 @@ public class HttpClient implements HttpTransport, HttpExecutor {
   public void setDispatcher(TaskDispatcher dispatcher) {
     this.mDispatcher = dispatcher;
   }
-  
+
+  public boolean isThrowOnHttpError() {
+    return throwOnHttpError;
+  }
+
+  public HttpClient setThrowOnHttpError(boolean throwOnHttpError) {
+    this.throwOnHttpError = throwOnHttpError;
+    return this;
+  }
+
   /**
    * Envíe sincrónicamente la solicitud y devuelva su respuesta.
    * 
@@ -149,13 +167,14 @@ public class HttpClient implements HttpTransport, HttpExecutor {
 
   /**
    * Comportamiento "axios": lanza {@link HttpException} si la respuesta no fue
-   * 2xx; si fue exitosa devuelve el {@link HttpResult} (code/headers/body).
+   * 2xx (a menos que {@link #setThrowOnHttpError} esté en {@code false}); si fue
+   * exitosa (o no se valida el status) devuelve el {@link HttpResult} (code/headers/data).
    */
   @Override
   public <V> HttpResult<V> execute(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
     HttpResponse response = send(request);
     try {
-      return new HttpResult.Converter<>(converter).convert(response);
+      return new HttpResult.Converter<>(converter, throwOnHttpError).convert(response);
 
     } finally {
       response.close();
@@ -167,9 +186,9 @@ public class HttpClient implements HttpTransport, HttpExecutor {
   }
 
   /**
-   * Versión diferida de {@link #execute}: {@link HttpTask#call()} usa el mismo
-   * {@link HttpResult.Converter}, así que también lanza {@link HttpException}
-   * (hacia {@code onFailure}) si la respuesta no fue 2xx.
+   * Versión diferida de {@link #execute}: comparte el mismo flag {@link #isThrowOnHttpError()},
+   * así que también lanza {@link HttpException} (hacia {@code onFailure}) si la
+   * respuesta no fue 2xx, salvo que se haya desactivado.
    *
    * @param <V>
    * @param request petición a realizar
@@ -178,7 +197,7 @@ public class HttpClient implements HttpTransport, HttpExecutor {
    * @return una llamada diferida
    */
   public <V> HttpTask<V> newTask(HttpRequest request, ResponseBodyConverter<V> converter) {
-    return new HttpTask<>(getDispatcher(), this, request, converter);
+    return new HttpTask<>(getDispatcher(), this, request, converter, throwOnHttpError);
   }
 
   public <V> HttpTask<V> newTask(HttpRequest request, Class<V> cast) {

@@ -18,6 +18,7 @@ public class HttpTask<V> extends AbstractTask<HttpResult<V>> {
     public final HttpRequest request;
     public final ResponseBodyConverter<V> converter;
     protected OnInterceptor interceptor;
+    protected boolean throwOnHttpError;
 
     /**
      * Inyección de Dependencias: Dispatcher, HttpClient, ResponseBodyConvert
@@ -25,10 +26,18 @@ public class HttpTask<V> extends AbstractTask<HttpResult<V>> {
     public HttpTask(
         TaskDispatcher dispatcher, HttpTransport stack, HttpRequest request, ResponseBodyConverter<V> converter
     ) {
+        this(dispatcher, stack, request, converter, true);
+    }
+
+    public HttpTask(
+        TaskDispatcher dispatcher, HttpTransport stack, HttpRequest request,
+        ResponseBodyConverter<V> converter, boolean throwOnHttpError
+    ) {
         super(dispatcher);
         this.stack = stack;
         this.request = request;
         this.converter = converter;
+        this.throwOnHttpError = throwOnHttpError;
     }
 
     private HttpResponse getResponse() throws Exception {
@@ -42,7 +51,7 @@ public class HttpTask<V> extends AbstractTask<HttpResult<V>> {
     public HttpResult<V> call() throws Exception {
         HttpResponse response = getResponse();
         try {
-          return new HttpResult.Converter<>(converter).convert(response);
+          return new HttpResult.Converter<>(converter, throwOnHttpError).convert(response);
 
         } finally {
           response.close();
@@ -55,6 +64,15 @@ public class HttpTask<V> extends AbstractTask<HttpResult<V>> {
 
     public HttpTask<V> setInterceptor(OnInterceptor interceptor) {
         this.interceptor = interceptor;
+        return this;
+    }
+
+    public boolean isThrowOnHttpError() {
+        return throwOnHttpError;
+    }
+
+    public HttpTask<V> setThrowOnHttpError(boolean throwOnHttpError) {
+        this.throwOnHttpError = throwOnHttpError;
         return this;
     }
 
