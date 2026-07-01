@@ -59,11 +59,11 @@ public class HttpTask<V> extends AbstractTask<HttpResult<V>> {
     }
 
     /**
-     * Versión diferida de {@link HttpClient#send}: en vez de {@link HttpResult}{@code <V>},
-     * resuelve directamente {@code V} (o lanza {@link HttpException}/la excepción que
-     * haya ocurrido) — sin duplicar la ejecución, solo desenvuelve {@link HttpResult#data}.
+     * En vez de resolver {@link HttpResult}{@code <V>} (como {@link #call}), resuelve
+     * directamente {@link HttpResult#data} — o lanza la excepción que haya ocurrido.
+     * No duplica la ejecución, solo desenvuelve el mismo resultado.
      */
-    public Task<V> toTask() {
+    public Task<V> newDataTask() {
         final HttpTask<V> self = this;
         return new Task<V>() {
             @Override

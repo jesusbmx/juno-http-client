@@ -60,16 +60,16 @@ public class Test {
                     }
                 });
 
-        // toTask(): igual que send() pero diferido - resuelve JSONObject directo, sin HttpResult
-        client.newTask(request, JSONObject.class).toTask()
+        // newDataTask: en vez de HttpResult<JSONObject>, resuelve JSONObject directo
+        client.newDataTask(request, JSONObject.class)
                 .async(new Callback<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject body) throws Exception {
-                        System.out.println("toTask OK: " + body.toString(1));
+                        System.out.println("DataTask OK: " + body.toString(1));
                     }
                     @Override
                     public void onFailure(Exception err) {
-                        System.out.println("toTask Err: " + err);
+                        System.out.println("DataTask Err: " + err);
                     }
                 });
     }

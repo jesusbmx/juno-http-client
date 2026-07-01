@@ -2,6 +2,7 @@ package juno.http;
 
 import java.util.ArrayList;
 import java.util.List;
+import juno.concurrent.Task;
 import juno.concurrent.TaskDispatcher;
 import juno.http.auth.Authorization;
 import juno.http.convert.ConverterFactory;
@@ -186,6 +187,23 @@ public class HttpClient implements HttpTransport, HttpExecutor {
 
   public HttpTask<HttpResponse> newTask(HttpRequest request) {
     return newTask(request, getResponseBodyConverter(HttpResponse.class));
+  }
+
+  /**
+   * En vez de {@link HttpResult}{@code <V>} (como {@link #newTask}), resuelve
+   * directamente {@link HttpResult#data}. Azúcar sobre {@code newTask(...).newDataTask()}
+   * para no exponer el wrapping en el sitio de la llamada.
+   */
+  public <V> Task<V> newDataTask(HttpRequest request, ResponseBodyConverter<V> converter) {
+    return newTask(request, converter).newDataTask();
+  }
+
+  public <V> Task<V> newDataTask(HttpRequest request, Class<V> cast) {
+    return newTask(request, cast).newDataTask();
+  }
+
+  public Task<HttpResponse> newDataTask(HttpRequest request) {
+    return newTask(request).newDataTask();
   }
 
   public <V> RequestBody createRequestBody(V object) {
