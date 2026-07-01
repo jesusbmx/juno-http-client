@@ -35,7 +35,7 @@ String get() throws Exception {
   HttpRequest request = HttpRequest.get(
        "https://postman-echo.com/get")
   ;
-  return client.send(request, String.class);
+  return client.call(request, String.class);
 }
 ```
 
@@ -59,7 +59,7 @@ String post(int id, String name, boolean active) throws Exception {
   HttpRequest request = HttpRequest.post(
       "https://postman-echo.com/post", reqBody)
   ;
-  return client.send(request, String.class);
+  return client.call(request, String.class);
 }
 ```
 
@@ -83,7 +83,7 @@ String request() throws Exception {
     HttpRequest request = HttpRequest.post(
         "https://postman-echo.com/post", reqBody)
     ;
-    return client.send(request, String.class);
+    return client.call(request, String.class);
 }
 ```
 
@@ -117,7 +117,7 @@ String upload(File file) throws Exception {
   HttpRequest request = HttpRequest.post(
     "https://postman-echo.com/post", reqBody)
   ;
-  return client.send(request, String.class);
+  return client.call(request, String.class);
 }
 ```
 
@@ -135,8 +135,8 @@ File download() throws Exception {
       .setDir(System.getProperty("user.home") + "\\Downloads\\") 
       //.setName("httpclient.jar")
   ;  
-  return client.send(request, converter);
-  //return client.send(request, File.class);
+  return client.call(request, converter);
+  //return client.call(request, File.class);
 }
 ```
 
@@ -280,7 +280,7 @@ JSONObject jsonRequest() throws Exception {
   HttpRequest request = HttpRequest.post(
         "https://postman-echo.com/post", reqBody);
 
-  return client.send(request, JSONObject.class);
+  return client.call(request, JSONObject.class);
 }
 ```
 
@@ -315,7 +315,7 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
         ".../auth/refresh_token", body);
 
     // Execute the request with another client to avoid entering a loop
-    JSONObject response = request.send(JSONObject.class);
+    JSONObject response = request.call(JSONObject.class);
 
     // Update the access and refresh tokens
     provider.setAccessToken(response.optString("accessToken"));
@@ -337,7 +337,7 @@ void login(String email, String password) throws Exception {
         ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
-    JSONObject response = request.send(JSONObject.class);
+    JSONObject response = request.call(JSONObject.class);
 
     // Store the received access and refresh tokens
     tokenProvider.setAccessToken(response.getString("accessToken"));
@@ -361,6 +361,7 @@ public HttpResponse requestWithToken() throws Exception{
 
   // Execute the request using the client configured with JWT authorization
   return client.send(request);
+}
 ```
 
 ### Simple Sign In and Token Refresh
@@ -379,7 +380,7 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
         ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
-    JSONObject response = request.send(JSONObject.class);
+    JSONObject response = request.call(JSONObject.class);
 
     // Store the new access token
     provider.setAccessToken(response.optString("accessToken"));

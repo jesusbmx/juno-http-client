@@ -11,5 +11,5 @@ public interface HttpTransport {
    *
    * @throws java.io.IOException
    */
-  public HttpResponse execute(HttpRequest request) throws Exception;
+  public HttpResponse send(HttpRequest request) throws Exception;
 }

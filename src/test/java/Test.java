@@ -24,7 +24,7 @@ public class Test {
 
         // axios: lanza HttpException si la respuesta no es 2xx
         try {
-          JSONObject body = request.send(JSONObject.class);
+          JSONObject body = request.call(JSONObject.class);
           System.out.println("Axios OK: " + body.toString(1));
 
         } catch(Exception err) {

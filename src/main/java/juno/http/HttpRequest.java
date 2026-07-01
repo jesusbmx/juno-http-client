@@ -198,32 +198,32 @@ public class HttpRequest {
         return url.toString();
     }
     
-    public HttpResponse execute(HttpTransport stack) throws Exception {
-        return stack.execute(this);
+    public HttpResponse send(HttpTransport stack) throws Exception {
+        return stack.send(this);
     }
 
-    public HttpResponse execute() throws Exception {
-        return HttpRequest.this.execute(HttpClient.getInstance());
+    public HttpResponse send() throws Exception {
+        return HttpRequest.this.send(HttpClient.getInstance());
     }
 
-    public <V> V send(HttpExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
-        return executor.send(this, convert);
+    public <V> V call(HttpCaller caller, ResponseBodyConverter<V> convert) throws Exception {
+        return caller.call(this, convert);
     }
 
-    public <V> V send(ResponseBodyConverter<V> convert) throws Exception {
-        return HttpRequest.this.send(HttpClient.getInstance(), convert);
+    public <V> V call(ResponseBodyConverter<V> convert) throws Exception {
+        return HttpRequest.this.call(HttpClient.getInstance(), convert);
     }
 
-    public <V> V send(HttpClient client, Class<V> convert) throws Exception {
-        return client.send(this, convert);
+    public <V> V call(HttpClient client, Class<V> convert) throws Exception {
+        return client.call(this, convert);
     }
 
-    public <V> V send(Class<V> convert) throws Exception {
-        return HttpRequest.this.send(HttpClient.getInstance(), convert);
+    public <V> V call(Class<V> convert) throws Exception {
+        return HttpRequest.this.call(HttpClient.getInstance(), convert);
     }
 
-    public <V> HttpResult<V> fetch(HttpExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
-        return executor.fetch(this, convert);
+    public <V> HttpResult<V> fetch(HttpFetcher fetcher, ResponseBodyConverter<V> convert) throws Exception {
+        return fetcher.fetch(this, convert);
     }
 
     public <V> HttpResult<V> fetch(ResponseBodyConverter<V> convert) throws Exception {

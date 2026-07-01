@@ -10,7 +10,7 @@ import juno.http.convert.ResponseBodyConverter;
 import juno.http.convert.generic.GenericConverterFactory;
 import juno.http.convert.json.JSONConverterFactory;
 
-public class HttpClient implements HttpTransport, HttpExecutor {
+public class HttpClient implements HttpTransport, HttpFetcher, HttpCaller {
     
   /** Singleton de la clase. */
   private static HttpClient instance;
@@ -133,7 +133,7 @@ public class HttpClient implements HttpTransport, HttpExecutor {
    * servidor
    */
   @Override
-  public HttpResponse execute(HttpRequest request) throws Exception {
+  public HttpResponse send(HttpRequest request) throws Exception {
     if (mAuthorization != null) {
         request.addHeader("Authorization", mAuthorization.generateAuthHeader());
     }
@@ -143,14 +143,14 @@ public class HttpClient implements HttpTransport, HttpExecutor {
     if (mInterceptor != null) {
         return mInterceptor.intercept(request, getHttpTransport());
     }
-    return getHttpTransport().execute(request);
+    return getHttpTransport().send(request);
   }
 
   @Override
   public <V> HttpResult<V> fetch(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
     HttpResponse response = null;
     try {
-      response = execute(request);
+      response = send(request);
       return new HttpResult.Converter<>(converter).convert(response);
 
     } catch(Exception e) {
@@ -171,12 +171,12 @@ public class HttpClient implements HttpTransport, HttpExecutor {
    * si la respuesta no fue 2xx.
    */
   @Override
-  public <V> V send(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
+  public <V> V call(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
     return fetch(request, converter).getOrThrow();
   }
 
-  public <V> V send(HttpRequest request, Class<V> cast) throws Exception {
-    return send(request, getResponseBodyConverter(cast));
+  public <V> V call(HttpRequest request, Class<V> cast) throws Exception {
+    return call(request, getResponseBodyConverter(cast));
   }
  
   /**

@@ -50,7 +50,7 @@ public class JsonTest {
         HttpRequest request = HttpRequest.post(
                 "https://postman-echo.com/post", reqBody);
 
-        return client.send(request, JSONObject.class);
+        return client.call(request, JSONObject.class);
     }
 
     public static void main(String[] args) throws Exception {

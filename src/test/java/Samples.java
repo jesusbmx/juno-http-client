@@ -21,7 +21,7 @@ public class Samples {
         HttpRequest request = HttpRequest.get(
                 "https://postman-echo.com/get");
 
-        return client.send(request, String.class);
+        return client.call(request, String.class);
     }
 
     /*
@@ -41,7 +41,7 @@ public class Samples {
         HttpRequest request = HttpRequest.post(
                 "https://postman-echo.com/post", reqBody);
 
-        return client.send(request, String.class);
+        return client.call(request, String.class);
     }
     
     /*
@@ -62,7 +62,7 @@ public class Samples {
         HttpRequest request = HttpRequest.post(
                 "https://postman-echo.com/post", reqBody);
 
-        return client.send(request, String.class);
+        return client.call(request, String.class);
     }
     
     /*
@@ -82,7 +82,7 @@ public class Samples {
         HttpRequest request = HttpRequest.post(
                 "https://postman-echo.com/post", reqBody);
 
-        return client.send(request, String.class);
+        return client.call(request, String.class);
     }
 
     /*
@@ -96,8 +96,8 @@ public class Samples {
         FileResponseBodyConverter convert = new FileResponseBodyConverter()
                 .setDir(System.getProperty("user.home") + "\\Downloads\\") //.setName("httpclient.jar")
         ;
-        return client.send(request, convert);
-        //return client.execute(request, File.class);
+        return client.call(request, convert);
+        //return client.call(request, File.class);
     }
     
     /*
@@ -115,7 +115,7 @@ public class Samples {
       HttpRequest request = HttpRequest.get(url)
         .addHeader("User-Agent", "nombre-cliente")
       ;
-      return client.execute(request);
+      return client.send(request);
     }
 
     public static void main(String[] args) throws Exception {

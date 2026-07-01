@@ -24,7 +24,7 @@ public class HttpTask<T> extends AbstractTask<T> {
     
     private HttpResponse execute(HttpRequest request) throws Exception {
         if (interceptor == null) {
-            return stack.execute(request);
+            return stack.send(request);
         }
         return interceptor.intercept(request, stack);
     }
