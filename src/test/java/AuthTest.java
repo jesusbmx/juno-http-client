@@ -42,7 +42,7 @@ public class AuthTest implements JwtTokenProvider.OnTokenRefresh {
                 "https://postman-echo.com/post", body);
 
         // Result
-        JSONObject response = request.call(JSONObject.class);
+        JSONObject response = request.execute(JSONObject.class).data;
         JSONObject form = response.getJSONObject("form");
         System.out.println(form.toString(1));
 
@@ -73,7 +73,7 @@ public class AuthTest implements JwtTokenProvider.OnTokenRefresh {
                 "https://postman-echo.com/post", body);
 
         // Result
-        JSONObject response = request.call(JSONObject.class);
+        JSONObject response = request.execute(JSONObject.class).data;
         JSONObject form = response.getJSONObject("form");
         System.out.println(form.toString(1));
 

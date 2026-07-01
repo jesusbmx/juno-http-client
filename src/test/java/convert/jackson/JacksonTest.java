@@ -3,19 +3,19 @@ package convert.jackson;
 import java.util.Date;
 import juno.concurrent.Task;
 import juno.concurrent.Callback;
+import juno.http.HttpResult;
 
 public class JacksonTest {
 
-  PostDao dao = new PostDao();  
-    
+  PostDao dao = new PostDao();
+
   public void list() {
-    Task<Post[]> task = dao.getPosts(); 
-    
-    task.async(new Callback<Post[]>() {
+    Task<HttpResult<Post[]>> task = dao.getPosts();
+
+    task.async(new Callback<HttpResult<Post[]>>() {
       @Override
-      public void onResponse(Post[] response) throws Exception {
-        //List<Post> list = Arrays.asList(result);
-        for (Post post : response) {
+      public void onResponse(HttpResult<Post[]> result) throws Exception {
+        for (Post post : result.data) {
           System.out.println(post.title);
         }
       }
@@ -24,8 +24,8 @@ public class JacksonTest {
         e.printStackTrace(System.out);
       }
     });
-  }  
-  
+  }
+
   public void insert() {
     Post post = new Post();
     post.id = 7;
@@ -34,12 +34,12 @@ public class JacksonTest {
     post.author = "My Author";
     post.url = "http://127.0.0.1";
     post.body = "My body";
-    
-    Task<String> task = dao.insert(post); 
-    task.async(new Callback<String>() {
+
+    Task<HttpResult<String>> task = dao.insert(post);
+    task.async(new Callback<HttpResult<String>>() {
       @Override
-      public void onResponse(String response) throws Exception {
-          System.out.println(response);
+      public void onResponse(HttpResult<String> result) throws Exception {
+          System.out.println(result.data);
       }
       @Override
       public void onFailure(Exception e) {
@@ -47,7 +47,7 @@ public class JacksonTest {
       }
     });
   }
-    
+
   public static void main(String[] args) {
     JacksonTest gsonTest = new JacksonTest();
     gsonTest.list();

@@ -10,7 +10,7 @@ import juno.http.convert.ResponseBodyConverter;
 import juno.http.convert.generic.GenericConverterFactory;
 import juno.http.convert.json.JSONConverterFactory;
 
-public class HttpClient implements HttpTransport, HttpFetcher, HttpCaller {
+public class HttpClient implements HttpTransport, HttpExecutor {
     
   /** Singleton de la clase. */
   private static HttpClient instance;
@@ -146,42 +146,29 @@ public class HttpClient implements HttpTransport, HttpFetcher, HttpCaller {
     return getHttpTransport().send(request);
   }
 
+  /**
+   * Comportamiento "axios": lanza {@link HttpException} si la respuesta no fue
+   * 2xx; si fue exitosa devuelve el {@link HttpResult} (code/headers/body).
+   */
   @Override
-  public <V> HttpResult<V> fetch(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
-    HttpResponse response = null;
+  public <V> HttpResult<V> execute(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
+    HttpResponse response = send(request);
     try {
-      response = send(request);
       return new HttpResult.Converter<>(converter).convert(response);
 
-    } catch(Exception e) {
-      if (response != null) {
-        response.close();
-      }
-
-      throw e;
+    } finally {
+      response.close();
     }
   }
 
-  public <V> HttpResult<V> fetch(HttpRequest request, Class<V> cast) throws Exception {
-    return fetch(request, getResponseBodyConverter(cast));
+  public <V> HttpResult<V> execute(HttpRequest request, Class<V> cast) throws Exception {
+    return execute(request, getResponseBodyConverter(cast));
   }
 
   /**
-   * Comportamiento "axios": desenvuelve {@link #fetch} o lanza {@link HttpException}
-   * si la respuesta no fue 2xx.
-   */
-  @Override
-  public <V> V call(HttpRequest request, ResponseBodyConverter<V> converter) throws Exception {
-    return fetch(request, converter).getOrThrow();
-  }
-
-  public <V> V call(HttpRequest request, Class<V> cast) throws Exception {
-    return call(request, getResponseBodyConverter(cast));
-  }
- 
-  /**
-   * Versión diferida de {@link #call}: "axios" - lanza {@link HttpException}
-   * si la respuesta no fue 2xx cuando se resuelva la {@link HttpTask}.
+   * Versión diferida de {@link #execute}: comparte el mismo {@link HttpResult.Converter},
+   * así que también lanza {@link HttpException} (hacia {@code onFailure}) si la
+   * respuesta no fue 2xx.
    *
    * @param <V>
    * @param request petición a realizar
@@ -189,30 +176,18 @@ public class HttpClient implements HttpTransport, HttpFetcher, HttpCaller {
    *
    * @return una llamada diferida
    */
-  public <V> HttpTask<V> newTask(HttpRequest request, ResponseBodyConverter<V> converter) {
-    return new HttpTask<V>(getDispatcher(), this, request, unwrap(new HttpResult.Converter<>(converter)));
-  }
-
-  public <V> HttpTask<V> newTask(HttpRequest request, Class<V> cast) {
-    return this.newTask(request, getResponseBodyConverter(cast));
-  }
-
-  public HttpTask<HttpResponse> newTask(HttpRequest request) {
-    return this.newTask(request, getResponseBodyConverter(HttpResponse.class));
-  }
-
-  /**
-   * Versión diferida de {@link #fetch}: "fetch" - nunca lanza por status HTTP,
-   * expone el resultado en {@link HttpResult} cuando se resuelva la {@link HttpTask}.
-   */
-  public <V> HttpTask<HttpResult<V>> newFetchTask(HttpRequest request, ResponseBodyConverter<V> converter) {
+  public <V> HttpTask<HttpResult<V>> newTask(HttpRequest request, ResponseBodyConverter<V> converter) {
     return new HttpTask<>(getDispatcher(), this, request, new HttpResult.Converter<>(converter));
   }
 
-  public <V> HttpTask<HttpResult<V>> newFetchTask(HttpRequest request, Class<V> cast) {
-    return newFetchTask(request, getResponseBodyConverter(cast));
+  public <V> HttpTask<HttpResult<V>> newTask(HttpRequest request, Class<V> cast) {
+    return newTask(request, getResponseBodyConverter(cast));
   }
-  
+
+  public HttpTask<HttpResult<HttpResponse>> newTask(HttpRequest request) {
+    return newTask(request, getResponseBodyConverter(HttpResponse.class));
+  }
+
   public <V> RequestBody createRequestBody(V object) {
     if (object == null) return null;
     try {
@@ -242,21 +217,6 @@ public class HttpClient implements HttpTransport, HttpFetcher, HttpCaller {
       }
     }
     throw new IllegalArgumentException("Could not RequestBody converter for class '" + type.getCanonicalName() + "'");
-  }
-
-  /**
-   * Comportamiento "axios": desenvuelve un {@link HttpResult} ya construido,
-   * lanzando su {@link HttpException} si la respuesta no fue 2xx. Usado por
-   * {@code newTask(...)} para compartir con {@code newFetchTask(...)} la misma
-   * decisión de éxito/error, que vive únicamente en {@link HttpResult.Converter}.
-   */
-  private <V> ResponseBodyConverter<V> unwrap(final ResponseBodyConverter<HttpResult<V>> resultConverter) {
-    return new ResponseBodyConverter<V>() {
-      @Override
-      public V convert(HttpResponse response) throws Exception {
-        return resultConverter.convert(response).getOrThrow();
-      }
-    };
   }
 
 }

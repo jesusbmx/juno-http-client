@@ -3,6 +3,7 @@ import juno.concurrent.Task;
 import juno.http.FormBody;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
+import juno.http.HttpResult;
 import juno.http.RequestBody;
 import org.json.JSONObject;
 
@@ -10,7 +11,7 @@ public class JsonTest {
 
     HttpClient client = HttpClient.getInstance();
 
-    public Task<JSONObject> insert(
+    public Task<HttpResult<JSONObject>> insert(
             String name, int age, boolean active) {
 
         // application-www-www-form-urlencoded
@@ -26,19 +27,19 @@ public class JsonTest {
     }
 
     public void async() {
-        Task<JSONObject> insert = insert(
+        Task<HttpResult<JSONObject>> insert = insert(
             "John Doe", 22, true);
 
         try {
-            JSONObject response = insert.sync();
-            System.out.println(response.toString(1));
+            HttpResult<JSONObject> result = insert.sync();
+            System.out.println(result.data.toString(1));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    JSONObject jsonRequest() throws Exception {
+
+    HttpResult<JSONObject> jsonRequest() throws Exception {
         JSONObject data = new JSONObject();
         data.put("user_id", 7);
         data.put("name", "jesus");
@@ -50,12 +51,12 @@ public class JsonTest {
         HttpRequest request = HttpRequest.post(
                 "https://postman-echo.com/post", reqBody);
 
-        return client.call(request, JSONObject.class);
+        return client.execute(request, JSONObject.class);
     }
 
     public static void main(String[] args) throws Exception {
         JsonTest test = new JsonTest();
         //test.async();
-        System.out.println(test.jsonRequest().toString(1));
+        System.out.println(test.jsonRequest().data.toString(1));
     }
 }

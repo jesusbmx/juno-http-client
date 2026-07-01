@@ -10,17 +10,12 @@ public class SimpleResponseBodyConverter implements ResponseBodyConverter<HttpRe
 
     @Override
     public HttpResponse convert(HttpResponse response) throws Exception {
-        try {
-            byte[] content = IOUtils.readByteArray(response.content);
+        byte[] content = IOUtils.readByteArray(response.content);
 
-            return new HttpResponse(
-                    response.code, 
-                    response.headers, 
-                    content);
-
-        } finally {
-            response.close();
-        }
+        return new HttpResponse(
+                response.code,
+                response.headers,
+                content);
     }
     
 }

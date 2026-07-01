@@ -26,7 +26,6 @@ public class JacksonResponseBodyConvert<T> implements ResponseBodyConverter<T> {
             
         } finally {
             IOUtils.closeQuietly(reader);
-            response.close();
         }
     }
     

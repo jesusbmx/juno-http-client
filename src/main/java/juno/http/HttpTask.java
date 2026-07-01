@@ -31,16 +31,12 @@ public class HttpTask<T> extends AbstractTask<T> {
 
     @Override
     public T call() throws Exception {
-        HttpResponse response = null;
+        HttpResponse response = execute(request);
         try {
-          response = execute(request);
           return converter.convert(response);
 
-        } catch(Exception e) {
-          if (response != null) {
-            response.close();
-          }
-          throw e;
+        } finally {
+          response.close();
         }
     }
 

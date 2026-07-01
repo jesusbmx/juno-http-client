@@ -7,7 +7,7 @@ To include Juno in your project using Gradle, add the following dependency:
 ```
 dependencies {
   implementation 'com.github.jesusbmx:juno:1.0.5'
-  implementation 'com.github.jesusbmx:juno-http-client:1.4.0'
+  implementation 'com.github.jesusbmx:juno-http-client:1.5.0'
 }
 ```
 
@@ -15,7 +15,7 @@ Alternatively, you can download the JAR file directly from [JitPack](https://jit
 
 Download [juno.jar](https://jitpack.io/com/github/jesusbmx/juno/1.0.5/juno-1.0.5.jar)
 
-Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.4.0/juno-http-client-1.4.0.jar)
+Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.5.0/juno-http-client-1.5.0.jar)
 
 
 ## [Samples](src/test/java/Samples.java)
@@ -31,11 +31,11 @@ GET https://postman-echo.com/get HTTP/1.1
 ```
 
 ```java
-String get() throws Exception {
+HttpResult<String> get() throws Exception {
   HttpRequest request = HttpRequest.get(
        "https://postman-echo.com/get")
   ;
-  return client.call(request, String.class);
+  return client.execute(request, String.class);
 }
 ```
 
@@ -49,7 +49,7 @@ id=7&name=bar&active=true
 ```
 
 ```java
-String post(int id, String name, boolean active) throws Exception {
+HttpResult<String> post(int id, String name, boolean active) throws Exception {
   // application-www-www-form-urlencoded
   FormBody reqBody = new FormBody()
           .add("id", id)
@@ -59,7 +59,7 @@ String post(int id, String name, boolean active) throws Exception {
   HttpRequest request = HttpRequest.post(
       "https://postman-echo.com/post", reqBody)
   ;
-  return client.call(request, String.class);
+  return client.execute(request, String.class);
 }
 ```
 
@@ -83,7 +83,7 @@ String request() throws Exception {
     HttpRequest request = HttpRequest.post(
         "https://postman-echo.com/post", reqBody)
     ;
-    return client.call(request, String.class);
+    return client.send(request, String.class);
 }
 ```
 
@@ -117,7 +117,7 @@ String upload(File file) throws Exception {
   HttpRequest request = HttpRequest.post(
     "https://postman-echo.com/post", reqBody)
   ;
-  return client.call(request, String.class);
+  return client.send(request, String.class);
 }
 ```
 
@@ -135,8 +135,8 @@ File download() throws Exception {
       .setDir(System.getProperty("user.home") + "\\Downloads\\") 
       //.setName("httpclient.jar")
   ;  
-  return client.call(request, converter);
-  //return client.call(request, File.class);
+  return client.send(request, converter);
+  //return client.send(request, File.class);
 }
 ```
 
@@ -194,7 +194,7 @@ HttpClient client = HttpClient.getInstance().setInterceptor((request, transport)
 We prepare the request
 
 ```java
-public Task<String> insert(
+public Task<HttpResult<String>> insert(
     int id, String name, boolean active) {
     
   // application-www-www-form-urlencoded
@@ -213,14 +213,13 @@ public Task<String> insert(
 #### Asynchronous
 
 Asynchronously send the request and notify your application with a callback when a response returns. Since this request is asynchronous, Restlight handles the execution in the background thread so that the
-Main UI is not blocked or interferes with it.
+Main UI is not blocked or interferes with it. Just like axios, a non-2xx status throws `HttpException` to `onFailure` instead of resolving `onResponse`.
 
 ```java
-Task<String> task = insert(22, "John Doe", true);
+Task<HttpResult<String>> task = insert(22, "John Doe", true);
     
-task.async((String response) -> {
-  String str = response;
-  System.out.println(str);
+task.async((HttpResult<String> result) -> {
+  System.out.println(result.data);
 
 }, (Exception e) ->  {
    e.printStackTrace();
@@ -232,11 +231,11 @@ task.async((String response) -> {
 Synchronously send the request and return your response.
 
 ```java
-Task<String> task = insert(22, "John Doe", true);
+Task<HttpResult<String>> task = insert(22, "John Doe", true);
     
 try {
-    String response = task.sync();
-    System.out.println(response);
+    HttpResult<String> result = task.sync();
+    System.out.println(result.body);
     
 } catch(Exception e) {
     e.printStackTrace();
@@ -251,7 +250,7 @@ For other java platforms like java swing if needed.
 
 #### JSON response
 ```java
-public Task<JSONObject> insert(
+public Task<HttpResult<JSONObject>> insert(
     String name, int age, boolean active) {
       
     // application-www-www-form-urlencoded
@@ -280,7 +279,7 @@ JSONObject jsonRequest() throws Exception {
   HttpRequest request = HttpRequest.post(
         "https://postman-echo.com/post", reqBody);
 
-  return client.call(request, JSONObject.class);
+  return client.send(request, JSONObject.class);
 }
 ```
 
@@ -315,7 +314,7 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
         ".../auth/refresh_token", body);
 
     // Execute the request with another client to avoid entering a loop
-    JSONObject response = request.call(JSONObject.class);
+    JSONObject response = request.send(JSONObject.class);
 
     // Update the access and refresh tokens
     provider.setAccessToken(response.optString("accessToken"));
@@ -337,7 +336,7 @@ void login(String email, String password) throws Exception {
         ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
-    JSONObject response = request.call(JSONObject.class);
+    JSONObject response = request.send(JSONObject.class);
 
     // Store the received access and refresh tokens
     tokenProvider.setAccessToken(response.getString("accessToken"));
@@ -380,7 +379,7 @@ JwtTokenProvider.OnTokenRefresh onTokenRefresh = (TokenProvider provider) -> {
         ".../auth/login", body);
 
     // Execute the request with another client to avoid entering a loop
-    JSONObject response = request.call(JSONObject.class);
+    JSONObject response = request.send(JSONObject.class);
 
     // Store the new access token
     provider.setAccessToken(response.optString("accessToken"));
@@ -437,14 +436,14 @@ public class PostApi {
     client.addConverterFactory(new GsonConverterFactory(gson));
   }
 
-  public Task<Post[]> getPosts() {
+  public Task<HttpResult<Post[]>> getPosts() {
     HttpRequest request = HttpRequest.get(
         "https://kylewbanks.com/rest/posts.json");
 
     return client.newTask(request, Post[].class);
   }
 
-  public Task<String> insert(Post p) {
+  public Task<HttpResult<String>> insert(Post p) {
     RequestBody reqBody = client.createRequestBody(p); // application/json
     // RequestBody reqBody = new FormBody(Maps.getPublicFields(p)); // application-www-www-form-urlencoded
     // RequestBody reqBody = new MultipartBody(Maps.getPublicFields(p)); // multipart/form-data
@@ -458,15 +457,15 @@ public class PostApi {
 ```
 
 Prepares the request to be executed in the background. Ideal for android applications.
-Asynchronously send the request and notify your application with a callback when a response returns.
+Asynchronously send the request and notify your application with a callback when a response returns. Just like axios, a non-2xx status throws `HttpException` to `onFailure` instead of resolving `onResponse`.
 ```java
 ...
 PostApi api = new PostApi();
     
-Task<Post[]> task = api.getPosts(); 
+Task<HttpResult<Post[]>> task = api.getPosts(); 
 
-task.async((Post[] response) -> {
-  List<Post> list = Arrays.asList(response);
+task.async((HttpResult<Post[]> result) -> {
+  List<Post> list = Arrays.asList(result.body);
   for (Post post : list) {
     System.out.println(post.title);
   }
@@ -523,14 +522,14 @@ public class PostApi {
     client.addConverterFactory(new JacksonConverterFactory(mapper));
   }
 
-  public Task<Post[]> getPosts() {
+  public Task<HttpResult<Post[]>> getPosts() {
     HttpRequest request = HttpRequest.get(
         "https://kylewbanks.com/rest/posts.json");
 
     return client.newTask(request, Post[].class);
   }
   
-  public Task<String> insert(Post p) {
+  public Task<HttpResult<String>> insert(Post p) {
     // application/json
     RequestBody reqBody = client.createRequestBody(p);
     
@@ -543,15 +542,15 @@ public class PostApi {
 ```
 
 Prepares the request to be executed in the background. Ideal for android applications.
-Asynchronously send the request and notify your application with a callback when a response returns.
+Asynchronously send the request and notify your application with a callback when a response returns. Just like axios, a non-2xx status throws `HttpException` to `onFailure` instead of resolving `onResponse`.
 ```java
 ...
 PostApi api = new PostApi();
     
-task<Post[]> task = api.getPosts(); 
+Task<HttpResult<Post[]>> task = api.getPosts(); 
 
-task.async((Post[] response) -> {
-  List<Post> list = Arrays.asList(response);
+task.async((HttpResult<Post[]> result) -> {
+  List<Post> list = Arrays.asList(result.body);
   for (Post post : list) {
     System.out.println(post.title);
   }

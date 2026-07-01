@@ -38,7 +38,6 @@ public class GsonResponseBodyConverter<T> implements ResponseBodyConverter<T> {
         
       } finally {
         IOUtils.closeQuietly(reader);
-        response.close();
       }
     }
     

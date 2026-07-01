@@ -4,23 +4,29 @@ public class HttpException extends Exception {
 
     public final int code;
     public final Headers headers;
-    public final String body;
+    public final String data;
 
-    public HttpException(int code, Headers headers, String body) {
-        super("HTTP " + code + (body == null || body.isEmpty() ? "" : ": " + body));
+    public HttpException(int code, Headers headers, String data) {
+        super("HTTP " + code + (data == null || data.isEmpty() ? "" : ": " + data));
         this.code = code;
         this.headers = headers;
-        this.body = body;
+        this.data = data;
     }
 
+    /**
+     * Igual que Retrofit: el body del error queda crudo en {@link #data}, sin
+     * intentar convertirlo con el converter de la respuesta exitosa — el error
+     * no necesariamente tiene la misma forma (puede ser HTML, texto plano, etc.).
+     * Si necesitas parsearlo, hazlo explícitamente con el converter que corresponda.
+     */
     public static HttpException from(HttpResponse response) {
         int code = response.code;
-        String body = "";
+        String data = "";
         try {
-            body = response.readString();
+            data = response.readString();
         } catch (Exception ignored) {
         }
-        return new HttpException(code, response.headers, body);
+        return new HttpException(code, response.headers, data);
     }
 
     public boolean isClientError() {

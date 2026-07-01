@@ -6,35 +6,24 @@ public class HttpResult<T> {
 
     public final int code;
     public final Headers headers;
-    public final T body;
-    public final HttpException error;
+    public final T data;
 
-    public HttpResult(int code, Headers headers, T body, HttpException error) {
+    public HttpResult(int code, Headers headers, T body) {
         this.code = code;
         this.headers = headers;
-        this.body = body;
-        this.error = error;
-    }
-
-    public boolean isSuccessful() {
-        return code >= 200 && code < 300;
-    }
-
-    /**
-     * Comportamiento "axios": desenvuelve el resultado o lanza el error HTTP.
-     */
-    public T getOrThrow() throws HttpException {
-        if (!isSuccessful()) {
-            throw error;
-        }
-        return body;
+        this.data = body;
     }
 
     @Override
     public String toString() {
-        return "HttpResult{code=" + code + ", headers=" + headers + ", body=" + body + '}';
+        return "HttpResult{code=" + code + ", headers=" + headers + ", body=" + data + '}';
     }
 
+    /**
+     * Comportamiento "axios": lanza {@link HttpException} si la respuesta no
+     * fue 2xx, sin intentar convertir el body de error; si fue exitosa
+     * devuelve un {@link HttpResult} (code/headers/body).
+     */
     public static class Converter<T> implements ResponseBodyConverter<HttpResult<T>> {
         private final ResponseBodyConverter<T> inner;
 
@@ -44,19 +33,15 @@ public class HttpResult<T> {
 
         @Override
         public HttpResult<T> convert(HttpResponse response) throws Exception {
+            if (!response.isSuccessful()) {
+                throw HttpException.from(response);
+            }
+
             int code = response.code;
             Headers headers = response.headers;
-            T body = null;
-            HttpException error = null;
-            
-            if (response.isSuccessful()) {
-                body = inner.convert(response);
-            } else {
-                error = HttpException.from(response);
-                response.close();
-            }
-            
-            return new HttpResult<>(code, headers, body, error);
+            T body = inner.convert(response);
+
+            return new HttpResult<>(code, headers, body);
         }
     }
 }

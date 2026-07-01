@@ -9,11 +9,7 @@ public class BytesResponseBodyConverter implements ResponseBodyConverter<byte[]>
 
     @Override
     public byte[] convert(HttpResponse response) throws Exception {
-      try {
-        return response.readBytes();
-      } finally {
-        response.close();
-      }
+      return response.readBytes();
     }
     
 }

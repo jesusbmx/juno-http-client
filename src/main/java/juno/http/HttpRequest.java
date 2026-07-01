@@ -206,36 +206,20 @@ public class HttpRequest {
         return HttpRequest.this.send(HttpClient.getInstance());
     }
 
-    public <V> V call(HttpCaller caller, ResponseBodyConverter<V> convert) throws Exception {
-        return caller.call(this, convert);
+    public <V> HttpResult<V> execute(HttpExecutor executor, ResponseBodyConverter<V> convert) throws Exception {
+        return executor.execute(this, convert);
     }
 
-    public <V> V call(ResponseBodyConverter<V> convert) throws Exception {
-        return HttpRequest.this.call(HttpClient.getInstance(), convert);
+    public <V> HttpResult<V> execute(ResponseBodyConverter<V> convert) throws Exception {
+        return HttpRequest.this.execute(HttpClient.getInstance(), convert);
     }
 
-    public <V> V call(HttpClient client, Class<V> convert) throws Exception {
-        return client.call(this, convert);
+    public <V> HttpResult<V> execute(HttpClient client, Class<V> convert) throws Exception {
+        return client.execute(this, convert);
     }
 
-    public <V> V call(Class<V> convert) throws Exception {
-        return HttpRequest.this.call(HttpClient.getInstance(), convert);
-    }
-
-    public <V> HttpResult<V> fetch(HttpFetcher fetcher, ResponseBodyConverter<V> convert) throws Exception {
-        return fetcher.fetch(this, convert);
-    }
-
-    public <V> HttpResult<V> fetch(ResponseBodyConverter<V> convert) throws Exception {
-        return HttpRequest.this.fetch(HttpClient.getInstance(), convert);
-    }
-
-    public <V> HttpResult<V> fetch(HttpClient client, Class<V> convert) throws Exception {
-        return client.fetch(this, convert);
-    }
-
-    public <V> HttpResult<V> fetch(Class<V> convert) throws Exception {
-        return HttpRequest.this.fetch(HttpClient.getInstance(), convert);
+    public <V> HttpResult<V> execute(Class<V> convert) throws Exception {
+        return HttpRequest.this.execute(HttpClient.getInstance(), convert);
     }
 
     @Override

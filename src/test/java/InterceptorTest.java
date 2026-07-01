@@ -3,13 +3,14 @@ import juno.concurrent.Task;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
+import juno.http.HttpResult;
 import juno.http.HttpUrl;
 import juno.http.OnInterceptor;
 import juno.http.HttpTransport;
 
 
 public class InterceptorTest {
-    
+
     HttpClient client = HttpClient.getInstance()
             .setInterceptor(new OnInterceptor() {
                 @Override
@@ -24,7 +25,7 @@ public class InterceptorTest {
             .setDebug(true)
     ;
 
-    Task<String> getIpLocation() { 
+    Task<HttpResult<String>> getIpLocation() {
       HttpUrl url = new HttpUrl("http://ip-api.com/")
         .addPath("json")
         .addPath("24.48.0.1")
@@ -32,14 +33,14 @@ public class InterceptorTest {
         .addQueryParameter("lang", "en")
       ;
       HttpRequest request = HttpRequest.get(url);
-      
+
       return client.newTask(request, String.class);
     }
-    
+
     public static void main(String[] args) throws Exception {
         InterceptorTest test = new InterceptorTest();
- 
-        final String response = test.getIpLocation().sync();
-        System.out.println(response);
+
+        final HttpResult<String> result = test.getIpLocation().sync();
+        System.out.println(result.data);
     }
 }

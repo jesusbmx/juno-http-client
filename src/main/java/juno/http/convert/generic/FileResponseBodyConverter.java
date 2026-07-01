@@ -60,7 +60,6 @@ public class FileResponseBodyConverter implements ResponseBodyConverter<File> {
       return f;
     } finally {
       IOUtils.closeQuietly(bos);
-      response.close();
     }
   }
 }
