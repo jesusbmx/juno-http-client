@@ -1,6 +1,7 @@
 package juno.http;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -86,36 +87,50 @@ public class URLConnectionTransport implements HttpTransport {
      * @param conn HTTP
      * @param request peticion
      *
+     * @return el body en texto si es de un content-type legible (para debug), si no {@code null}
+     *
      * @throws IOException
      */
-    public void writeBody(HttpURLConnection conn, HttpRequest request)
+    public String writeBody(HttpURLConnection conn, HttpRequest request)
             throws IOException {
         final RequestBody requestBody = request.getBody();
 
-        if (request.requiresRequestBody() && requestBody != null) {
-            final String contentType = requestBody.contentType();
-            
-            // Setup connection:
-            conn.setDoOutput(true);
-            conn.addRequestProperty(Headers.CONTENT_TYPE, contentType);
+        if (!request.requiresRequestBody() || requestBody == null) {
+            return null;
+        }
 
-            // Length:
-            final long contentLength = requestBody.contentLength();
-            setFixedLengthStreamingMode(conn, contentLength);
+        final String contentType = requestBody.contentType();
 
-            // Write params:
-            BufferedOutputStream bos = null;
-            try {
-                bos = new BufferedOutputStream(conn.getOutputStream());
-                Debug.debugRequest(request, requestBody, contentType, contentLength);
-                requestBody.writeTo(bos);
+        // Setup connection:
+        conn.setDoOutput(true);
+        conn.addRequestProperty(Headers.CONTENT_TYPE, contentType);
 
-            } finally {
-                IOUtils.closeQuietly(bos);
+        // Length:
+        final long contentLength = requestBody.contentLength();
+        setFixedLengthStreamingMode(conn, contentLength);
+
+        // Loguea el body como texto solo si es legible y no viene de un multipart (archivos).
+        final boolean captureForDebug = Debug.isDebug()
+                && Debug.isReadableContentType(contentType)
+                && !(requestBody instanceof MultipartBody);
+
+        BufferedOutputStream bos = null;
+        try {
+            bos = new BufferedOutputStream(conn.getOutputStream());
+
+            if (captureForDebug) {
+                final ByteArrayOutputStream captured = IOUtils.arrayOutputStream();
+                requestBody.writeTo(captured);
+                final byte[] bytes = captured.toByteArray();
+                bos.write(bytes);
+                return new String(bytes, request.getUrl().getCharset());
             }
 
-        } else {
-            Debug.debugRequest(request);
+            requestBody.writeTo(bos);
+            return null;
+
+        } finally {
+            IOUtils.closeQuietly(bos);
         }
     }
 
@@ -162,12 +177,7 @@ public class URLConnectionTransport implements HttpTransport {
                 .addHeadersMapList(conn.getHeaderFields());
 
         // Create Http Response
-        final HttpResponse response = new HttpResponse(
-                responseCode, headers, content);
-
-        Debug.debugResponse(request, response);
-
-        return response;
+        return new HttpResponse(responseCode, headers, content);
     }
 
     /**
@@ -202,11 +212,14 @@ public class URLConnectionTransport implements HttpTransport {
     @Override
     public HttpResponse send(HttpRequest request) throws Exception {
         HttpURLConnection conn = null;
+        final long startedAt = System.currentTimeMillis();
         try {
             conn = open(request);
             writeHeaders(conn, request);
-            writeBody(conn, request);
-            return getResponse(conn, request);
+            String reqBody = writeBody(conn, request);
+            HttpResponse response = getResponse(conn, request);
+            Debug.log(request, response, reqBody, System.currentTimeMillis() - startedAt);
+            return response;
 
         } catch (UnknownHostException e) {
             if (conn != null) {
