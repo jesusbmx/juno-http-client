@@ -7,7 +7,7 @@ To include Juno in your project using Gradle, add the following dependency:
 ```
 dependencies {
   implementation 'com.github.jesusbmx:juno:1.0.5'
-  implementation 'com.github.jesusbmx:juno-http-client:1.2.0'
+  implementation 'com.github.jesusbmx:juno-http-client:1.3.0'
 }
 ```
 
@@ -15,7 +15,7 @@ Alternatively, you can download the JAR file directly from [JitPack](https://jit
 
 Download [juno.jar](https://jitpack.io/com/github/jesusbmx/juno/1.0.5/juno-1.0.5.jar)
 
-Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.2.0/juno-http-client-1.2.0.jar)
+Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.3.0/juno-http-client-1.3.0.jar)
 
 
 ## [Samples](src/test/java/Samples.java)
@@ -206,7 +206,7 @@ public Task<String> insert(
   HttpRequest request = HttpRequest.post(
       "https://postman-echo.com/post", reqBody);
 
-  return client.newTask(request, String.class);
+  return client.newCall(request, String.class);
 }
 ```
 
@@ -263,7 +263,7 @@ public Task<JSONObject> insert(
     HttpRequest request = HttpRequest.post(
         "https://postman-echo.com/post", reqBody);
         
-    return client.newTask(request, JSONObject.class);
+    return client.newCall(request, JSONObject.class);
 }
 ```
 
@@ -441,7 +441,7 @@ public class PostApi {
     HttpRequest request = HttpRequest.get(
         "https://kylewbanks.com/rest/posts.json");
 
-    return client.newTask(request, Post[].class);
+    return client.newCall(request, Post[].class);
   }
 
   public Task<String> insert(Post p) {
@@ -452,7 +452,7 @@ public class PostApi {
     HttpRequest request = HttpRequest.post(
             "https://postman-echo.com/post", reqBody);
     
-    return client.newTask(request, String.class);
+    return client.newCall(request, String.class);
   }
 }
 ```
@@ -527,7 +527,7 @@ public class PostApi {
     HttpRequest request = HttpRequest.get(
         "https://kylewbanks.com/rest/posts.json");
 
-    return client.newTask(request, Post[].class);
+    return client.newCall(request, Post[].class);
   }
   
   public Task<String> insert(Post p) {
@@ -537,7 +537,7 @@ public class PostApi {
     HttpRequest request = HttpRequest.post(
             "https://postman-echo.com/post", reqBody);
     
-    return client.newTask(request, String.class);
+    return client.newCall(request, String.class);
   }
 }
 ```

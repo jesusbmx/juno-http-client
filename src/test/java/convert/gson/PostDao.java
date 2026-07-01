@@ -29,7 +29,7 @@ public class PostDao {
     HttpRequest request = HttpRequest.get(
             "https://kylewbanks.com/rest/posts.json");
 
-    return client.newTask(request, Post[].class);
+    return client.newCall(request, Post[].class);
   }
   
   public Task<String> insert(Post p) {
@@ -38,7 +38,7 @@ public class PostDao {
     HttpRequest request = HttpRequest.post(
             "https://postman-echo.com/post", reqBody);
     
-    return client.newTask(request, String.class);
+    return client.newCall(request, String.class);
   }
 
   //  BasicHttpStack stack = new BasicHttpStack() {  

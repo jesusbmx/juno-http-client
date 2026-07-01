@@ -180,33 +180,37 @@ public class HttpClient implements HttpTransport, HttpFetcher, HttpCaller {
   }
  
   /**
-   * Crea una invocación de un método que envía una solicitud a un servidor web 
-   * y devuelve una respuesta.
-   * 
+   * Versión diferida de {@link #call}: "axios" - lanza {@link HttpException}
+   * si la respuesta no fue 2xx cuando se resuelva la {@link HttpTask}.
+   *
    * @param <V>
    * @param request petición a realizar
    * @param converter adaptador para parsear la respuesta
-   * 
-   * @return una llamada
+   *
+   * @return una llamada diferida
    */
-  public <V> HttpTask<V> newTask(HttpRequest request, ResponseBodyConverter<V> converter) {
+  public <V> HttpTask<V> newCall(HttpRequest request, ResponseBodyConverter<V> converter) {
     return new HttpTask<V>(getDispatcher(), this, request, unwrap(new HttpResult.Converter<>(converter)));
   }
-  
-  public <V> HttpTask<V> newTask(HttpRequest request, Class<V> cast) {
-    return this.newTask(request, getResponseBodyConverter(cast));
+
+  public <V> HttpTask<V> newCall(HttpRequest request, Class<V> cast) {
+    return this.newCall(request, getResponseBodyConverter(cast));
   }
 
-  public HttpTask<HttpResponse> newTask(HttpRequest request) {
-    return this.newTask(request, getResponseBodyConverter(HttpResponse.class));
+  public HttpTask<HttpResponse> newCall(HttpRequest request) {
+    return this.newCall(request, getResponseBodyConverter(HttpResponse.class));
   }
 
-  public <V> HttpTask<HttpResult<V>> newFetchTask(HttpRequest request, ResponseBodyConverter<V> converter) {
+  /**
+   * Versión diferida de {@link #fetch}: "fetch" - nunca lanza por status HTTP,
+   * expone el resultado en {@link HttpResult} cuando se resuelva la {@link HttpTask}.
+   */
+  public <V> HttpTask<HttpResult<V>> newFetch(HttpRequest request, ResponseBodyConverter<V> converter) {
     return new HttpTask<>(getDispatcher(), this, request, new HttpResult.Converter<>(converter));
   }
 
-  public <V> HttpTask<HttpResult<V>> newFetchTask(HttpRequest request, Class<V> cast) {
-    return newFetchTask(request, getResponseBodyConverter(cast));
+  public <V> HttpTask<HttpResult<V>> newFetch(HttpRequest request, Class<V> cast) {
+    return newFetch(request, getResponseBodyConverter(cast));
   }
   
   public <V> RequestBody createRequestBody(V object) {
@@ -243,7 +247,7 @@ public class HttpClient implements HttpTransport, HttpFetcher, HttpCaller {
   /**
    * Comportamiento "axios": desenvuelve un {@link HttpResult} ya construido,
    * lanzando su {@link HttpException} si la respuesta no fue 2xx. Usado por
-   * {@code newTask(...)} para compartir con {@code newFetchTask(...)} la misma
+   * {@code newCall(...)} para compartir con {@code newFetch(...)} la misma
    * decisión de éxito/error, que vive únicamente en {@link HttpResult.Converter}.
    */
   private <V> ResponseBodyConverter<V> unwrap(final ResponseBodyConverter<HttpResult<V>> resultConverter) {

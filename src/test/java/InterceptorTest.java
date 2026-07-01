@@ -33,7 +33,7 @@ public class InterceptorTest {
       ;
       HttpRequest request = HttpRequest.get(url);
       
-      return client.newTask(request, String.class);
+      return client.newCall(request, String.class);
     }
     
     public static void main(String[] args) throws Exception {
