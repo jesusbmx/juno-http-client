@@ -180,7 +180,7 @@ try ( HttpResponse response = getIpLocation() ) {
 ```java
 HttpClient client = HttpClient.getInstance().setInterceptor((request, transport) -> {
     HttpResponse response = transport.send(request);
-    if (response.isSuccessful()) {
+    if (response.ok) {
         return response;
     }
     throw new Exception("Unknown error code: " + response.code);
@@ -194,7 +194,7 @@ HttpClient client = HttpClient.getInstance().setInterceptor((request, transport)
 We prepare the request
 
 ```java
-public Task<HttpResult<String>> insert(
+public HttpTask<String> insert(
     int id, String name, boolean active) {
     
   // application-www-www-form-urlencoded
@@ -216,7 +216,7 @@ Asynchronously send the request and notify your application with a callback when
 Main UI is not blocked or interferes with it. Just like axios, a non-2xx status throws `HttpException` to `onFailure` instead of resolving `onResponse`.
 
 ```java
-Task<HttpResult<String>> task = insert(22, "John Doe", true);
+HttpTask<String> task = insert(22, "John Doe", true);
     
 task.async((HttpResult<String> result) -> {
   System.out.println(result.data);
@@ -231,11 +231,11 @@ task.async((HttpResult<String> result) -> {
 Synchronously send the request and return your response.
 
 ```java
-Task<HttpResult<String>> task = insert(22, "John Doe", true);
+HttpTask<String> task = insert(22, "John Doe", true);
     
 try {
     HttpResult<String> result = task.sync();
-    System.out.println(result.body);
+    System.out.println(result.data);
     
 } catch(Exception e) {
     e.printStackTrace();
@@ -250,7 +250,7 @@ For other java platforms like java swing if needed.
 
 #### JSON response
 ```java
-public Task<HttpResult<JSONObject>> insert(
+public HttpTask<JSONObject> insert(
     String name, int age, boolean active) {
       
     // application-www-www-form-urlencoded
@@ -436,14 +436,14 @@ public class PostApi {
     client.addConverterFactory(new GsonConverterFactory(gson));
   }
 
-  public Task<HttpResult<Post[]>> getPosts() {
+  public HttpTask<Post[]> getPosts() {
     HttpRequest request = HttpRequest.get(
         "https://kylewbanks.com/rest/posts.json");
 
     return client.newTask(request, Post[].class);
   }
 
-  public Task<HttpResult<String>> insert(Post p) {
+  public HttpTask<String> insert(Post p) {
     RequestBody reqBody = client.createRequestBody(p); // application/json
     // RequestBody reqBody = new FormBody(Maps.getPublicFields(p)); // application-www-www-form-urlencoded
     // RequestBody reqBody = new MultipartBody(Maps.getPublicFields(p)); // multipart/form-data
@@ -462,10 +462,10 @@ Asynchronously send the request and notify your application with a callback when
 ...
 PostApi api = new PostApi();
     
-Task<HttpResult<Post[]>> task = api.getPosts(); 
+HttpTask<Post[]> task = api.getPosts(); 
 
 task.async((HttpResult<Post[]> result) -> {
-  List<Post> list = Arrays.asList(result.body);
+  List<Post> list = Arrays.asList(result.data);
   for (Post post : list) {
     System.out.println(post.title);
   }
@@ -522,14 +522,14 @@ public class PostApi {
     client.addConverterFactory(new JacksonConverterFactory(mapper));
   }
 
-  public Task<HttpResult<Post[]>> getPosts() {
+  public HttpTask<Post[]> getPosts() {
     HttpRequest request = HttpRequest.get(
         "https://kylewbanks.com/rest/posts.json");
 
     return client.newTask(request, Post[].class);
   }
   
-  public Task<HttpResult<String>> insert(Post p) {
+  public HttpTask<String> insert(Post p) {
     // application/json
     RequestBody reqBody = client.createRequestBody(p);
     
@@ -547,10 +547,10 @@ Asynchronously send the request and notify your application with a callback when
 ...
 PostApi api = new PostApi();
     
-Task<HttpResult<Post[]>> task = api.getPosts(); 
+HttpTask<Post[]> task = api.getPosts(); 
 
 task.async((HttpResult<Post[]> result) -> {
-  List<Post> list = Arrays.asList(result.body);
+  List<Post> list = Arrays.asList(result.data);
   for (Post post : list) {
     System.out.println(post.title);
   }

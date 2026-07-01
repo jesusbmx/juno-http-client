@@ -1,16 +1,16 @@
 package convert.gson;
 
 import java.util.Date;
-import juno.concurrent.Task;
 import juno.concurrent.Callback;
 import juno.http.HttpResult;
+import juno.http.HttpTask;
 
 public class GsonTest {
 
   PostDao dao = new PostDao();
 
   public void list() {
-    Task<HttpResult<Post[]>> task = dao.getPosts();
+    HttpTask<Post[]> task = dao.getPosts();
 
     task.async(new Callback<HttpResult<Post[]>>() {
       @Override
@@ -35,7 +35,7 @@ public class GsonTest {
     post.url = "http://127.0.0.1";
     post.body = "My body";
 
-    Task<HttpResult<String>> task = dao.insert(post);
+    HttpTask<String> task = dao.insert(post);
 
     task.async(new Callback<HttpResult<String>>() {
       @Override

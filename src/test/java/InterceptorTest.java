@@ -1,9 +1,9 @@
 
-import juno.concurrent.Task;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpResponse;
 import juno.http.HttpResult;
+import juno.http.HttpTask;
 import juno.http.HttpUrl;
 import juno.http.OnInterceptor;
 import juno.http.HttpTransport;
@@ -16,7 +16,7 @@ public class InterceptorTest {
                 @Override
                 public HttpResponse intercept(HttpRequest request, HttpTransport stack) throws Exception {
                     HttpResponse response = stack.send(request);
-                    if (response.code >= 200 && response.code <= 299) {
+                    if (response.ok) {
                         return response;
                     }
                     throw new Exception("Unknown error code: " + response.code);
@@ -25,7 +25,7 @@ public class InterceptorTest {
             .setDebug(true)
     ;
 
-    Task<HttpResult<String>> getIpLocation() {
+    HttpTask<String> getIpLocation() {
       HttpUrl url = new HttpUrl("http://ip-api.com/")
         .addPath("json")
         .addPath("24.48.0.1")

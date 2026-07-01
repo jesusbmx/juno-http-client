@@ -1,9 +1,9 @@
 
-import juno.concurrent.Task;
 import juno.http.FormBody;
 import juno.http.HttpClient;
 import juno.http.HttpRequest;
 import juno.http.HttpResult;
+import juno.http.HttpTask;
 import juno.http.RequestBody;
 import org.json.JSONObject;
 
@@ -11,7 +11,7 @@ public class JsonTest {
 
     HttpClient client = HttpClient.getInstance();
 
-    public Task<HttpResult<JSONObject>> insert(
+    public HttpTask<JSONObject> insert(
             String name, int age, boolean active) {
 
         // application-www-www-form-urlencoded
@@ -27,7 +27,7 @@ public class JsonTest {
     }
 
     public void async() {
-        Task<HttpResult<JSONObject>> insert = insert(
+        HttpTask<JSONObject> insert = insert(
             "John Doe", 22, true);
 
         try {

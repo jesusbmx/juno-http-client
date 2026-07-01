@@ -33,7 +33,7 @@ public class HttpResult<T> {
 
         @Override
         public HttpResult<T> convert(HttpResponse response) throws Exception {
-            if (!response.isSuccessful()) {
+            if (!response.ok) {
                 throw HttpException.from(response);
             }
 

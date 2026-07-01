@@ -166,9 +166,9 @@ public class HttpClient implements HttpTransport, HttpExecutor {
   }
 
   /**
-   * Versión diferida de {@link #execute}: comparte el mismo {@link HttpResult.Converter},
-   * así que también lanza {@link HttpException} (hacia {@code onFailure}) si la
-   * respuesta no fue 2xx.
+   * Versión diferida de {@link #execute}: {@link HttpTask#call()} usa el mismo
+   * {@link HttpResult.Converter}, así que también lanza {@link HttpException}
+   * (hacia {@code onFailure}) si la respuesta no fue 2xx.
    *
    * @param <V>
    * @param request petición a realizar
@@ -176,15 +176,15 @@ public class HttpClient implements HttpTransport, HttpExecutor {
    *
    * @return una llamada diferida
    */
-  public <V> HttpTask<HttpResult<V>> newTask(HttpRequest request, ResponseBodyConverter<V> converter) {
-    return new HttpTask<>(getDispatcher(), this, request, new HttpResult.Converter<>(converter));
+  public <V> HttpTask<V> newTask(HttpRequest request, ResponseBodyConverter<V> converter) {
+    return new HttpTask<>(getDispatcher(), this, request, converter);
   }
 
-  public <V> HttpTask<HttpResult<V>> newTask(HttpRequest request, Class<V> cast) {
+  public <V> HttpTask<V> newTask(HttpRequest request, Class<V> cast) {
     return newTask(request, getResponseBodyConverter(cast));
   }
 
-  public HttpTask<HttpResult<HttpResponse>> newTask(HttpRequest request) {
+  public HttpTask<HttpResponse> newTask(HttpRequest request) {
     return newTask(request, getResponseBodyConverter(HttpResponse.class));
   }
 

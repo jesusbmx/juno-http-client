@@ -4,24 +4,28 @@ import juno.concurrent.AbstractTask;
 import juno.concurrent.TaskDispatcher;
 import juno.http.convert.ResponseBodyConverter;
 
-public class HttpTask<T> extends AbstractTask<T> {
+/**
+ * Llamada diferida: {@code HttpTask<V>} siempre resuelve un {@link HttpResult}{@code <V>}
+ * (nunca el {@code V} crudo), igual que {@link HttpClient#execute} en su versión síncrona.
+ */
+public class HttpTask<V> extends AbstractTask<HttpResult<V>> {
     public final HttpTransport stack;
     public final HttpRequest request;
-    public final ResponseBodyConverter<T> converter;
+    public final ResponseBodyConverter<V> converter;
     protected OnInterceptor interceptor;
 
     /**
      * Inyección de Dependencias: Dispatcher, HttpClient, ResponseBodyConvert
      */
     public HttpTask(
-        TaskDispatcher dispatcher, HttpTransport stack, HttpRequest request, ResponseBodyConverter<T> converter
+        TaskDispatcher dispatcher, HttpTransport stack, HttpRequest request, ResponseBodyConverter<V> converter
     ) {
         super(dispatcher);
         this.stack = stack;
         this.request = request;
         this.converter = converter;
     }
-    
+
     private HttpResponse execute(HttpRequest request) throws Exception {
         if (interceptor == null) {
             return stack.send(request);
@@ -30,10 +34,10 @@ public class HttpTask<T> extends AbstractTask<T> {
     }
 
     @Override
-    public T call() throws Exception {
+    public HttpResult<V> call() throws Exception {
         HttpResponse response = execute(request);
         try {
-          return converter.convert(response);
+          return new HttpResult.Converter<>(converter).convert(response);
 
         } finally {
           response.close();
@@ -43,8 +47,8 @@ public class HttpTask<T> extends AbstractTask<T> {
     public OnInterceptor getInterceptor() {
         return interceptor;
     }
-    
-    public HttpTask<T> setInterceptor(OnInterceptor interceptor) {
+
+    public HttpTask<V> setInterceptor(OnInterceptor interceptor) {
         this.interceptor = interceptor;
         return this;
     }

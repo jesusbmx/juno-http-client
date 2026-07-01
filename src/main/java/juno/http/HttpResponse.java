@@ -16,11 +16,13 @@ public class HttpResponse implements Closeable {
 
     protected boolean closed;
     public final int code;
+    public final boolean ok;
     public final Headers headers;
     public final InputStream content;
 
     public HttpResponse(int code, Headers headers, InputStream content) {
         this.code = code;
+        this.ok = code >= 200 && code < 300;
         this.headers = headers;
         this.content = content;
     }
@@ -74,10 +76,6 @@ public class HttpResponse implements Closeable {
         }
     }
     
-    public boolean isSuccessful() {
-        return code >= 200 && code < 300;
-    }
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
