@@ -44,7 +44,7 @@ public class GenericConverterFactory implements ConverterFactory {
         if (type == File.class)
             return (ResponseBodyConverter<V>) new FileResponseBodyConverter();
         if (type == HttpResponse.class)
-            return (ResponseBodyConverter<V>) SimpleResponseBodyConverter.INSTANCE;
+            return (ResponseBodyConverter<V>) HttpResponseBodyConverter.INSTANCE;
         if (type == String.class)
             return (ResponseBodyConverter<V>) StringResponseBodyConverter.INSTANCE;
         

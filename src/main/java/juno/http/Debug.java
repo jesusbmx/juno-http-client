@@ -1,6 +1,5 @@
 package juno.http;
 
-import java.lang.management.ManagementFactory;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,12 +13,10 @@ public final class Debug {
         "application/json",
         "application/xml",
         "application/x-www-form-urlencoded",
-        "multipart/form-data",
+        //"multipart/form-data",
         "text/plain",
         "text/html"
     ));
-
-    private static final String PID = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
 
     private static boolean isDebug;
 
@@ -47,7 +44,7 @@ public final class Debug {
 
     /**
      * Registra una línea por petición, una vez que ya se tiene la respuesta:
-     * {@code [timestamp] INFO (pid): METHOD url status elapsed ms - size}
+     * {@code [timestamp] INFO: METHOD url status elapsed ms - size}
      * y, si hubo body de request legible, una segunda línea con {@code reqBody}.
      */
     public static void log(HttpRequest request, HttpResponse response, String reqBody, long elapsedMs) {
@@ -58,7 +55,7 @@ public final class Debug {
         final long size = response.getContentLength();
         final StringBuilder line = new StringBuilder()
                 .append('[').append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date())).append(']')
-                .append(" INFO (").append(PID).append("): ")
+                .append(" INFO: ")
                 .append(request.getMethod()).append(' ')
                 .append(request.urlAndParams())
                 .append(' ').append(response.code)

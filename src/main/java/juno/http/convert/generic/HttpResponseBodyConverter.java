@@ -4,9 +4,9 @@ import juno.http.HttpResponse;
 import juno.http.convert.ResponseBodyConverter;
 import juno.io.IOUtils;
 
-public class SimpleResponseBodyConverter implements ResponseBodyConverter<HttpResponse> {
+public class HttpResponseBodyConverter implements ResponseBodyConverter<HttpResponse> {
     
-    public static final SimpleResponseBodyConverter INSTANCE = new SimpleResponseBodyConverter();
+    public static final HttpResponseBodyConverter INSTANCE = new HttpResponseBodyConverter();
 
     @Override
     public HttpResponse convert(HttpResponse response) throws Exception {
