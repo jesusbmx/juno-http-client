@@ -21,7 +21,7 @@ public class WebSocketTest {
     // Hilo NO daemon -> mantiene la JVM viva mientras haya tareas pendientes
     // (el reintento agendado). Si usáramos un hilo daemon acá, el proceso
     // podría morir en medio de la espera del backoff.
-    private static final ScheduledExecutorService scheduler =
+    private final ScheduledExecutorService scheduler =
             Executors.newSingleThreadScheduledExecutor();
     
     private static final long RECONNECT_DELAY_MS = 8_000;
