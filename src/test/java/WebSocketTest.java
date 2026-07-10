@@ -50,10 +50,11 @@ public class WebSocketTest {
             }
         });
 
-        ws.connect();
-
-        // el hilo lector de WebSocket corre como daemon: esperamos aquí a que
-        // se dispare onClosed/onFailure para que el proceso no termine antes.
-        done.await();
+        final boolean isConnected = ws.connectBlocking();
+        if (isConnected) {
+            // el hilo lector de WebSocket corre como daemon: esperamos aquí a que
+            // se dispare onClosed/onFailure para que el proceso no termine antes.
+            done.await();
+        }
     }
 }
