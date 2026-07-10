@@ -35,6 +35,10 @@ import juno.util.Base64;
  * RFC), negociación de subprotocolo, {@code SSLSocketFactory} personalizado
  * (mTLS, trust store propio) y proxy HTTP vía {@code CONNECT}.
  *
+ * <p>{@link #connect()} es asíncrono (no bloquea, seguro de llamar desde el hilo
+ * principal de Android); usa {@link #connectBlocking()} si necesitas esperar el
+ * resultado sincrónicamente en tu propio hilo de fondo.
+ *
  * <pre>{@code
  * WebSocket ws = new WebSocket("wss://example.com/chat?token=" + token,
  *     new WebSocketAdapter() {
@@ -44,8 +48,9 @@ import juno.util.Base64;
  *       @Override public void onMessage(WebSocket ws, String text) {
  *         System.out.println("message: " + text);
  *       }
- *       @Override public void onFailure(WebSocket ws, Exception e) {
- *         // reconectar aquí, igual que el onclose del hook de React Native
+ *       @Override public void onClosed(WebSocket ws, int code, String reason) {
+ *         // reconectar aquí, igual que el onclose del hook de React Native —
+ *         // se dispara siempre, sea cierre limpio o caída de red (code == ABNORMAL_CLOSURE)
  *       }
  *     });
  * ws.connect();
@@ -218,30 +223,67 @@ public class WebSocket {
     // ------------------------------------------------------------------
 
     /**
-     * Abre el socket TCP (a través del proxy si hay uno configurado; TLS si es
-     * wss://, con verificación de hostname), realiza el handshake HTTP de
-     * actualización a WebSocket —siguiendo redirecciones 3xx hasta
-     * {@link #setMaxRedirects}— y, si tiene éxito, arranca el hilo lector (y el de
-     * keepalive, si está activado) en segundo plano. Llama a
-     * {@link WebSocketListener#onOpen} antes de retornar.
+     * Conecta en segundo plano — no bloquea el hilo que la llama (imprescindible
+     * en Android, donde abrir sockets en el hilo principal está prohibido). El
+     * resultado llega por los callbacks de {@link WebSocketListener}:
+     * {@code onOpen} si el handshake tuvo éxito, o {@code onFailure} seguido de
+     * {@code onClosed(ABNORMAL_CLOSURE, ...)} si falló.
      *
-     * @throws IOException si falla la conexión o el servidor no acepta el handshake.
+     * @see #connectBlocking() si necesitas esperar el resultado sincrónicamente.
      */
-    public synchronized void connect() throws IOException {
+    public synchronized void connect() {
+        if (socket != null) throw new IllegalStateException("connect() already called");
+
+        Thread connectThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                connectBlocking();
+            }
+        }, "WebSocket-Connect");
+        connectThread.setDaemon(true);
+        connectThread.start();
+    }
+
+    /**
+     * Igual que {@link #connect()} pero bloqueante: espera a que el handshake
+     * termine (o falle) antes de retornar, en el mismo hilo que la llama. No
+     * lanza excepciones — el motivo de una falla, si la hay, llega por
+     * {@code onFailure}/{@code onClosed} igual que con {@link #connect()}.
+     *
+     * @return {@code true} si el handshake tuvo éxito ({@code onOpen} ya se disparó),
+     *         {@code false} si falló.
+     */
+    public synchronized boolean connectBlocking() {
         if (socket != null) throw new IllegalStateException("connect() already called");
 
         URI target = uri;
         for (int attempt = 0; ; attempt++) {
             try {
                 doConnect(target);
-                return;
+                return true;
             } catch (WebSocketRedirectException e) {
                 if (attempt >= maxRedirects) {
-                    throw new IOException("Too many redirects (" + maxRedirects + ")");
+                    reportConnectFailure(new IOException("Too many redirects (" + maxRedirects + ")"));
+                    return false;
                 }
-                target = resolveRedirect(target, e.location);
+                try {
+                    target = resolveRedirect(target, e.location);
+                } catch (IOException redirectError) {
+                    reportConnectFailure(redirectError);
+                    return false;
+                }
+            } catch (IOException e) {
+                reportConnectFailure(e);
+                return false;
             }
         }
+    }
+
+    /** Reporta por los callbacks una falla del handshake inicial (nunca llegó a abrir). */
+    private void reportConnectFailure(Exception e) {
+        closeSocketQuietly();
+        listener.onFailure(this, e);
+        listener.onClosed(this, ABNORMAL_CLOSURE, e.getMessage());
     }
 
     private void doConnect(URI target) throws IOException {
@@ -545,7 +587,7 @@ public class WebSocket {
             }
             return true;
         } catch (IOException e) {
-            listener.onFailure(this, e);
+            failConnection(e);
             return false;
         }
     }
@@ -556,7 +598,7 @@ public class WebSocket {
             writeFrame(opcode, payload, true);
             return true;
         } catch (IOException e) {
-            listener.onFailure(this, e);
+            failConnection(e);
             return false;
         }
     }
@@ -631,16 +673,29 @@ public class WebSocket {
         } catch (InterruptedException expected) {
             // cancel()/close() interrumpe este hilo intencionalmente al cerrar
         } catch (IOException e) {
-            if (open) {
-                open = false;
-                closeSocketQuietly();
-                listener.onFailure(this, e);
-            }
+            failConnection(e);
         }
     }
 
     private void interruptPingThread() {
         if (pingThread != null) pingThread.interrupt();
+    }
+
+    /**
+     * Termina la conexión por una causa anómala (red caída, timeout de ping,
+     * frame inválido, escritura fallida, etc.): cierra el socket y dispara
+     * {@code onFailure} seguido de {@code onClosed(ABNORMAL_CLOSURE, ...)} —
+     * igual que el navegador/React Native, que siempre disparan {@code onclose}
+     * al morir la conexión, sea limpia o no. {@code onClosed} es la señal
+     * universal de "la conexión terminó"; úsala para reconectar.
+     */
+    private void failConnection(Exception e) {
+        if (!open) return;
+        open = false;
+        interruptPingThread();
+        closeSocketQuietly();
+        listener.onFailure(this, e);
+        listener.onClosed(this, ABNORMAL_CLOSURE, e.getMessage());
     }
 
     // ------------------------------------------------------------------
@@ -669,7 +724,7 @@ public class WebSocket {
             writeFrame(OP_CLOSE, buildClosePayload(code, reason), true);
             return true;
         } catch (IOException e) {
-            listener.onFailure(this, e);
+            failConnection(e);
             return false;
         }
     }
@@ -743,12 +798,7 @@ public class WebSocket {
                 }
             }
         } catch (IOException e) {
-            if (open) {
-                open = false;
-                interruptPingThread();
-                closeSocketQuietly();
-                listener.onFailure(this, e);
-            }
+            failConnection(e);
         }
     }
 

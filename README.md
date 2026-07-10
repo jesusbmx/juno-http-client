@@ -7,7 +7,7 @@ To include Juno in your project using Gradle, add the following dependency:
 ```
 dependencies {
   implementation 'com.github.jesusbmx:juno:1.0.5'
-  implementation 'com.github.jesusbmx:juno-http-client:1.5.3'
+  implementation 'com.github.jesusbmx:juno-http-client:1.5.4'
 }
 ```
 
@@ -15,7 +15,7 @@ Alternatively, you can download the JAR file directly from [JitPack](https://jit
 
 Download [juno.jar](https://jitpack.io/com/github/jesusbmx/juno/1.0.5/juno-1.0.5.jar)
 
-Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.5.3/juno-http-client-1.5.3.jar)
+Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.5.4/juno-http-client-1.5.4.jar)
 
 
 ## [Samples](src/test/java/Samples.java)
@@ -589,21 +589,39 @@ WebSocket ws = new WebSocket("wss://ws.postman-echo.com/raw", new WebSocketAdapt
 
     @Override
     public void onClosed(WebSocket ws, int code, String reason) {
+        // Always fires when the socket dies — clean (NORMAL_CLOSURE) or not
+        // (ABNORMAL_CLOSURE), same as the browser/React Native `onclose`.
+        // This is where you reconnect.
         System.out.println("[closed] " + code + " " + reason);
     }
 
     @Override
     public void onFailure(WebSocket ws, Exception e) {
+        // Optional diagnostics only — always followed by onClosed(ABNORMAL_CLOSURE, ...).
         e.printStackTrace();
     }
 });
-ws.connect();
+ws.connect(); // async — safe to call from Android's main thread, result comes via the listener
+```
+
+`connect()` does not block and does not throw — it always reports the outcome
+through `onOpen` or `onFailure`/`onClosed`. If you need to wait for the result
+synchronously from your own background thread, use `connectBlocking()` instead
+(same idea as `WebSocketClient#connectBlocking()` in Java-WebSocket):
+
+```java
+boolean connected = ws.connectBlocking();
+if (connected) {
+    ws.send("hola");
+} else {
+    // el motivo ya se reportó por onFailure/onClosed
+}
 ```
 
 `send`/`close`/`cancel` can be called from any thread once connected;
-callbacks always run on the socket's internal reader thread. Reconnection
+callbacks always run on the socket's internal reader/connect thread. Reconnection
 (like the classic `onclose` + `setTimeout` pattern) is left to the caller —
-just call `connect()` again on a new `WebSocket` instance from `onFailure`/`onClosed`.
+just call `connect()` again on a new `WebSocket` instance from `onClosed`.
 
 License
 =======

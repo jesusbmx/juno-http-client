@@ -21,15 +21,25 @@ public interface WebSocketListener {
     /** Llega un mensaje binario (frame o secuencia de frames fragmentados ya reensamblados). */
     void onMessage(WebSocket ws, byte[] bytes);
 
-    /** Se recibió un frame de cierre del servidor; el socket se cerrará justo después. */
+    /** Se recibió un frame de cierre del servidor; el socket se cerrará justo después. Solo aplica al cierre limpio. */
     void onClosing(WebSocket ws, int code, String reason);
 
-    /** El cierre (propio o del servidor) terminó y el socket ya está cerrado. No hay más callbacks tras este. */
+    /**
+     * El socket ya está cerrado — señal universal de "la conexión terminó",
+     * igual que {@code onclose} en el navegador/React Native. Se dispara
+     * SIEMPRE al final de la vida del socket, sea un cierre limpio (código
+     * {@link WebSocket#NORMAL_CLOSURE}, tras {@link #onClosing}) o anómalo
+     * (código {@link WebSocket#ABNORMAL_CLOSURE}, precedido por {@link #onFailure}).
+     * Este es el lugar correcto para implementar reconexión — no {@code onFailure}.
+     */
     void onClosed(WebSocket ws, int code, String reason);
 
     /**
-     * La conexión terminó de forma anómala (error de handshake, IOException durante
-     * la lectura/escritura, cierre inesperado del socket). No hay más callbacks tras este.
+     * Diagnóstico opcional: la conexión se cayó por una causa anómala (error de
+     * handshake, IOException durante lectura/escritura, timeout de ping, frame
+     * inválido). Siempre va seguido de {@link #onClosed} con
+     * {@link WebSocket#ABNORMAL_CLOSURE} — no lo uses para decidir si reconectar,
+     * úsalo solo para loguear/diagnosticar el motivo.
      */
     void onFailure(WebSocket ws, Exception e);
 }
