@@ -8,10 +8,15 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import juno.http.Headers;
@@ -22,6 +27,13 @@ import juno.util.Base64;
  * {@link SSLSocket}, sin dependencias externas — mismo criterio que
  * {@link juno.http.URLConnectionTransport} para HTTP. Expone el mismo modelo de
  * eventos que el WebSocket nativo del navegador/React Native.
+ *
+ * <p>Solo lado cliente, pero cubre lo que un cliente real necesita: verificación
+ * de hostname TLS, keepalive con detección de conexión perdida, fragmentación de
+ * mensajes grandes al enviar, validación estricta de UTF-8 en frames de texto
+ * (falla la conexión con 1007 si el servidor manda UTF-8 inválido, como exige el
+ * RFC), negociación de subprotocolo, {@code SSLSocketFactory} personalizado
+ * (mTLS, trust store propio) y proxy HTTP vía {@code CONNECT}.
  *
  * <pre>{@code
  * WebSocket ws = new WebSocket("wss://example.com/chat?token=" + token,
@@ -53,8 +65,12 @@ public class WebSocket {
     /** Cierre anómalo: el socket se cortó sin un frame de cierre previo. */
     public static final int ABNORMAL_CLOSURE = 1006;
 
+    /** El payload de un frame de texto no era UTF-8 válido (RFC 6455 §8.1). */
+    public static final int INVALID_PAYLOAD_DATA = 1007;
+
     private static final String GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
     private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final byte[] EMPTY_PAYLOAD = new byte[0];
 
     private static final int OP_CONTINUATION = 0x0;
     private static final int OP_TEXT = 0x1;
@@ -66,19 +82,32 @@ public class WebSocket {
     /** Límite defensivo contra frames con una longitud declarada absurda (servidor malicioso/bugueado). */
     private static final long MAX_PAYLOAD_LENGTH = 16L * 1024 * 1024;
 
-    private final URI uri;
+    private URI uri;
     private final Headers requestHeaders;
     private final WebSocketListener listener;
     private final SecureRandom random = new SecureRandom();
     private final Object writeLock = new Object();
 
     private int connectTimeoutMs = 10000;
+    private int maxRedirects = 5;
+    private String[] subprotocols;
+    private String acceptedProtocol;
+    private SSLSocketFactory sslSocketFactory;
+    private String proxyHost;
+    private int proxyPort;
+    private String proxyUsername;
+    private String proxyPassword;
+    private long pingIntervalMs;
+    private long pingTimeoutMs = 10000;
+    private int maxOutgoingFrameSize;
 
     private Socket socket;
     private OutputStream out;
     private InputStream in;
+    private Thread pingThread;
 
     private volatile boolean open;
+    private volatile boolean pongPending;
     private boolean closeSent;
 
     // Estado de reensamblado de mensajes fragmentados (solo tocado por el hilo lector).
@@ -122,6 +151,64 @@ public class WebSocket {
         return this;
     }
 
+    /** Máximo de redirecciones 3xx a seguir durante el handshake antes de fallar. Default: 5. */
+    public WebSocket setMaxRedirects(int maxRedirects) {
+        this.maxRedirects = maxRedirects;
+        return this;
+    }
+
+    /** Lista de subprotocolos a ofrecer (header {@code Sec-WebSocket-Protocol}), en orden de preferencia. */
+    public WebSocket setSubprotocols(String... subprotocols) {
+        this.subprotocols = subprotocols;
+        return this;
+    }
+
+    /** Subprotocolo aceptado por el servidor tras {@link #connect()}, o {@code null} si no se negoció ninguno. */
+    public String getAcceptedProtocol() {
+        return acceptedProtocol;
+    }
+
+    /** Factory TLS personalizado (mTLS, trust store propio, pinning, etc.). Por default usa {@link SSLSocketFactory#getDefault()}. */
+    public WebSocket setSSLSocketFactory(SSLSocketFactory sslSocketFactory) {
+        this.sslSocketFactory = sslSocketFactory;
+        return this;
+    }
+
+    /** Conecta a través de un proxy HTTP (túnel {@code CONNECT}), sin autenticación. */
+    public WebSocket setProxy(String host, int port) {
+        return setProxy(host, port, null, null);
+    }
+
+    /** Conecta a través de un proxy HTTP (túnel {@code CONNECT}) con autenticación Basic. */
+    public WebSocket setProxy(String host, int port, String username, String password) {
+        this.proxyHost = host;
+        this.proxyPort = port;
+        this.proxyUsername = username;
+        this.proxyPassword = password;
+        return this;
+    }
+
+    /**
+     * Activa el keepalive: cada {@code intervalMs} manda un ping; si no llega el pong
+     * correspondiente dentro de {@code timeoutMs}, se trata como conexión perdida y
+     * dispara {@link WebSocketListener#onFailure}. Desactivado por default (intervalMs &lt;= 0).
+     */
+    public WebSocket setPingInterval(long intervalMs, long timeoutMs) {
+        this.pingIntervalMs = intervalMs;
+        this.pingTimeoutMs = timeoutMs;
+        return this;
+    }
+
+    /**
+     * Si un mensaje saliente supera este tamaño, se fragmenta en varios frames de
+     * como máximo {@code maxOutgoingFrameSize} bytes. {@code 0} (default) desactiva
+     * la fragmentación: cada mensaje se manda en un único frame.
+     */
+    public WebSocket setMaxOutgoingFrameSize(int maxOutgoingFrameSize) {
+        this.maxOutgoingFrameSize = maxOutgoingFrameSize;
+        return this;
+    }
+
     public boolean isOpen() {
         return open;
     }
@@ -131,50 +218,158 @@ public class WebSocket {
     // ------------------------------------------------------------------
 
     /**
-     * Abre el socket TCP (TLS si es wss://), realiza el handshake HTTP de
-     * actualización a WebSocket y, si tiene éxito, arranca el hilo lector en
-     * segundo plano. Llama a {@link WebSocketListener#onOpen} antes de retornar.
+     * Abre el socket TCP (a través del proxy si hay uno configurado; TLS si es
+     * wss://, con verificación de hostname), realiza el handshake HTTP de
+     * actualización a WebSocket —siguiendo redirecciones 3xx hasta
+     * {@link #setMaxRedirects}— y, si tiene éxito, arranca el hilo lector (y el de
+     * keepalive, si está activado) en segundo plano. Llama a
+     * {@link WebSocketListener#onOpen} antes de retornar.
      *
      * @throws IOException si falla la conexión o el servidor no acepta el handshake.
      */
     public synchronized void connect() throws IOException {
         if (socket != null) throw new IllegalStateException("connect() already called");
 
-        final boolean secure = "wss".equalsIgnoreCase(uri.getScheme());
-        final String host = uri.getHost();
-        final int port = uri.getPort() != -1 ? uri.getPort() : (secure ? 443 : 80);
+        URI target = uri;
+        for (int attempt = 0; ; attempt++) {
+            try {
+                doConnect(target);
+                return;
+            } catch (WebSocketRedirectException e) {
+                if (attempt >= maxRedirects) {
+                    throw new IOException("Too many redirects (" + maxRedirects + ")");
+                }
+                target = resolveRedirect(target, e.location);
+            }
+        }
+    }
 
-        socket = secure ? SSLSocketFactory.getDefault().createSocket() : new Socket();
+    private void doConnect(URI target) throws IOException {
+        this.uri = target;
+
+        final boolean secure = "wss".equalsIgnoreCase(target.getScheme());
+        final String host = target.getHost();
+        final int port = target.getPort() != -1 ? target.getPort() : (secure ? 443 : 80);
+
+        final Socket rawSocket = new Socket();
+        Socket connectedSocket = rawSocket;
         try {
-            socket.connect(new InetSocketAddress(host, port), connectTimeoutMs);
-            socket.setTcpNoDelay(true);
-            if (secure) {
-                ((SSLSocket) socket).startHandshake();
+            final InetSocketAddress connectAddress = proxyHost != null
+                    ? new InetSocketAddress(proxyHost, proxyPort)
+                    : new InetSocketAddress(host, port);
+            rawSocket.connect(connectAddress, connectTimeoutMs);
+            rawSocket.setTcpNoDelay(true);
+
+            if (proxyHost != null) {
+                tunnelThroughProxy(rawSocket, host, port);
             }
 
+            if (secure) {
+                final SSLSocketFactory factory = sslSocketFactory != null
+                        ? sslSocketFactory
+                        : (SSLSocketFactory) SSLSocketFactory.getDefault();
+                final SSLSocket sslSocket = (SSLSocket) factory.createSocket(rawSocket, host, port, true);
+                connectedSocket = sslSocket;
+
+                // Un SSLSocket "crudo" NO valida por sí solo que el certificado
+                // corresponda al host al que nos conectamos — hay que pedirlo explícitamente.
+                SSLParameters params = sslSocket.getSSLParameters();
+                if (params == null) params = new SSLParameters();
+                params.setEndpointIdentificationAlgorithm("HTTPS");
+                sslSocket.setSSLParameters(params);
+
+                sslSocket.startHandshake();
+            }
+
+            socket = connectedSocket;
             out = socket.getOutputStream();
             in = socket.getInputStream();
 
             final String key = generateWebSocketKey();
             writeHandshakeRequest(host, port, key);
             final Headers responseHeaders = readHandshakeResponse(key);
+            acceptedProtocol = responseHeaders.getValue("Sec-WebSocket-Protocol");
 
             open = true;
-            Thread reader = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    readLoop();
-                }
-            }, "WebSocket-Reader");
-            reader.setDaemon(true);
-            reader.start();
+            startReaderThread();
+            startPingThreadIfNeeded();
 
             listener.onOpen(this, responseHeaders);
 
         } catch (IOException e) {
-            closeSocketQuietly();
+            try {
+                connectedSocket.close();
+            } catch (IOException ignored) {
+            }
+            socket = null;
+            out = null;
+            in = null;
             throw e;
         }
+    }
+
+    private void tunnelThroughProxy(Socket rawSocket, String host, int port) throws IOException {
+        final OutputStream proxyOut = rawSocket.getOutputStream();
+        final InputStream proxyIn = rawSocket.getInputStream();
+
+        final StringBuilder sb = new StringBuilder();
+        sb.append("CONNECT ").append(host).append(':').append(port).append(" HTTP/1.1\r\n");
+        sb.append("Host: ").append(host).append(':').append(port).append("\r\n");
+        if (proxyUsername != null) {
+            final String credentials = proxyUsername + ":" + (proxyPassword != null ? proxyPassword : "");
+            sb.append("Proxy-Authorization: Basic ")
+                    .append(Base64.getEncoder().encodeToString(credentials.getBytes(UTF8)))
+                    .append("\r\n");
+        }
+        sb.append("\r\n");
+
+        proxyOut.write(sb.toString().getBytes(UTF8));
+        proxyOut.flush();
+
+        final String statusLine = readLine(proxyIn);
+        if (statusLine == null) {
+            throw new IOException("Proxy closed the connection during CONNECT");
+        }
+
+        final String[] parts = statusLine.split(" ", 3);
+        final int code;
+        try {
+            code = parts.length > 1 ? Integer.parseInt(parts[1]) : -1;
+        } catch (NumberFormatException e) {
+            throw new IOException("Malformed proxy CONNECT response: " + statusLine);
+        }
+
+        String line;
+        while ((line = readLine(proxyIn)) != null && !line.isEmpty()) {
+            // drena los headers de la respuesta del proxy, no nos interesan
+        }
+
+        if (code != 200) {
+            throw new IOException("Proxy CONNECT to " + host + ":" + port + " failed: " + statusLine);
+        }
+    }
+
+    private void startReaderThread() {
+        Thread reader = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                readLoop();
+            }
+        }, "WebSocket-Reader");
+        reader.setDaemon(true);
+        reader.start();
+    }
+
+    private void startPingThreadIfNeeded() {
+        if (pingIntervalMs <= 0) return;
+        pingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                pingLoop();
+            }
+        }, "WebSocket-Ping");
+        pingThread.setDaemon(true);
+        pingThread.start();
     }
 
     private String generateWebSocketKey() {
@@ -210,6 +405,14 @@ public class WebSocket {
         sb.append("Connection: Upgrade\r\n");
         sb.append("Sec-WebSocket-Key: ").append(key).append("\r\n");
         sb.append("Sec-WebSocket-Version: 13\r\n");
+        if (subprotocols != null && subprotocols.length > 0) {
+            sb.append("Sec-WebSocket-Protocol: ");
+            for (int i = 0; i < subprotocols.length; i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(subprotocols[i]);
+            }
+            sb.append("\r\n");
+        }
         for (int i = 0; i < requestHeaders.size(); i++) {
             sb.append(requestHeaders.getName(i)).append(": ").append(requestHeaders.getValue(i)).append("\r\n");
         }
@@ -220,7 +423,7 @@ public class WebSocket {
     }
 
     private Headers readHandshakeResponse(String key) throws IOException {
-        final String statusLine = readLine();
+        final String statusLine = readLine(in);
         if (statusLine == null) {
             throw new IOException("Server closed the connection during handshake");
         }
@@ -232,14 +435,23 @@ public class WebSocket {
         } catch (NumberFormatException e) {
             throw new IOException("Malformed handshake status line: " + statusLine);
         }
-        if (statusCode != 101) {
-            throw new IOException("Unexpected handshake response: " + statusLine);
-        }
 
         final Headers headers = new Headers();
         String line;
-        while ((line = readLine()) != null && !line.isEmpty()) {
+        while ((line = readLine(in)) != null && !line.isEmpty()) {
             headers.add(line);
+        }
+
+        if (statusCode >= 300 && statusCode < 400) {
+            final String location = headers.getValue("Location");
+            if (location == null) {
+                throw new IOException("Redirect response without Location header: " + statusLine);
+            }
+            throw new WebSocketRedirectException(location);
+        }
+
+        if (statusCode != 101) {
+            throw new IOException("Unexpected handshake response: " + statusLine);
         }
 
         final String accept = headers.getValue("Sec-WebSocket-Accept");
@@ -250,17 +462,59 @@ public class WebSocket {
         return headers;
     }
 
-    /** Lee una línea CRLF cruda del handshake. Se detiene justo en el límite de los headers, sin tocar el framing binario posterior. */
-    private String readLine() throws IOException {
+    /** Lee una línea CRLF cruda (handshake o túnel de proxy) sin tocar el framing binario posterior. */
+    private static String readLine(InputStream stream) throws IOException {
         final StringBuilder sb = new StringBuilder();
         int c;
         boolean any = false;
-        while ((c = in.read()) != -1) {
+        while ((c = stream.read()) != -1) {
             any = true;
             if (c == '\n') break;
             if (c != '\r') sb.append((char) c);
         }
         return any ? sb.toString() : null;
+    }
+
+    private static final class WebSocketRedirectException extends IOException {
+        final String location;
+
+        WebSocketRedirectException(String location) {
+            super("Redirect to " + location);
+            this.location = location;
+        }
+    }
+
+    private static URI resolveRedirect(URI base, String location) throws IOException {
+        final URI resolved;
+        try {
+            resolved = base.resolve(location);
+        } catch (IllegalArgumentException e) {
+            throw new IOException("Invalid redirect Location: " + location, e);
+        }
+
+        final String scheme = resolved.getScheme();
+        if (scheme == null) {
+            throw new IOException("Redirect Location missing scheme: " + location);
+        }
+        if ("http".equalsIgnoreCase(scheme)) {
+            return withScheme(resolved, "ws");
+        }
+        if ("https".equalsIgnoreCase(scheme)) {
+            return withScheme(resolved, "wss");
+        }
+        if (!"ws".equalsIgnoreCase(scheme) && !"wss".equalsIgnoreCase(scheme)) {
+            throw new IOException("Unsupported redirect scheme: " + scheme);
+        }
+        return resolved;
+    }
+
+    private static URI withScheme(URI uri, String scheme) throws IOException {
+        try {
+            return new URI(scheme, uri.getUserInfo(), uri.getHost(), uri.getPort(),
+                    uri.getPath(), uri.getQuery(), uri.getFragment());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
     }
 
     // ------------------------------------------------------------------
@@ -269,22 +523,26 @@ public class WebSocket {
 
     public boolean send(String text) {
         if (text == null) throw new NullPointerException("text == null");
-        return sendFrame(OP_TEXT, text.getBytes(UTF8));
+        return sendMessage(OP_TEXT, text.getBytes(UTF8));
     }
 
     public boolean send(byte[] data) {
         if (data == null) throw new NullPointerException("data == null");
-        return sendFrame(OP_BINARY, data);
+        return sendMessage(OP_BINARY, data);
     }
 
     public boolean sendPing(byte[] payload) {
-        return sendFrame(OP_PING, payload != null ? payload : new byte[0]);
+        return sendFrame(OP_PING, payload != null ? payload : EMPTY_PAYLOAD);
     }
 
-    private boolean sendFrame(int opcode, byte[] payload) {
+    private boolean sendMessage(int opcode, byte[] payload) {
         if (!open) return false;
         try {
-            writeFrame(opcode, payload);
+            if (maxOutgoingFrameSize > 0 && payload.length > maxOutgoingFrameSize) {
+                writeFragmented(opcode, payload);
+            } else {
+                writeFrame(opcode, payload, true);
+            }
             return true;
         } catch (IOException e) {
             listener.onFailure(this, e);
@@ -292,12 +550,39 @@ public class WebSocket {
         }
     }
 
-    /** Escribe un frame único (sin fragmentar), siempre enmascarado — obligatorio para frames cliente->servidor. */
-    private void writeFrame(int opcode, byte[] payload) throws IOException {
+    private boolean sendFrame(int opcode, byte[] payload) {
+        if (!open) return false;
+        try {
+            writeFrame(opcode, payload, true);
+            return true;
+        } catch (IOException e) {
+            listener.onFailure(this, e);
+            return false;
+        }
+    }
+
+    /** Divide un mensaje grande en frames de a lo sumo {@link #maxOutgoingFrameSize} bytes. */
+    private void writeFragmented(int opcode, byte[] payload) throws IOException {
+        int offset = 0;
+        boolean first = true;
+        while (offset < payload.length) {
+            final int chunkLen = Math.min(maxOutgoingFrameSize, payload.length - offset);
+            final byte[] chunk = new byte[chunkLen];
+            System.arraycopy(payload, offset, chunk, 0, chunkLen);
+            offset += chunkLen;
+
+            final boolean fin = offset >= payload.length;
+            writeFrame(first ? opcode : OP_CONTINUATION, chunk, fin);
+            first = false;
+        }
+    }
+
+    /** Escribe un frame, siempre enmascarado — obligatorio para frames cliente->servidor. */
+    private void writeFrame(int opcode, byte[] payload, boolean fin) throws IOException {
         synchronized (writeLock) {
             final int length = payload.length;
 
-            out.write(0x80 | opcode); // FIN=1
+            out.write((fin ? 0x80 : 0x00) | opcode);
 
             if (length <= 125) {
                 out.write(0x80 | length);
@@ -326,8 +611,50 @@ public class WebSocket {
     }
 
     // ------------------------------------------------------------------
+    // Keepalive (ping/pong automático)
+    // ------------------------------------------------------------------
+
+    private void pingLoop() {
+        try {
+            while (true) {
+                Thread.sleep(pingIntervalMs);
+                if (!open) return;
+
+                pongPending = true;
+                writeFrame(OP_PING, EMPTY_PAYLOAD, true);
+
+                Thread.sleep(pingTimeoutMs);
+                if (open && pongPending) {
+                    throw new IOException("Ping timeout: no pong received within " + pingTimeoutMs + " ms");
+                }
+            }
+        } catch (InterruptedException expected) {
+            // cancel()/close() interrumpe este hilo intencionalmente al cerrar
+        } catch (IOException e) {
+            if (open) {
+                open = false;
+                closeSocketQuietly();
+                listener.onFailure(this, e);
+            }
+        }
+    }
+
+    private void interruptPingThread() {
+        if (pingThread != null) pingThread.interrupt();
+    }
+
+    // ------------------------------------------------------------------
     // Cierre
     // ------------------------------------------------------------------
+
+    private static byte[] buildClosePayload(int code, String reason) {
+        final byte[] reasonBytes = reason != null ? reason.getBytes(UTF8) : EMPTY_PAYLOAD;
+        final byte[] payload = new byte[2 + reasonBytes.length];
+        payload[0] = (byte) ((code >>> 8) & 0xFF);
+        payload[1] = (byte) (code & 0xFF);
+        System.arraycopy(reasonBytes, 0, payload, 2, reasonBytes.length);
+        return payload;
+    }
 
     /**
      * Inicia el cierre "limpio": manda el frame de cierre y espera a que el
@@ -338,14 +665,8 @@ public class WebSocket {
     public synchronized boolean close(int code, String reason) {
         if (!open || closeSent) return false;
         try {
-            final byte[] reasonBytes = reason != null ? reason.getBytes(UTF8) : new byte[0];
-            final byte[] payload = new byte[2 + reasonBytes.length];
-            payload[0] = (byte) ((code >>> 8) & 0xFF);
-            payload[1] = (byte) (code & 0xFF);
-            System.arraycopy(reasonBytes, 0, payload, 2, reasonBytes.length);
-
             closeSent = true;
-            writeFrame(OP_CLOSE, payload);
+            writeFrame(OP_CLOSE, buildClosePayload(code, reason), true);
             return true;
         } catch (IOException e) {
             listener.onFailure(this, e);
@@ -360,6 +681,7 @@ public class WebSocket {
     /** Corta el socket de inmediato, sin esperar el handshake de cierre. No dispara {@code onClosed} ni {@code onFailure}. */
     public void cancel() {
         open = false;
+        interruptPingThread();
         closeSocketQuietly();
     }
 
@@ -380,10 +702,11 @@ public class WebSocket {
                 RawFrame frame = readFrame();
                 switch (frame.opcode) {
                     case OP_PING:
-                        writeFrame(OP_PONG, frame.payload);
+                        writeFrame(OP_PONG, frame.payload, true);
                         break;
 
                     case OP_PONG:
+                        pongPending = false;
                         break;
 
                     case OP_CLOSE:
@@ -422,17 +745,41 @@ public class WebSocket {
         } catch (IOException e) {
             if (open) {
                 open = false;
+                interruptPingThread();
                 closeSocketQuietly();
                 listener.onFailure(this, e);
             }
         }
     }
 
-    private void dispatchMessage(int opcode, byte[] payload) {
+    private void dispatchMessage(int opcode, byte[] payload) throws IOException {
         if (opcode == OP_TEXT) {
-            listener.onMessage(this, new String(payload, UTF8));
+            final String text;
+            try {
+                text = decodeStrictUtf8(payload);
+            } catch (CharacterCodingException e) {
+                sendCloseFrameQuietly(INVALID_PAYLOAD_DATA, "Invalid UTF-8 payload");
+                throw new IOException("Invalid UTF-8 payload received from server", e);
+            }
+            listener.onMessage(this, text);
         } else {
             listener.onMessage(this, payload);
+        }
+    }
+
+    private static String decodeStrictUtf8(byte[] bytes) throws CharacterCodingException {
+        final CharsetDecoder decoder = UTF8.newDecoder()
+                .onMalformedInput(CodingErrorAction.REPORT)
+                .onUnmappableCharacter(CodingErrorAction.REPORT);
+        return decoder.decode(ByteBuffer.wrap(bytes)).toString();
+    }
+
+    private void sendCloseFrameQuietly(int code, String reason) {
+        if (closeSent) return;
+        try {
+            closeSent = true;
+            writeFrame(OP_CLOSE, buildClosePayload(code, reason), true);
+        } catch (IOException ignored) {
         }
     }
 
@@ -449,13 +796,14 @@ public class WebSocket {
         if (!closeSent) {
             try {
                 closeSent = true;
-                writeFrame(OP_CLOSE, frame.payload);
+                writeFrame(OP_CLOSE, frame.payload, true);
             } catch (IOException ignored) {
                 // el socket se cierra de inmediato de todas formas
             }
         }
 
         open = false;
+        interruptPingThread();
         closeSocketQuietly();
         listener.onClosed(this, code, reason);
     }
