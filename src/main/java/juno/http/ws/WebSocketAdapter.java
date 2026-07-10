@@ -1,7 +1,5 @@
 package juno.http.ws;
 
-import juno.http.Headers;
-
 /**
  * Implementación vacía de {@link WebSocketListener} para sobreescribir solo los
  * métodos que interesan, igual que {@code juno.concurrent.CallbackAdapter}.
@@ -9,7 +7,7 @@ import juno.http.Headers;
 public abstract class WebSocketAdapter implements WebSocketListener {
 
     @Override
-    public void onOpen(WebSocket ws, Headers responseHeaders) {
+    public void onOpen(WebSocket ws, ServerHandshake handshake) {
     }
 
     @Override

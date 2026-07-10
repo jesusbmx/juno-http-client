@@ -1,7 +1,5 @@
 package juno.http.ws;
 
-import juno.http.Headers;
-
 /**
  * Callbacks del ciclo de vida de un {@link WebSocket}, equivalentes a los del
  * WebSocket nativo del navegador/React Native ({@code onopen}/{@code onmessage}/
@@ -13,7 +11,7 @@ import juno.http.Headers;
 public interface WebSocketListener {
 
     /** El handshake HTTP de actualización a WebSocket se completó correctamente. */
-    void onOpen(WebSocket ws, Headers responseHeaders);
+    void onOpen(WebSocket ws, ServerHandshake handshake);
 
     /** Llega un mensaje de texto (frame o secuencia de frames fragmentados ya reensamblados). */
     void onMessage(WebSocket ws, String text);

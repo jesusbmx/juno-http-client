@@ -42,8 +42,8 @@ import juno.util.Base64;
  * <pre>{@code
  * WebSocket ws = new WebSocket("wss://example.com/chat?token=" + token,
  *     new WebSocketAdapter() {
- *       @Override public void onOpen(WebSocket ws, Headers headers) {
- *         System.out.println("connected");
+ *       @Override public void onOpen(WebSocket ws, ServerHandshake handshake) {
+ *         System.out.println("connected: " + handshake.getHttpStatus() + " " + handshake.getHttpStatusMessage());
  *       }
  *       @Override public void onMessage(WebSocket ws, String text) {
  *         System.out.println("message: " + text);
@@ -329,14 +329,14 @@ public class WebSocket {
 
             final String key = generateWebSocketKey();
             writeHandshakeRequest(host, port, key);
-            final Headers responseHeaders = readHandshakeResponse(key);
-            acceptedProtocol = responseHeaders.getValue("Sec-WebSocket-Protocol");
+            final ServerHandshake handshake = readHandshakeResponse(key);
+            acceptedProtocol = handshake.getValue("Sec-WebSocket-Protocol");
 
             open = true;
             startReaderThread();
             startPingThreadIfNeeded();
 
-            listener.onOpen(this, responseHeaders);
+            listener.onOpen(this, handshake);
 
         } catch (IOException e) {
             try {
@@ -464,7 +464,7 @@ public class WebSocket {
         out.flush();
     }
 
-    private Headers readHandshakeResponse(String key) throws IOException {
+    private ServerHandshake readHandshakeResponse(String key) throws IOException {
         final String statusLine = readLine(in);
         if (statusLine == null) {
             throw new IOException("Server closed the connection during handshake");
@@ -477,6 +477,7 @@ public class WebSocket {
         } catch (NumberFormatException e) {
             throw new IOException("Malformed handshake status line: " + statusLine);
         }
+        final String statusMessage = parts.length > 2 ? parts[2] : "";
 
         final Headers headers = new Headers();
         String line;
@@ -501,7 +502,7 @@ public class WebSocket {
             throw new IOException("Invalid Sec-WebSocket-Accept header: " + accept);
         }
 
-        return headers;
+        return new ServerHandshake(statusCode, statusMessage, headers);
     }
 
     /** Lee una línea CRLF cruda (handshake o túnel de proxy) sin tocar el framing binario posterior. */

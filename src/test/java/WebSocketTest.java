@@ -2,7 +2,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import juno.http.Headers;
+import juno.http.ws.ServerHandshake;
 import juno.http.ws.WebSocket;
 import juno.http.ws.WebSocketAdapter;
 import juno.util.Dates;
@@ -60,8 +60,8 @@ public class WebSocketTest {
     private void connect() {
         ws = new WebSocket("wss://ws.postman-echo.com/raw", new WebSocketAdapter() {
             @Override
-            public void onOpen(WebSocket ws, Headers headers) {
-                System.out.println("[open] conectado");
+            public void onOpen(WebSocket ws, ServerHandshake handshake) {
+                System.out.println("[open] conectado: status:" + handshake.getHttpStatus() + " statusMessage:" + handshake.getHttpStatusMessage());
             }
 
             @Override

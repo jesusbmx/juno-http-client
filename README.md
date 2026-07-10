@@ -577,7 +577,9 @@ Sec-WebSocket-Version: 13
 ```java
 WebSocket ws = new WebSocket("wss://ws.postman-echo.com/raw", new WebSocketAdapter() {
     @Override
-    public void onOpen(WebSocket ws, Headers responseHeaders) {
+    public void onOpen(WebSocket ws, ServerHandshake handshake) {
+        // handshake extends Headers -- getValue/size/etc. still work, plus:
+        System.out.println(handshake.getHttpStatus() + " " + handshake.getHttpStatusMessage());
         ws.send("hola desde juno-http-client");
     }
 
