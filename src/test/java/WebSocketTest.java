@@ -24,7 +24,7 @@ public class WebSocketTest {
     private static final ScheduledExecutorService scheduler =
             Executors.newSingleThreadScheduledExecutor();
     
-    private static final long RECONNECT_DELAY_MS = 5_000;
+    private static final long RECONNECT_DELAY_MS = 8_000;
 
     private volatile WebSocket ws;
     private volatile boolean mounted;
