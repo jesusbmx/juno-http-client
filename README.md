@@ -7,7 +7,7 @@ To include Juno in your project using Gradle, add the following dependency:
 ```
 dependencies {
   implementation 'com.github.jesusbmx:juno:1.0.5'
-  implementation 'com.github.jesusbmx:juno-http-client:1.5.1'
+  implementation 'com.github.jesusbmx:juno-http-client:1.5.2'
 }
 ```
 
@@ -15,7 +15,7 @@ Alternatively, you can download the JAR file directly from [JitPack](https://jit
 
 Download [juno.jar](https://jitpack.io/com/github/jesusbmx/juno/1.0.5/juno-1.0.5.jar)
 
-Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.5.1/juno-http-client-1.5.1.jar)
+Download [juno-http-client.jar](https://jitpack.io/com/github/jesusbmx/juno-http-client/1.5.2/juno-http-client-1.5.2.jar)
 
 
 ## [Samples](src/test/java/Samples.java)
@@ -241,51 +241,6 @@ try {
     e.printStackTrace();
 }
 ```
-
-## [WebSocket](src/test/java/WebSocketTest.java)
-
-Native RFC 6455 WebSocket client, no external dependencies — same criteria as
-`URLConnectionTransport` for HTTP. It mirrors the browser/React Native
-`WebSocket` event model (`onopen`/`onmessage`/`onclose`/`onerror`).
-
-```
-GET wss://ws.postman-echo.com/raw HTTP/1.1
-Upgrade: websocket
-Connection: Upgrade
-Sec-WebSocket-Key: ...
-Sec-WebSocket-Version: 13
-```
-
-```java
-WebSocket ws = new WebSocket("wss://ws.postman-echo.com/raw", new WebSocketAdapter() {
-    @Override
-    public void onOpen(WebSocket ws, Headers responseHeaders) {
-        ws.send("hola desde juno-http-client");
-    }
-
-    @Override
-    public void onMessage(WebSocket ws, String text) {
-        System.out.println("[message] " + text);
-        ws.close(WebSocket.NORMAL_CLOSURE, "listo");
-    }
-
-    @Override
-    public void onClosed(WebSocket ws, int code, String reason) {
-        System.out.println("[closed] " + code + " " + reason);
-    }
-
-    @Override
-    public void onFailure(WebSocket ws, Exception e) {
-        e.printStackTrace();
-    }
-});
-ws.connect();
-```
-
-`send`/`close`/`cancel` can be called from any thread once connected;
-callbacks always run on the socket's internal reader thread. Reconnection
-(like the classic `onclose` + `setTimeout` pattern) is left to the caller —
-just call `connect()` again on a new `WebSocket` instance from `onFailure`/`onClosed`.
 
 ## [JSON](https://github.com/stleary/JSON-java)
 (https://www.json.org/json-en.html)
@@ -604,6 +559,51 @@ task.async((HttpResult<Post[]> result) -> {
   e.printStackTrace(System.out);
 });
 ```
+
+## [WebSocket](src/test/java/WebSocketTest.java)
+
+Native RFC 6455 WebSocket client, no external dependencies — same criteria as
+`URLConnectionTransport` for HTTP. It mirrors the browser/React Native
+`WebSocket` event model (`onopen`/`onmessage`/`onclose`/`onerror`).
+
+```
+GET wss://ws.postman-echo.com/raw HTTP/1.1
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: ...
+Sec-WebSocket-Version: 13
+```
+
+```java
+WebSocket ws = new WebSocket("wss://ws.postman-echo.com/raw", new WebSocketAdapter() {
+    @Override
+    public void onOpen(WebSocket ws, Headers responseHeaders) {
+        ws.send("hola desde juno-http-client");
+    }
+
+    @Override
+    public void onMessage(WebSocket ws, String text) {
+        System.out.println("[message] " + text);
+        ws.close(WebSocket.NORMAL_CLOSURE, "listo");
+    }
+
+    @Override
+    public void onClosed(WebSocket ws, int code, String reason) {
+        System.out.println("[closed] " + code + " " + reason);
+    }
+
+    @Override
+    public void onFailure(WebSocket ws, Exception e) {
+        e.printStackTrace();
+    }
+});
+ws.connect();
+```
+
+`send`/`close`/`cancel` can be called from any thread once connected;
+callbacks always run on the socket's internal reader thread. Reconnection
+(like the classic `onclose` + `setTimeout` pattern) is left to the caller —
+just call `connect()` again on a new `WebSocket` instance from `onFailure`/`onClosed`.
 
 License
 =======
