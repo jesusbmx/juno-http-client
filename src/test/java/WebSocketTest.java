@@ -33,11 +33,6 @@ public class WebSocketTest {
             }
 
             @Override
-            public void onClosing(WebSocket ws, int code, String reason) {
-                System.out.println("[closing] code:" + code + " reason:" + reason);
-            }
-
-            @Override
             public void onClosed(WebSocket ws, int code, String reason) {
                 System.out.println("[closed] code:" + code + " reason:" + reason);
                 done.countDown();
