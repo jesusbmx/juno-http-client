@@ -185,7 +185,24 @@ public class MultipartBody extends RequestBody {
   public List<Part> parts() {
     return parts;
   }
-  
+
+  /**
+   * Representa las partes como "nombre=valor", omitiendo las que sean
+   * binarias (archivos, octet-stream, etc.).
+   */
+  @Override public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("MultipartBody[");
+    boolean first = true;
+    for (Part part : parts) {
+      if (!first) sb.append(", ");
+      sb.append(part);
+      first = false;
+    }
+    sb.append(']');
+    return sb.toString();
+  }
+
   public static class Part {
 
     final RequestBody body;
@@ -203,7 +220,37 @@ public class MultipartBody extends RequestBody {
     public RequestBody body() {
       return body;
     }
-    
+
+    public String name() {
+      return headers.getNameFromContentDisposition();
+    }
+
+    /** true si el contenido no es texto (archivo, binario, etc.). */
+    public boolean isBinary() {
+      final String contentType = body.contentType();
+      return contentType == null
+              || !contentType.toLowerCase(java.util.Locale.ROOT).startsWith("text/");
+    }
+
+    /** Lee el contenido del body como String, usando el charset del Content-Type. */
+    public String valueAsString() {
+      try {
+        final ByteArrayOutputStream baos = IOUtils.arrayOutputStream();
+        body.writeTo(baos);
+        final Charset charset = Headers.getCharsetFromContentType(
+                body.contentType(), RequestBody.DEFAULT_ENCODING);
+        return new String(baos.toByteArray(), charset);
+      } catch (IOException e) {
+        return "";
+      }
+    }
+
+    @Override public String toString() {
+      return isBinary()
+              ? name() + "=<binary>"
+              : name() + "=" + valueAsString();
+    }
+
     public static Part createFormData(String name, RequestBody body) {
       final Headers headers = Headers.of(
               Headers.CONTENT_DISPOSITION, String.format("form-data; name=\"%s\"", name),

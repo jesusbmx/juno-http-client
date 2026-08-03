@@ -114,9 +114,17 @@ public class Headers {
   }
   
   public String getFileNameFromContentDisposition() {
-    final String contentDisposition = getContentDisposition(); 
+    final String contentDisposition = getContentDisposition();
     if (contentDisposition != null) {
       return Strings.subStr(contentDisposition, "filename=\"", "\"");
+    }
+    return null;
+  }
+
+  public String getNameFromContentDisposition() {
+    final String contentDisposition = getContentDisposition();
+    if (contentDisposition != null) {
+      return Strings.subStr(contentDisposition, "name=\"", "\"");
     }
     return null;
   }

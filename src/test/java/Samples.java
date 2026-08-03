@@ -14,7 +14,7 @@ public class Samples {
 
     HttpClient client = HttpClient.getInstance()
             .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36")
-            //.setDebug(true)
+            .setDebug(true)
     ;
 
     /*
@@ -89,15 +89,15 @@ public class Samples {
     }
 
     /*
-    GET https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar HTTP/1.1
+    GET https://jitpack.io/com/github/jesusbmx/juno-http-client/1.5.4/juno-http-client-1.5.4.jar HTTP/1.1
     */
     HttpResult<File> download() throws Exception {
         HttpRequest request = HttpRequest.get(
-                "https://github.com/jesusbmx/java-http-client/raw/master/dist/juno-http-client.jar")
+                "https://jitpack.io/com/github/jesusbmx/juno-http-client/1.5.4/juno-http-client-1.5.4.jar")
                 .setTimeoutMs(20000);
 
         FileResponseBodyConverter convert = new FileResponseBodyConverter()
-                .setDir(System.getProperty("user.home") + "\\Downloads\\") //.setName("httpclient.jar")
+               // .setDir(System.getProperty("user.home") + "\\Downloads\\") //.setName("httpclient.jar")
         ;
         return client.execute(request, convert);
         //return client.execute(request, File.class);
@@ -125,11 +125,11 @@ public class Samples {
         Samples samples = new Samples();
         System.out.println(samples.get().data);
         System.out.println(samples.post(7, "bar", true).data);
-//
-//        File f = samples.download().data;
-//        System.out.println(f);
-//        System.out.println(samples.upload(f));
-//
+
+        File f = samples.download().data;
+        System.out.println(f);
+        System.out.println(samples.upload(f).data);
+
         System.out.println(samples.request().data);
         System.out.println(samples.getIpLocation().readString());
     }

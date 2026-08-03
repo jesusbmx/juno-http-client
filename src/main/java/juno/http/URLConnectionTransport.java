@@ -1,7 +1,6 @@
 package juno.http;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,48 +86,28 @@ public class URLConnectionTransport implements HttpTransport {
      * @param conn HTTP
      * @param request peticion
      *
-     * @return el body en texto si es de un content-type legible (para debug), si no {@code null}
-     *
      * @throws IOException
      */
-    public String writeBody(HttpURLConnection conn, HttpRequest request)
+    public void writeBody(HttpURLConnection conn, HttpRequest request)
             throws IOException {
         final RequestBody requestBody = request.getBody();
 
         if (!request.requiresRequestBody() || requestBody == null) {
-            return null;
+            return;
         }
-
-        final String contentType = requestBody.contentType();
 
         // Setup connection:
         conn.setDoOutput(true);
-        conn.addRequestProperty(Headers.CONTENT_TYPE, contentType);
+        conn.addRequestProperty(Headers.CONTENT_TYPE, requestBody.contentType());
 
         // Length:
         final long contentLength = requestBody.contentLength();
         setFixedLengthStreamingMode(conn, contentLength);
 
-        // Loguea el body como texto solo si es legible y no viene de un multipart (archivos).
-        final boolean captureForDebug = Debug.isDebug()
-                && Debug.isReadableContentType(contentType)
-                && !(requestBody instanceof MultipartBody);
-
         BufferedOutputStream bos = null;
         try {
             bos = new BufferedOutputStream(conn.getOutputStream());
-
-            if (captureForDebug) {
-                final ByteArrayOutputStream captured = IOUtils.arrayOutputStream();
-                requestBody.writeTo(captured);
-                final byte[] bytes = captured.toByteArray();
-                bos.write(bytes);
-                return new String(bytes, request.getUrl().getCharset());
-            }
-
             requestBody.writeTo(bos);
-            return null;
-
         } finally {
             IOUtils.closeQuietly(bos);
         }
@@ -216,9 +195,9 @@ public class URLConnectionTransport implements HttpTransport {
         try {
             conn = open(request);
             writeHeaders(conn, request);
-            String reqBody = writeBody(conn, request);
+            writeBody(conn, request);
             HttpResponse response = getResponse(conn, request);
-            Debug.log(request, response, reqBody, System.currentTimeMillis() - startedAt);
+            Debug.log(request, response, System.currentTimeMillis() - startedAt);
             return response;
 
         } catch (UnknownHostException e) {

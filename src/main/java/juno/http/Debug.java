@@ -1,5 +1,7 @@
 package juno.http;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +15,7 @@ public final class Debug {
         "application/json",
         "application/xml",
         "application/x-www-form-urlencoded",
-        //"multipart/form-data",
+        "multipart/form-data",
         "text/plain",
         "text/html"
     ));
@@ -45,9 +47,9 @@ public final class Debug {
     /**
      * Registra una línea por petición, una vez que ya se tiene la respuesta:
      * {@code [timestamp] INFO: METHOD url status elapsed ms - size}
-     * y, si hubo body de request legible, una segunda línea con {@code reqBody}.
+     * y, si el body de la request es legible, una segunda línea con {@code reqBody}.
      */
-    public static void log(HttpRequest request, HttpResponse response, String reqBody, long elapsedMs) {
+    public static void log(HttpRequest request, HttpResponse response, long elapsedMs) {
         if (!isDebug) {
             return;
         }
@@ -63,11 +65,41 @@ public final class Debug {
                 .append(" - ").append(size >= 0 ? String.valueOf(size) : "-")
                 .append('\n');
 
+        final String reqBody = describeBody(request.getBody());
         if (reqBody != null && !reqBody.isEmpty()) {
             line.append("    reqBody: ").append(reqBody).append('\n');
         }
 
         System.out.print(line);
+    }
+
+    /**
+     * Describe el body de una request como texto para debug: {@code null} si
+     * no hay body o su content-type no es legible. Un {@link MultipartBody}
+     * siempre se describe (su propio {@code toString()} omite las partes binarias).
+     */
+    public static String describeBody(RequestBody body) {
+        if (body == null) {
+            return null;
+        }
+        if (body instanceof MultipartBody) {
+            return body.toString();
+        }
+
+        final String contentType = body.contentType();
+        if (contentType == null || !isReadableContentType(contentType)) {
+            return null;
+        }
+
+        try {
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            body.writeTo(baos);
+            final Charset charset = Headers.getCharsetFromContentType(
+                    contentType, RequestBody.DEFAULT_ENCODING);
+            return new String(baos.toByteArray(), charset);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static boolean isReadableContentType(String contentType) {
