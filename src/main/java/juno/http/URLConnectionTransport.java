@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import juno.io.IOUtils;
@@ -205,6 +206,15 @@ public class URLConnectionTransport implements HttpTransport {
                 conn.disconnect();
             }
             throw new UnknownHostException("Network error: Unable to resolve host for URL: " + e.getMessage() + ". Please check your internet connection.");
+
+        } catch (SocketTimeoutException e) {
+            if (conn != null) {
+                conn.disconnect();
+            }
+            final SocketTimeoutException timeoutEx = new SocketTimeoutException(
+                    "The server took too long to respond. Please check your internet connection and try again.");
+            timeoutEx.initCause(e);
+            throw timeoutEx;
 
         } catch (IOException e) {
             if (conn != null) {

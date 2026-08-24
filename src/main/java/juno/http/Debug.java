@@ -46,7 +46,7 @@ public final class Debug {
 
     /**
      * Registra una línea por petición, una vez que ya se tiene la respuesta:
-     * {@code [timestamp] INFO: METHOD url status elapsed ms - size}
+     * {@code [I] [HH:mm:ss.SSS]  [METHOD] url status elapsedms - size}
      * y, si el body de la request es legible, una segunda línea con {@code reqBody}.
      */
     public static void log(HttpRequest request, HttpResponse response, long elapsedMs) {
@@ -56,12 +56,11 @@ public final class Debug {
 
         final long size = response.getContentLength();
         final StringBuilder line = new StringBuilder()
-                .append('[').append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date())).append(']')
-                .append(" INFO: ")
-                .append(request.getMethod()).append(' ')
+                .append("[I] [").append(new SimpleDateFormat("HH:mm:ss.SSS").format(new Date())).append(']')
+                .append("  [").append(request.getMethod()).append("] ")
                 .append(request.urlAndParams())
                 .append(' ').append(response.code)
-                .append(' ').append(elapsedMs).append(" ms")
+                .append(' ').append(elapsedMs).append("ms")
                 .append(" - ").append(size >= 0 ? String.valueOf(size) : "-")
                 .append('\n');
 
