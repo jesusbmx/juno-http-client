@@ -212,7 +212,7 @@ public class URLConnectionTransport implements HttpTransport {
                 conn.disconnect();
             }
             final SocketTimeoutException timeoutEx = new SocketTimeoutException(
-                    "The server took too long to respond. Please check your internet connection and try again.");
+                    "The server took too long to respond.");
             timeoutEx.initCause(e);
             throw timeoutEx;
 
